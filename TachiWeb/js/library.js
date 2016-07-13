@@ -1,3 +1,4 @@
+//TODO We have literally no error handling, maybe a snackbar or something when an error occurs?
 var coverRoot = apiRoot + "/cover";
 var libraryRoot = apiRoot + "/library";
 var libraryGrid;
