@@ -1,29 +1,35 @@
-.layout-waterfall .mdl-layout__header-row .mdl-navigation__link:last-of-type  {
-  padding-right: 0;
+.layout-waterfall .mdl-layout__header-row .mdl-navigation__link:last-of-type {
+    padding-right: 0;
 }
+
 /** App bar **/
 .app-bar-btn {
     margin-top: 10px;
-  margin-bottom: 15px;
-  margin-right: 10px;
+    margin-bottom: 15px;
+    margin-right: 10px;
 }
+
 /** Search bar is a button too! **/
 .search-bar {
-  margin-right: 5px;
+    margin-right: 5px;
 }
+
 /** Fix checkboxes being crazy wide **/
 .mdl-checkbox {
-  max-width: 20px;
+    max-width: 20px;
 }
+
 /** Cards **/
 .manga_card {
-  color: white;
+    color: white;
 }
+
 .manga_card_img {
-  width: 100%;
+    width: 100%;
 }
+
 .manga_card_label {
-  width: 100%;
-  background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0));
-  padding: 8px;
+    width: 100%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0));
+    padding: 8px;
 }
