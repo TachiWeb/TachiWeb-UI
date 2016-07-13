@@ -22,6 +22,7 @@
 /** Cards **/
 .manga_card {
     color: white;
+    position: relative;
 }
 
 .manga_card_img {
@@ -29,7 +30,9 @@
 }
 
 .manga_card_label {
+    position: absolute;
     width: 100%;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0));
     padding: 8px;
+    bottom: 0;
 }
