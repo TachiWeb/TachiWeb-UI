@@ -23,6 +23,11 @@
 .manga_card {
     color: white;
     position: relative;
+    padding: 0;
+    text-transform: none;
+    text-align: left;
+    line-height: 20px;
+    height: auto;
 }
 
 .manga_card_img {

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <!-- JQuery -->
+    <script src="js/jquery-3.0.0.min.js"></script>
     <!-- Material Lite -->
     <link href="css/material.min.css" rel="stylesheet">
     <script src="js/material.min.js"></script>
@@ -9,6 +11,7 @@
     <!-- Core -->
     <link href="css/core.css" rel="stylesheet">
     <script src="js/core.js"></script>
+    <script src="js/library.js"></script>
 </head>
 <body>
 <!-- Uses a header that contracts as the page scrolls down. -->
@@ -83,13 +86,8 @@
     </ul>
     <main class="mdl-layout__content">
         <div class="page-content">
+            <!-- TODO Unread Manga counts -->
             <div id="manga_grid" class="mdl-grid">
-                <div class="mdl-card mdl-shadow--4dp manga_card mdl-cell mdl-cell--2-col">
-                    <img class="manga_card_img" src="thumb_cover.jpg"/>
-                    <div class="manga_card_label">
-                        Naruto Gaiden
-                    </div>
-                </div>
             </div>
         </div>
     </main>
