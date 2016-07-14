@@ -1,16 +1,34 @@
 //TODO We have literally no error handling, maybe a snackbar or something when an error occurs?
 var coverRoot = apiRoot + "/cover";
 var libraryRoot = apiRoot + "/library";
+var librarySpinner;
 var libraryGrid;
 
 function updateLibrary() {
+	showSpinner();
     var xhr = new XMLHttpRequest();
     xhr.open("GET", libraryRoot, true);
     xhr.onload = function () {
-        var parsed = JSON.parse(xhr.responseText);
-        updateLibraryUI(parsed)
+		try {
+        	var parsed = JSON.parse(xhr.responseText);
+        	updateLibraryUI(parsed);
+		} catch(e) {
+			libraryUpdateError();
+		}
+		hideSpinner();
     };
+	xhr.onerror = function() {
+		libraryUpdateError();
+		hideSpinner();
+	};
     xhr.send();
+}
+
+function showSpinner() {
+	librarySpinner.css("opacity", 1);
+}
+function hideSpinner() {
+	librarySpinner.css("opacity", 0);
 }
 
 function buildCoverUrl(mangaId) {
@@ -33,10 +51,22 @@ function updateLibraryUI(mangas) {
         label.textContent = manga.title;
         card.appendChild(label);
         libraryGrid[0].appendChild(card);
+		//Make sure MDL gets these changes
         componentHandler.upgradeElement(card);
     }
 }
-window.onload = function() {
+function libraryUpdateError() {
+	snackbar.showSnackbar({
+		message: "Error getting library!",
+		timeout: 2000,
+		actionText: "Retry",
+		actionHandler: function() {
+			updateLibrary();
+		}
+	});
+}
+function onLoad() {
     libraryGrid = $("#manga_grid");
+	librarySpinner = $(".loading_spinner");
     updateLibrary();
-};
+}
