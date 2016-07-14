@@ -2,6 +2,7 @@ var coverRoot = apiRoot + "/cover";
 var libraryRoot = apiRoot + "/library";
 var librarySpinner;
 var libraryWrapper;
+var libraryTabsParent;
 var libraryTabs;
 
 function updateLibrary() {
@@ -38,11 +39,15 @@ function buildCoverUrl(mangaId) {
 }
 
 function showTabs() {
-
+    if(!libraryTabsParent[0].contains(libraryTabs[0])) {
+        libraryTabsParent[0].appendChild(libraryTabs[0]);
+    }
 }
 
 function hideTabs() {
-
+    if(libraryTabsParent[0].contains(libraryTabs[0])) {
+        libraryTabsParent[0].removeChild(libraryTabs[0]);
+    }
 }
 
 function updateLibraryUI(mangas) {
@@ -145,5 +150,6 @@ function onLoad() {
     librarySpinner = $(".loading_spinner");
     libraryWrapper = $("#library_wrapper");
     libraryTabs = $("#library_tabs");
+    libraryTabsParent = libraryTabs.parent();
     updateLibrary();
 }
