@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <!-- JQuery -->
     <script src="js/jquery-3.0.0.min.js"></script>
@@ -13,95 +14,93 @@
     <script src="js/core.js"></script>
     <script src="js/library.js"></script>
 </head>
+
 <body>
-<!-- Uses a header that contracts as the page scrolls down. -->
-<div class="layout-waterfall mdl-layout mdl-js-layout">
-    <header class="mdl-layout__header mdl-layout__header--waterfall">
-        <!-- Top row, always visible -->
-        <div class="mdl-layout__header-row">
-            <!-- Title -->
-            <span class="mdl-layout-title">My Library</span>
-            <div class="mdl-layout-spacer"></div>
-            <button id="filter_btn" class="app-bar-btn mdl-button mdl-js-button mdl-button--icon">
+    <!-- Uses a header that contracts as the page scrolls down. -->
+    <div class="layout-waterfall mdl-layout mdl-js-layout">
+        <header class="mdl-layout__header mdl-layout__header--waterfall">
+            <!-- Top row, always visible -->
+            <div class="mdl-layout__header-row">
+                <!-- Title -->
+                <span class="mdl-layout-title">My Library</span>
+                <div class="mdl-layout-spacer"></div>
+                <button id="filter_btn" class="app-bar-btn mdl-button mdl-js-button mdl-button--icon">
                 <i class="material-icons">filter_list</i>
             </button>
-            <div class="search-bar mdl-textfield mdl-js-textfield mdl-textfield--expandable
+                <div class="search-bar mdl-textfield mdl-js-textfield mdl-textfield--expandable
 			mdl-textfield--floating-label mdl-textfield--align-right">
-                <label class="mdl-button mdl-js-button mdl-button--icon"
-                       for="waterfall-exp">
+                    <label class="mdl-button mdl-js-button mdl-button--icon" for="waterfall-exp">
                     <i class="material-icons">search</i>
                 </label>
-                <div class="mdl-textfield__expandable-holder">
-                    <input class="mdl-textfield__input" type="text" name="sample"
-                           id="waterfall-exp">
+                    <div class="mdl-textfield__expandable-holder">
+                        <input class="mdl-textfield__input" type="text" name="sample" id="waterfall-exp">
+                    </div>
                 </div>
-            </div>
-            <button id="refresh_btn" class="app-bar-btn mdl-button mdl-js-button mdl-button--icon">
+                <button id="refresh_btn" class="app-bar-btn mdl-button mdl-js-button mdl-button--icon">
                 <i class="material-icons">refresh</i>
             </button>
-            <button id="more_btn" class="app-bar-btn mdl-button mdl-js-button mdl-button--icon">
+                <button id="more_btn" class="app-bar-btn mdl-button mdl-js-button mdl-button--icon">
                 <i class="material-icons">more_vert</i>
             </button>
+            </div>
+            <!-- Bottom row, not visible on scroll -->
+            <!-- TODO Get these categories going -->
+            <div id="library_tabs" class="mdl-layout__tab-bar mdl-js-ripple-effect">
+                <a href="#scroll-tab-1" class="mdl-layout__tab is-active">Tab 1</a>
+                <a href="#scroll-tab-2" class="mdl-layout__tab">Tab 2</a>
+                <a href="#scroll-tab-3" class="mdl-layout__tab">Tab 3</a>
+                <a href="#scroll-tab-4" class="mdl-layout__tab">Tab 4</a>
+                <a href="#scroll-tab-5" class="mdl-layout__tab">Tab 5</a>
+                <a href="#scroll-tab-6" class="mdl-layout__tab">Tab 6</a>
+            </div>
+        </header>
+        <div class="mdl-layout__drawer">
+            <span class="mdl-layout-title">Title</span>
+            <nav class="mdl-navigation">
+                <a class="mdl-navigation__link" href="">Link</a>
+                <a class="mdl-navigation__link" href="">Link</a>
+                <a class="mdl-navigation__link" href="">Link</a>
+                <a class="mdl-navigation__link" href="">Link</a>
+            </nav>
         </div>
-        <!-- Bottom row, not visible on scroll -->
-        <!-- TODO Get these categories going -->
-        <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
-            <a href="#scroll-tab-1" class="mdl-layout__tab is-active">Tab 1</a>
-            <a href="#scroll-tab-2" class="mdl-layout__tab">Tab 2</a>
-            <a href="#scroll-tab-3" class="mdl-layout__tab">Tab 3</a>
-            <a href="#scroll-tab-4" class="mdl-layout__tab">Tab 4</a>
-            <a href="#scroll-tab-5" class="mdl-layout__tab">Tab 5</a>
-            <a href="#scroll-tab-6" class="mdl-layout__tab">Tab 6</a>
-        </div>
-    </header>
-    <div class="mdl-layout__drawer">
-        <span class="mdl-layout-title">Title</span>
-        <nav class="mdl-navigation">
-            <a class="mdl-navigation__link" href="">Link</a>
-            <a class="mdl-navigation__link" href="">Link</a>
-            <a class="mdl-navigation__link" href="">Link</a>
-            <a class="mdl-navigation__link" href="">Link</a>
-        </nav>
-    </div>
-    <!-- Menus -->
-    <ul class="mdl-menu mdl-js-ripple-effect mdl-menu--bottom-right mdl-js-menu" for="more_btn">
-        <li class="mdl-menu__item">Edit categories</li>
-    </ul>
-    <ul class="mdl-menu mdl-js-ripple-effect mdl-menu--bottom-right mdl-js-menu" for="filter_btn">
-        <label for="download-chkbx">
+        <!-- Menus -->
+        <ul class="mdl-menu mdl-js-ripple-effect mdl-menu--bottom-right mdl-js-menu" for="more_btn">
+            <li class="mdl-menu__item">Edit categories</li>
+        </ul>
+        <ul class="mdl-menu mdl-js-ripple-effect mdl-menu--bottom-right mdl-js-menu" for="filter_btn">
+            <label for="download-chkbx">
             <li class="mdl-menu__item">
                 <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="download-chkbx">
                     <input type="checkbox" id="download-chkbx" class="mdl-checkbox__input">
-                </label>
-                Downloaded
+                </label> Downloaded
             </li>
-        </label><label for="unread-chkbx">
+            </label><label for="unread-chkbx">
         <li class="mdl-menu__item">
             <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="unread-chkbx">
                 <input type="checkbox" id="unread-chkbx" class="mdl-checkbox__input">
+            </label> Unread
+            </li>
             </label>
-            Unread
-        </li>
-    </label>
-        <li class="mdl-menu__item">Remove filter</li>
-    </ul>
-    <main class="mdl-layout__content">
-        <div class="page-content">
-		  <!-- NOTE: This wrapper is necessary, don't touch it! -->
-		  <div class="loading_spinner">
-		  <div class="mdl-spinner mdl-js-spinner is-active"></div>
-		  </div>
-            <!-- TODO Unread Manga counts -->
-            <!-- TODO Loading -->
-            <div id="manga_grid" class="mdl-grid">
+            <li class="mdl-menu__item">Remove filter</li>
+        </ul>
+        <main class="mdl-layout__content">
+            <div class="page-content">
+                <!-- NOTE: This wrapper is necessary, don't touch it! -->
+                <div class="loading_spinner">
+                    <div class="mdl-spinner mdl-js-spinner is-active"></div>
+                </div>
+                <!-- TODO Unread Manga counts -->
+                <div id="library_wrapper"></div>
+                <!--<div id="manga_grid" class="mdl-grid">
+                </div>-->
             </div>
-        </div>
-		<!-- Snackbar -->
-	  <div id="snackbar" class="mdl-js-snackbar mdl-snackbar">
-		<div class="mdl-snackbar__text"></div>
-		<button class="mdl-snackbar__action" type="button"></button>
-	  </div>
-    </main>
-</div>
+            <!-- Snackbar -->
+            <div id="snackbar" class="mdl-js-snackbar mdl-snackbar">
+                <div class="mdl-snackbar__text"></div>
+                <button class="mdl-snackbar__action" type="button"></button>
+            </div>
+        </main>
+    </div>
 </body>
-</html>		
+
+</html>
