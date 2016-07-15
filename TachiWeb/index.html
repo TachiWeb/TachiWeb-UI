@@ -25,9 +25,9 @@
             <button id="filter_btn" class="app-bar-btn mdl-button mdl-js-button mdl-button--icon">
                 <i class="material-icons">filter_list</i>
             </button>
-            <div class="search-bar mdl-textfield mdl-js-textfield mdl-textfield--expandable
+            <div id="search_box" class="search-bar mdl-textfield mdl-js-textfield mdl-textfield--expandable
 			mdl-textfield--floating-label mdl-textfield--align-right">
-                <label class="mdl-button mdl-js-button mdl-button--icon"
+                <label id="search_btn" class="mdl-button mdl-js-button mdl-button--icon"
                        for="waterfall-exp">
                     <i class="material-icons">search</i>
                 </label>
@@ -85,6 +85,19 @@
     </label>
         <li class="mdl-menu__item">Remove filter</li>
     </ul>
+    <!-- Tooltips -->
+    <div class="mdl-tooltip mdl-tooltip--large" for="filter_btn">
+        Filter
+    </div>
+    <div class="mdl-tooltip mdl-tooltip--large" for="search_btn">
+        Search
+    </div>
+    <div class="mdl-tooltip mdl-tooltip--large" for="refresh_btn">
+        Update Library
+    </div>
+    <div class="mdl-tooltip mdl-tooltip--large" for="more_btn">
+        More
+    </div>
     <main class="mdl-layout__content">
         <div class="page-content">
             <!-- TODO Unread Manga counts -->

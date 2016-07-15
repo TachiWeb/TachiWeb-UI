@@ -19,6 +19,11 @@
     max-width: 20px;
 }
 
+/** Header has way too much padding on right **/
+.mdl-layout__header-row {
+    padding-right: 5px;
+}
+
 /** Cards **/
 .manga_card {
     color: white;
