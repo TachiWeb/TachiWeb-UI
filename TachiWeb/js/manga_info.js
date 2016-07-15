@@ -1,3 +1,4 @@
+var filterButton;
 var reverseOrderBtn;
 var downloadBtn;
 var refreshBtn;
@@ -10,6 +11,7 @@ var infoPanel;
 var chapterPanel;
 
 function onLoad() {
+	filterButton = $("#filter_btn");
 	reverseOrderBtn = $("#reverse_order_btn");
 	downloadBtn = $("#download_btn");
 	refreshBtn = $("#refresh_btn");
@@ -30,6 +32,7 @@ function setupTabs() {
 					});
 }
 function selectInfoTab() {
+	filterButton.hide(fadeSpeed);
 	reverseOrderBtn.hide(fadeSpeed);
 	downloadBtn.hide(fadeSpeed);
 	moreBtn.hide(fadeSpeed);
@@ -37,6 +40,7 @@ function selectInfoTab() {
 	chapterPanel.removeClass("selected");
 }
 function selectChapterTab() {
+	filterButton.show(fadeSpeed);
 	reverseOrderBtn.show(fadeSpeed);
 	downloadBtn.show(fadeSpeed);
 	moreBtn.show(fadeSpeed);
