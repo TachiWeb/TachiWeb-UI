@@ -46,8 +46,8 @@
     padding: 8px;
     bottom: 0;
 }
-/** Category headers **/
-.category_header {
+/** List headers **/
+.list_header {
     width: 100%;
     background: rgb(96,125,139);
     padding: 8px;

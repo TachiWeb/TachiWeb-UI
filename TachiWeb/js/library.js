@@ -79,7 +79,7 @@ function updateLibraryUI(mangas) {
             categoryName = categoryKeys[i];
             category = categories[categoryName];
             var categorySplitter = document.createElement("div");
-            categorySplitter.className = "category_header";
+            categorySplitter.className = "list_header";
             categorySplitter.textContent = categoryName;
             libraryWrapper[0].appendChild(categorySplitter);
             //Actually append mangas
