@@ -4,6 +4,7 @@ var coverRoot = apiRoot + "/cover";
 var libraryRoot = apiRoot + "/library";
 var infoRoot = apiRoot + "/manga_info";
 var snackbar;
+//TODO copy the QueryParams object from reader to here
 
 //Api functions
 function buildCoverUrl(mangaId) {
