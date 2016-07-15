@@ -24,6 +24,7 @@ function updateLibrary() {
             applyAndUpdate(currentManga);
         }
         catch (e) {
+            console.error(e);
             libraryUpdateError();
         }
         hideSpinner();

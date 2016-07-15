@@ -1,8 +1,15 @@
+html,body {
+    height: 100%;
+}
 .layout-waterfall .mdl-layout__header-row .mdl-navigation__link:last-of-type {
     padding-right: 0;
 }
 
 /** App bar **/
+.back-button {
+    margin-left: -20px;
+}
+
 .app-bar-btn {
     margin-top: 10px;
     margin-bottom: 15px;

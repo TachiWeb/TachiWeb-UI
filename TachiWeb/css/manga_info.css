@@ -2,7 +2,7 @@
 .tab_panel {
   transition: all 0.25s;
   opacity: 0;
-  pointer-events: "none";
+  pointer-events: none;
   position: absolute;
   top: 0;
   left: 0;
@@ -11,11 +11,12 @@
 }
 .tab_panel.selected {
   opacity: 1;
-  pointer-events: "all";
+  pointer-events: all;
 }
 /** Header **/
 #info_header {
   width: 100%;
+  padding: 16px;
 }
 #cover_img {
   width: 20%;
