@@ -146,7 +146,7 @@ function applyFilters(mangas) {
         if(filters.onlyUnread && manga.unread <= 0) {
             remove = true;
         }
-        if(!remove && filters.text.trim !== "" && manga.title.indexOf(filters.text) <= -1) {
+        if(!remove && filters.text.trim !== "" && manga.title.toLowerCase().indexOf(filters.text.toLowerCase()) <= -1) {
             remove = true;
         }
         if(remove) {
