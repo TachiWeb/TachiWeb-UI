@@ -41,10 +41,18 @@
 
 .manga_card_label {
     position: absolute;
-    width: 100%;
+    width: calc(100% - 16px); /* Label gets cut off otherwise for some reason **/
     background: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.7) 40%, rgba(0, 0, 0, 0) 100%);
     padding: 8px;
     bottom: 0;
+}
+/** Category headers **/
+.category_header {
+    width: 100%;
+    background: rgb(96,125,139);
+    padding: 8px;
+    color: white;
+    font-size: 20px;
 }
 /** Spinners **/
 .loading_spinner {

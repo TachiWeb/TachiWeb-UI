@@ -14,11 +14,6 @@ function valid(v) {
 	return v !== undefined && v !== null;
 }
 
-//Update material JS
-$(window).resize(function() {
-    componentHandler.upgradeAllRegistered();
-});
-
 //Catch onload
 window.onload = function() {
 	//Setup snackbar

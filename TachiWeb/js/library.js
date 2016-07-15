@@ -2,8 +2,7 @@ var coverRoot = apiRoot + "/cover";
 var libraryRoot = apiRoot + "/library";
 var librarySpinner;
 var libraryWrapper;
-var libraryTabsParent;
-var libraryTabs;
+var currentManga;
 
 function updateLibrary() {
     showSpinner();
@@ -11,8 +10,8 @@ function updateLibrary() {
     xhr.open("GET", libraryRoot, true);
     xhr.onload = function() {
         try {
-            var parsed = JSON.parse(xhr.responseText);
-            updateLibraryUI(parsed);
+            currentManga = JSON.parse(xhr.responseText);
+            updateLibraryUI(currentManga);
         }
         catch (e) {
             libraryUpdateError();
@@ -38,25 +37,17 @@ function buildCoverUrl(mangaId) {
     return coverRoot + "/" + mangaId;
 }
 
-function showTabs() {
-    if(!libraryTabsParent[0].contains(libraryTabs[0])) {
-        libraryTabsParent[0].appendChild(libraryTabs[0]);
-    }
-}
-
-function hideTabs() {
-    if(libraryTabsParent[0].contains(libraryTabs[0])) {
-        libraryTabsParent[0].removeChild(libraryTabs[0]);
-    }
-}
-
 function updateLibraryUI(mangas) {
     //Construct categories
     var categories = {};
     for (var i = 0; i < mangas.length; i++) {
         var manga = mangas[i];
-        for (var a = 0; a < manga.categories.length; a++) {
-            var categoryName = manga.categories[a];
+        var mCategories = manga.categories.slice(0);
+        if(mCategories.length <= 0) {
+            mCategories.push("Default");
+        }
+        for (var a = 0; a < mCategories.length; a++) {
+            var categoryName = mCategories[a];
             var category = categories[categoryName];
             if (!valid(category)) {
                 category = [];
@@ -67,7 +58,6 @@ function updateLibraryUI(mangas) {
     }
     //Remove old entries
     clearElement(libraryWrapper[0]);
-    clearElement(libraryTabs[0]);
     var categoryKeys = Object.keys(categories);
     if (categoryKeys.length <= 1) {
         //Append directly if we don't have tabs
@@ -76,31 +66,13 @@ function updateLibraryUI(mangas) {
         for(i = 0; i < categoryKeys.length; i++) {
             categoryName = categoryKeys[i];
             category = categories[categoryName];
-            var categoryId = "category-tab-" + i;
-            //Generate tabs
-            var categoryTab = document.createElement("a");
-            categoryTab.className = "mdl-layout__tab";
-            //First tab is active
-            if(i === 0) {
-                categoryTab.className += " is-active";
-            }
-            categoryTab.href = "#" + categoryId;
-            categoryTab.textContent = categoryName;
-            libraryTabs[0].appendChild(categoryTab);
-            //Generate content
-            var categoryPanel = document.createElement("div");
-            categoryPanel.className = "mdl-tabs__panel";
-            //First panel is active
-            if(i === 0) {
-                categoryPanel.className += " is-active";
-            }
-            categoryPanel.id = categoryId;
-            libraryWrapper[0].appendChild(categoryPanel);
+            var categorySplitter = document.createElement("div");
+            categorySplitter.className = "category_header";
+            categorySplitter.textContent = categoryName;
+            libraryWrapper[0].appendChild(categorySplitter);
             //Actually append mangas
-            appendMangas(category, categoryPanel);
+            appendMangas(category, libraryWrapper[0]);
         }
-        //Make sure MDL gets tab changes
-        componentHandler.upgradeElement(libraryTabs[0]);
     }
     //Make sure MDL gets content changes
     componentHandler.upgradeElement(libraryWrapper[0]);
@@ -112,6 +84,7 @@ function appendMangas(mangas, rootElement) {
     for (var i = 0; i < mangas.length; i++) {
         appendManga(mangas[i], libraryGrid);
     }
+    componentHandler.upgradeElement(libraryGrid);
 }
 
 function createGrid() {
@@ -133,6 +106,8 @@ function appendManga(manga, element) {
     label.textContent = manga.title;
     card.appendChild(label);
     element.appendChild(card);
+    componentHandler.upgradeElement(card);
+    componentHandler.upgradeElement(element);
 }
 
 function libraryUpdateError() {
@@ -149,7 +124,5 @@ function libraryUpdateError() {
 function onLoad() {
     librarySpinner = $(".loading_spinner");
     libraryWrapper = $("#library_wrapper");
-    libraryTabs = $("#library_tabs");
-    libraryTabsParent = libraryTabs.parent();
     updateLibrary();
 }
