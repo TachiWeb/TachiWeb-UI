@@ -1,5 +1,3 @@
-var coverRoot = apiRoot + "/cover";
-var libraryRoot = apiRoot + "/library";
 var librarySpinner;
 var libraryWrapper;
 var currentManga;
@@ -43,10 +41,6 @@ function showSpinner() {
 
 function hideSpinner() {
     librarySpinner.css("opacity", 0);
-}
-
-function buildCoverUrl(mangaId) {
-    return coverRoot + "/" + mangaId;
 }
 
 function updateLibraryUI(mangas) {

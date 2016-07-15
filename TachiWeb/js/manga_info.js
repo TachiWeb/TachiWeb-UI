@@ -1,4 +1,3 @@
-var infoRoot = apiRoot + "/manga_info";
 var reverseOrderBtn;
 var downloadBtn;
 var refreshBtn;

@@ -1,3 +1,6 @@
+<!-- By the time TachiWeb is released, the new manga info PR probably would have been merged so:
+  TODO New Manga Info Screen
+  -->
 <!DOCTYPE html>
 <html>
 
@@ -46,8 +49,8 @@
         </div>
         <!-- Bottom row, not visible on scroll -->
         <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
-		<a id="info_tab" href="#info_panel" class="mdl-layout__tab">Info</a>
-		<a id="chapter_tab" href="#chapter_panel" class="mdl-layout__tab is-active">Chapters</a>
+		  <a id="info_tab" href="#info_panel" class="mdl-layout__tab">Info</a>
+		  <a id="chapter_tab" href="#chapter_panel" class="mdl-layout__tab is-active">Chapters</a>
         </div>
 	  </header>
 	  <div class="mdl-layout__drawer">
@@ -63,7 +66,7 @@
 	  <ul class="mdl-menu mdl-js-ripple-effect mdl-menu--bottom-right mdl-js-menu" for="more_btn">
         <li class="mdl-menu__item">Change display mode</li>
 		<li class="mdl-menu__item">Sorting mode</li>
-		</ul>
+	  </ul>
 	  <ul class="mdl-menu mdl-js-ripple-effect mdl-menu--bottom-right mdl-js-menu" for="filter_btn">
         <label for="download-chkbx">
 		  <li class="mdl-menu__item">
@@ -106,7 +109,19 @@
 	  </div>
 	  <main class="mdl-layout__content">
         <div class="page-content">
-		  <div class="mdl-tabs__panel tab_panel" id="info_panel">test1</div>
+		  <div class="mdl-tabs__panel tab_panel" id="info_panel">
+			<!-- When we actually want to apply a background to #info_header, use this: https://css-tricks.com/tinted-images-multiple-backgrounds/ -->
+			<div id="info_header">
+			  <img id="cover_img" width="100%" />
+			  <div id="header_content"></div>
+			</div>
+			<button id="fav_btn" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+			  <i class="material-icons">turned_in</i>
+			</button>
+			<div id="manga_desc_wrapper">
+			  <div id="manga_desc"></div>
+			</div>
+		  </div>
 		  <div class="mdl-tabs__panel tab_panel selected is-active" id="chapter_panel">test2</div>
         </div>
         <!-- Snackbar -->

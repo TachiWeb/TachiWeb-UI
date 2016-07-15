@@ -1,6 +1,14 @@
 //var apiRoot = "/api";
 var apiRoot = "http://localhost:4567/api";
+var coverRoot = apiRoot + "/cover";
+var libraryRoot = apiRoot + "/library";
+var infoRoot = apiRoot + "/manga_info";
 var snackbar;
+
+//Api functions
+function buildCoverUrl(mangaId) {
+    return coverRoot + "/" + mangaId;
+}
 
 //Remove all children from element
 function clearElement(myNode) {
