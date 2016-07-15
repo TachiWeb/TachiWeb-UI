@@ -2,6 +2,7 @@ var filterButton;
 var reverseOrderBtn;
 var downloadBtn;
 var refreshBtn;
+var refreshTooltip;
 var openBrowserBtn;
 var moreBtn;
 var infoTab;
@@ -15,6 +16,7 @@ function onLoad() {
 	reverseOrderBtn = $("#reverse_order_btn");
 	downloadBtn = $("#download_btn");
 	refreshBtn = $("#refresh_btn");
+	refreshTooltip = $("#refresh_tooltip");
 	openBrowserBtn = $("#open_browser_btn");
 	moreBtn = $("#more_btn");
 	infoTab = $("#info_tab");
@@ -38,6 +40,7 @@ function selectInfoTab() {
 	moreBtn.hide(fadeSpeed);
 	infoPanel.addClass("selected");
 	chapterPanel.removeClass("selected");
+	refreshTooltip.text("Refresh Info");
 }
 function selectChapterTab() {
 	filterButton.show(fadeSpeed);
@@ -46,4 +49,5 @@ function selectChapterTab() {
 	moreBtn.show(fadeSpeed);
 	infoPanel.removeClass("selected");
 	chapterPanel.addClass("selected");
+	refreshTooltip.text("Refresh Chapters");
 }
