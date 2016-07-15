@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <!-- JQuery -->
+    <script src="js/jquery-3.0.0.min.js"></script>
+    <!-- Material Lite -->
+    <link href="css/material.min.css" rel="stylesheet">
+    <script src="js/material.min.js"></script>
+    <!-- Material Fonts -->
+    <link href="css/material_fonts.css" rel="stylesheet">
+    <!-- Core -->
+    <link href="css/core.css" rel="stylesheet">
+    <script src="js/core.js"></script>
+    <script src="js/library.js"></script>
+	<title>Manga Info</title>
+  </head>
+  <body>
+	<!-- Uses a header that contracts as the page scrolls down. -->
+	<div class="layout-waterfall mdl-layout mdl-js-layout mdl-layout--fixed-tabs">
+	  <header class="mdl-layout__header mdl-layout__header--waterfall">
+        <!-- Top row, always visible -->
+        <div class="mdl-layout__header-row">
+		  <!-- Title -->
+		  <span id="manga_title" class="mdl-layout-title">Loading</span>
+		  <div class="mdl-layout-spacer"></div>
+		  <button id="filter_btn" class="app-bar-btn mdl-button mdl-js-button mdl-button--icon">
+			<i class="material-icons">filter_list</i>
+		  </button>
+		  <button id="reverse_order_btn" class="app-bar-btn mdl-button mdl-js-button mdl-button--icon">
+			<i class="material-icons">swap_vert</i>
+		  </button>
+		  <button id="download_btn" class="app-bar-btn mdl-button mdl-js-button mdl-button--icon">
+			<i class="material-icons">file_download</i>
+		  </button>
+		  <button id="refresh_btn" class="app-bar-btn mdl-button mdl-js-button mdl-button--icon">
+			<i class="material-icons">refresh</i>
+		  </button>
+		  <button id="open_browser_btn" class="app-bar-btn mdl-button mdl-js-button mdl-button--icon">
+			<i class="material-icons">public</i>
+		  </button>
+		  <button id="more_btn" class="app-bar-btn mdl-button mdl-js-button mdl-button--icon">
+			<i class="material-icons">more_vert</i>
+		  </button>
+        </div>
+        <!-- Bottom row, not visible on scroll -->
+        <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
+		<a href="#scroll-tab-1" class="mdl-layout__tab">Info</a>
+		<a href="#scroll-tab-2" class="mdl-layout__tab is-active">Chapters</a>
+        </div>
+	  </header>
+	  <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">Title</span>
+        <nav class="mdl-navigation">
+		  <a class="mdl-navigation__link" href="">Link</a>
+		  <a class="mdl-navigation__link" href="">Link</a>
+		  <a class="mdl-navigation__link" href="">Link</a>
+		  <a class="mdl-navigation__link" href="">Link</a>
+        </nav>
+	  </div>
+	  <!-- Menus -->
+	  <ul class="mdl-menu mdl-js-ripple-effect mdl-menu--bottom-right mdl-js-menu" for="more_btn">
+        <li class="mdl-menu__item">Change display mode</li>
+		<li class="mdl-menu__item">Sorting mode</li>
+		</ul>
+	  <ul class="mdl-menu mdl-js-ripple-effect mdl-menu--bottom-right mdl-js-menu" for="filter_btn">
+        <label for="download-chkbx">
+		  <li class="mdl-menu__item">
+			<label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="download-chkbx">
+			  <input type="checkbox" id="download-chkbx" class="mdl-checkbox__input">
+			</label>
+			Downloaded
+		  </li>
+        </label><label for="unread-chkbx">
+		  <li class="mdl-menu__item">
+            <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="unread-chkbx">
+			  <input type="checkbox" id="unread-chkbx" class="mdl-checkbox__input">
+            </label>
+            Unread
+		  </li>
+		</label>
+        <li id="clear_filters_btn" class="mdl-menu__item">Remove filter</li>
+	  </ul>
+	  <!-- Tooltips -->
+	  <div class="mdl-tooltip mdl-tooltip--large" for="filter_btn">
+        Filter
+	  </div>
+	  <div class="mdl-tooltip mdl-tooltip--large" for="reverse_order_btn">
+        Reverse Sort Order
+	  </div>
+	  <div class="mdl-tooltip mdl-tooltip--large" for="search_btn">
+        Search
+	  </div>
+	  <div class="mdl-tooltip mdl-tooltip--large" for="refresh_btn">
+        Refresh Chapters
+	  </div>
+	  <div class="mdl-tooltip mdl-tooltip--large" for="open_browser_btn">
+        Open In Browser
+	  </div>
+	  <div class="mdl-tooltip mdl-tooltip--large" for="download_btn">
+        Download
+	  </div>
+	  <div class="mdl-tooltip mdl-tooltip--large" for="more_btn">
+        More
+	  </div>
+	  <main class="mdl-layout__content">
+        <div class="page-content">
+		  
+        </div>
+        <!-- Snackbar -->
+        <div id="snackbar" class="mdl-js-snackbar mdl-snackbar">
+		  <div class="mdl-snackbar__text"></div>
+		  <button class="mdl-snackbar__action" type="button"></button>
+        </div>
+	  </main>
+	</div>
+  </body>
+</html>		
