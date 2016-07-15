@@ -3,6 +3,18 @@ var libraryRoot = apiRoot + "/library";
 var librarySpinner;
 var libraryWrapper;
 var currentManga;
+var unreadCheckbox;
+var filters;
+function resetFilters() {
+    filters = {
+        onlyUnread: false,
+        text: ""
+    };
+}
+function mapFiltersToUI() {
+    mdlCheckboxCheck(unreadCheckbox, filters.onlyUnread);
+}
+resetFilters();
 
 function updateLibrary() {
     showSpinner();
@@ -11,7 +23,7 @@ function updateLibrary() {
     xhr.onload = function() {
         try {
             currentManga = JSON.parse(xhr.responseText);
-            updateLibraryUI(currentManga);
+            applyAndUpdate(currentManga);
         }
         catch (e) {
             libraryUpdateError();
@@ -121,8 +133,48 @@ function libraryUpdateError() {
     });
 }
 
+function applyAndUpdate(mangas) {
+    var clonedMangas = mangas.slice(0);
+    applyFilters(clonedMangas);
+    updateLibraryUI(clonedMangas);
+}
+
+function applyFilters(mangas) {
+    for (var i = mangas.length - 1; i >= 0; i--) {
+        var manga = mangas[i];
+        var remove = false;
+        if(filters.onlyUnread && manga.unread <= 0) {
+            remove = true;
+        }
+        if(!remove && filters.text.trim !== "" && manga.title.indexOf(filters.text) <= -1) {
+            remove = true;
+        }
+        if(remove) {
+            mangas.splice(i, 1);
+        }
+    }
+}
+
+function setupFilters() {
+    unreadCheckbox = $("#unread-chkbx");
+    unreadCheckbox.change(function() {
+        filters.onlyUnread = this.checked;
+        applyAndUpdate(currentManga);
+    });
+    $("#clear_filters_btn").click(function() {
+        resetFilters();
+        mapFiltersToUI();
+        applyAndUpdate(currentManga);
+    });
+    $("#manga_search").on('input',function(e){
+        filters.text = $(this).val();
+        applyAndUpdate(currentManga);
+    });
+}
+
 function onLoad() {
     librarySpinner = $(".loading_spinner");
     libraryWrapper = $("#library_wrapper");
+    setupFilters();
     updateLibrary();
 }

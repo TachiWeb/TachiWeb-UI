@@ -14,6 +14,23 @@ function valid(v) {
 	return v !== undefined && v !== null;
 }
 
+function rawElement(element) {
+	if(element instanceof jQuery) {
+		return element[0];
+	} else {
+		return element;
+	}
+}
+
+function mdlCheckboxCheck(checkbox, check) {
+	//For some stupid reason, we need the parent label to change the checkbox!
+	if(check) {
+		rawElement(checkbox.parent()).MaterialCheckbox.check();
+	} else {
+		rawElement(checkbox.parent()).MaterialCheckbox.uncheck();
+	}
+}
+
 //Catch onload
 window.onload = function() {
 	//Setup snackbar

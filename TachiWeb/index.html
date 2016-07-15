@@ -29,12 +29,11 @@
             <div id="search_box" class="search-bar mdl-textfield mdl-js-textfield mdl-textfield--expandable
 			mdl-textfield--floating-label mdl-textfield--align-right">
                 <label id="search_btn" class="mdl-button mdl-js-button mdl-button--icon"
-                       for="waterfall-exp">
+                       for="manga_search">
                     <i class="material-icons">search</i>
                 </label>
                 <div class="mdl-textfield__expandable-holder">
-                    <input class="mdl-textfield__input" type="text" name="sample"
-                           id="waterfall-exp">
+                    <input class="mdl-textfield__input" type="text" id="manga_search">
                 </div>
             </div>
             <button id="refresh_btn" class="app-bar-btn mdl-button mdl-js-button mdl-button--icon">
@@ -86,7 +85,7 @@
             Unread
         </li>
     </label>
-        <li class="mdl-menu__item">Remove filter</li>
+        <li id="clear_filters_btn" class="mdl-menu__item">Remove filter</li>
     </ul>
     <!-- Tooltips -->
     <div class="mdl-tooltip mdl-tooltip--large" for="filter_btn">
