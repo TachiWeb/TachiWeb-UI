@@ -12,7 +12,8 @@
     <!-- Core -->
     <link href="css/core.css" rel="stylesheet">
     <script src="js/core.js"></script>
-    <script src="js/library.js"></script>
+	<link href="css/manga_info.css" rel="stylesheet">
+    <script src="js/manga_info.js"></script>
 	<title>Manga Info</title>
   </head>
   <body>
@@ -45,8 +46,8 @@
         </div>
         <!-- Bottom row, not visible on scroll -->
         <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
-		<a href="#scroll-tab-1" class="mdl-layout__tab">Info</a>
-		<a href="#scroll-tab-2" class="mdl-layout__tab is-active">Chapters</a>
+		<a id="info_tab" href="#info_panel" class="mdl-layout__tab">Info</a>
+		<a id="chapter_tab" href="#chapter_panel" class="mdl-layout__tab is-active">Chapters</a>
         </div>
 	  </header>
 	  <div class="mdl-layout__drawer">
@@ -105,7 +106,8 @@
 	  </div>
 	  <main class="mdl-layout__content">
         <div class="page-content">
-		  
+		  <div class="mdl-tabs__panel tab_panel" id="info_panel">test1</div>
+		  <div class="mdl-tabs__panel tab_panel selected is-active" id="chapter_panel">test2</div>
         </div>
         <!-- Snackbar -->
         <div id="snackbar" class="mdl-js-snackbar mdl-snackbar">

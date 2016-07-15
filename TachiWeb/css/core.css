@@ -24,6 +24,11 @@
     padding-right: 5px;
 }
 
+/** Page content **/
+.page-content {
+  position: relative;
+}
+
 /** Cards **/
 .manga_card {
     color: white;
