@@ -7,10 +7,10 @@ var refreshTooltip;
 var openBrowserBtn;
 var moreBtn;
 var infoTab;
-var chapterTab;
+var chaptersTab;
 var fadeSpeed = 250;
 var infoPanel;
-var chapterPanel;
+var chaptersPanel;
 var spinner;
 
 var infoHeaderElement;
@@ -22,9 +22,27 @@ var mangaDescElement;
 var mangaTitleElement;
 
 var currentInfo;
+var currentChapters;
 var mangaId = QueryString.id;
 var backLink = QueryString.b;
 var mangaUrl;
+
+var unreadCheckbox;
+var clearFiltersButton;
+
+var filters;
+function resetFilters() {
+	filters = {
+		onlyUnread: false
+	};
+}
+resetFilters();
+function mapFiltersToUI() {
+	mdlCheckboxCheck(unreadCheckbox, filters.onlyUnread);
+}
+var sort = {
+	reverse: false
+};
 
 function onLoad() {
 	backButton = $(".back-button");
@@ -36,9 +54,9 @@ function onLoad() {
 	openBrowserBtn = $("#open_browser_btn");
 	moreBtn = $("#more_btn");
 	infoTab = $("#info_tab");
-	chapterTab = $("#chapter_tab");
+	chaptersTab = $("#chapter_tab");
 	infoPanel = $("#info_panel");
-	chapterPanel = $("#chapter_panel");
+	chaptersPanel = $("#chapter_panel");
 	spinner = $(".loading_spinner");
 
 	infoHeaderElement = $("#info_header");
@@ -49,10 +67,33 @@ function onLoad() {
 	mangaDescElement = $("#manga_desc");
 	mangaTitleElement = $("#manga_title");
 
+	unreadCheckbox = $("#unread-chkbx");
+	clearFiltersButton = $("#clear_filters_btn");
+
 	setupTabs();
 	updateInfo();
+	updateChapters();
 	setupBackButton();
 	setupBrowserUrlButton();
+	setupFilters();
+	setupSort();
+}
+function setupSort() {
+	reverseOrderBtn.click(function() {
+		sort.reverse = !sort.reverse;
+		applyAndUpdateChapters(currentChapters);
+	});
+}
+function setupFilters() {
+	unreadCheckbox.change(function() {
+		filters.onlyUnread = this.checked;
+		applyAndUpdateChapters(currentChapters);
+	});
+	clearFiltersButton.click(function() {
+		resetFilters();
+		mapFiltersToUI();
+		applyAndUpdateChapters(currentChapters);
+	});
 }
 function setupBackButton () {
 	backButton.click(function () {
@@ -67,7 +108,7 @@ function setupTabs() {
 	infoTab.click(function() {
 					  selectInfoTab();
 				  });
-	chapterTab.click(function() {
+	chaptersTab.click(function() {
 						selectChapterTab();
 					});
 }
@@ -77,7 +118,7 @@ function selectInfoTab() {
 	downloadBtn.hide(fadeSpeed);
 	moreBtn.hide(fadeSpeed);
 	infoPanel.addClass("selected");
-	chapterPanel.removeClass("selected");
+	chaptersPanel.removeClass("selected");
 	refreshTooltip.text("Refresh Info");
 }
 function selectChapterTab() {
@@ -86,11 +127,14 @@ function selectChapterTab() {
 	downloadBtn.show(fadeSpeed);
 	moreBtn.show(fadeSpeed);
 	infoPanel.removeClass("selected");
-	chapterPanel.addClass("selected");
+	chaptersPanel.addClass("selected");
 	refreshTooltip.text("Refresh Chapters");
 }
 function buildInfoUrl(mangaId) {
 	return infoRoot + "/" + mangaId;
+}
+function buildChaptersUrl(mangaId) {
+	return chaptersRoot + "/" + mangaId;
 }
 function updateInfo() {
 	showSpinner();
@@ -114,7 +158,91 @@ function updateInfo() {
 	xhr.send();
 }
 function updateChapters() {
-	//TODO
+	showSpinner();
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", buildChaptersUrl(mangaId), true);
+	xhr.onload = function() {
+		try {
+			currentChapters = JSON.parse(xhr.responseText);
+			applyAndUpdateChapters(currentChapters);
+		}
+		catch (e) {
+			console.error(e);
+			chaptersUpdateError();
+		}
+		hideSpinner();
+	};
+	xhr.onerror = function() {
+		chaptersUpdateError();
+		hideSpinner();
+	};
+	xhr.send();
+}
+function applyAndUpdateChapters(chapters) {
+	var clonedChapters = chapters.slice(0);
+	applyFilters(clonedChapters);
+	applySort(clonedChapters);
+	updateChaptersUI(clonedChapters);
+}
+function applySort(chapters) {
+	chapters.sort(function(a, b) {
+		return a.chapter_number - b.chapter_number;
+	});
+	if(sort.reverse) {
+		chapters.reverse();
+	}
+}
+function applyFilters(chapters) {
+	for (var i = chapters.length - 1; i >= 0; i--) {
+		var chapter = chapters[i];
+		var remove = false;
+		if(filters.onlyUnread && chapter.read) {
+			remove = true;
+		}
+		if(remove) {
+			chapters.splice(i, 1);
+		}
+	}
+}
+
+function updateChaptersUI(chapters) {
+	clearElement(chaptersPanel[0]);
+	for(var i = 0; i < chapters.length; i++) {
+		var chapter = chapters[i];
+		var element = document.createElement("div");
+		element.className = "chapter_entry mdl-button mdl-js-button mdl-js-ripple-effect";
+		if(chapter.read) {
+			$(element).css("color", "grey");
+		}
+		var titleRow = document.createElement("div");
+		titleRow.className = "chapter_row";
+		var titleElement = document.createElement("div");
+		titleElement.className = "chapter_title";
+		titleElement.textContent = chapter.name;
+		titleRow.appendChild(titleElement);
+		element.appendChild(titleRow);
+		element.appendChild(document.createElement("br"));
+		element.appendChild(document.createElement("br"));
+		var bottomRow = document.createElement("div");
+		bottomRow.className = "chapter_row chapter_row_bottom";
+		var dateElement = document.createElement("div");
+		dateElement.className = "chapter_date chapter_row_bottom_entry";
+		dateElement.textContent = moment(chapter.date).format('L');
+		bottomRow.appendChild(dateElement);
+		if(!chapter.read && chapter.last_page_read > 0) {
+			var pageElement = document.createElement("div");
+			pageElement.className = "chapter_page chapter_row_bottom_entry";
+			pageElement.textContent = "Page " + (chapter.last_page_read + 1);
+			bottomRow.appendChild(pageElement);
+		}
+		var downloadElement = document.createElement("div");
+		downloadElement.className = "chapter_downloaded chapter_row_bottom_entry";
+		downloadElement.textContent = ""; //TODO Change when downloading is actually implemented
+		bottomRow.appendChild(downloadElement);
+		element.appendChild(bottomRow);
+		chaptersPanel[0].appendChild(element);
+		componentHandler.upgradeElement(element);
+	}
 }
 function updateInfoUI(info) {
 	//Set title
@@ -182,7 +310,7 @@ function infoUpdateError() {
 		}
 	});
 }
-function chapterUpdateError() {
+function chaptersUpdateError() {
 	snackbar.showSnackbar({
 		message: "Error getting chapters!",
 		timeout: 2000,

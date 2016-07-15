@@ -12,6 +12,8 @@
     <script src="js/material.min.js"></script>
     <!-- Material Fonts -->
     <link href="css/material_fonts.css" rel="stylesheet">
+	  <!-- Moment.js -->
+	  <script src="js/moment-with-locales.js"></script>
     <!-- Core -->
     <link href="css/core.css" rel="stylesheet">
     <script src="js/core.js"></script>
@@ -118,7 +120,20 @@
 			  <div id="manga_desc"></div>
 			</div>
 		  </div>
-		  <div class="mdl-tabs__panel tab_panel selected is-active" id="chapter_panel">test2</div>
+		  <div class="mdl-tabs__panel tab_panel selected is-active" id="chapter_panel">
+			  <div class="chapter_entry mdl-button mdl-js-button mdl-js-ripple-effect">
+				  <div class="chapter_row">
+					  <div class="chapter_title">Test Chapter</div>
+				  </div>
+				  <br>
+				  <br>
+				  <div class="chapter_row chapter_row_bottom">
+					  <div class="chapter_date chapter_row_bottom_entry">10/10/2000</div>
+					  <div class="chapter_page chapter_row_bottom_entry">Page 1</div>
+					  <div class="chapter_downloaded chapter_row_bottom_entry">DOWNLOADED</div>
+				  </div>
+			  </div>
+		  </div>
         </div>
         <!-- Snackbar -->
         <div id="snackbar" class="mdl-js-snackbar mdl-snackbar">

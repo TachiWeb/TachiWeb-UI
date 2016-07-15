@@ -3,6 +3,7 @@ var apiRoot = "http://localhost:4567/api";
 var coverRoot = apiRoot + "/cover";
 var libraryRoot = apiRoot + "/library";
 var infoRoot = apiRoot + "/manga_info";
+var chaptersRoot = apiRoot + "/chapters";
 var snackbar;
 var QueryString = function () {
 	// This function is anonymous, is executed immediately and
