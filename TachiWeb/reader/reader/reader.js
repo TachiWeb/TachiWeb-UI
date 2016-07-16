@@ -143,7 +143,7 @@ function setupImageManager() {
     };
     $(window).resize(function () {
         imageManager.setupReaderElements();
-        imageManager.goToSelectedImage(null, true);
+        imageManager.goToSelectedImage(null, false);
     });
     imageManager.goToSelectedImage(null, true);
 }
@@ -300,7 +300,7 @@ function properlyScaleImage(image) {
     };
     img.src = src;
 }
-//Resacle images on window resize
+//Rescale images on window resize
 $(window).resize(function() {
     for(var i = 0; i < maxPages; i++) {
         var image = imageManager.readerElements[i];
