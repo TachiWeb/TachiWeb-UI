@@ -51,7 +51,7 @@ function onLoad() {
     setupReader();
     setupButtonManager();
     updateButtons();
-    loadImages();
+    loadNextImage();
     requestAnimationFrame(animate);
 }
 function setupReader() {
@@ -72,7 +72,6 @@ function setupImageManager() {
     imageManager.rotation = 0;
     imageManager.animateReaderRow = function (to, onComplete) {
         var that = this;
-        this.animating = true;
         this.animation = new TWEEN.Tween({x: this.readerRowTransform})
             .to({x: to}, imageSlideTime)
             .onUpdate(function () {
@@ -99,20 +98,19 @@ function setupImageManager() {
         var that = this;
         that.docWidth = $(document).width();
         for(var i = 0; i < imageManager.wrapperElements.length; i++) {
-            that.wrapperElements[i].style.width = (imageManager.docWidth - 200) + "px";
+            that.wrapperElements[i].css("width", (imageManager.docWidth - 200) + "px");
         }
     };
     for(var i = 0; i < maxPages; i++) {
         var readerElement = document.createElement("div");
         readerElement.className = "reader_img_wrapper";
         imageManager.readerRow[0].appendChild(readerElement);
-        imageManager.wrapperElements.push(readerElement);
+        imageManager.wrapperElements.push($(readerElement));
         var nestedReaderElement = document.createElement("div");
         nestedReaderElement.className = "reader_img";
-        imageManager.readerElements.push(nestedReaderElement);
+        imageManager.readerElements.push($(nestedReaderElement));
         readerElement.appendChild(nestedReaderElement);
         var jqueryReaderElement = $(nestedReaderElement);
-        activateZoom(jqueryReaderElement);
         jqueryReaderElement.data(loaded, false);
     }
     imageManager.setupReaderElements();
@@ -247,7 +245,7 @@ function rotateImage() {
 }
 function updateRotation() {
     for(var i = 0; i < imageManager.readerElements.length; i++) {
-        applyRotation($(imageManager.readerElements[i]));
+        applyRotation(imageManager.readerElements[i]);
     }
 }
 function getRotationCSS() {
@@ -285,12 +283,7 @@ function toggleFullScreen() {
 function copySrcFromTo(i1, i2) {
     i2.attr("src", i1.attr("src"));
 }
-function loadImages() {
-    for(var i = 0; i < maxPages; i++) {
-        tryLoad($(imageManager.readerElements[i]), i);
-    }
-}
-function imageElement(image, src) {
+function setImageSource(image, src) {
     image.css("background-image", "url(\"" + src + "\")");
     image.data("src", src);
     properlyScaleImage(image);
@@ -311,10 +304,9 @@ function properlyScaleImage(image) {
 $(window).resize(function() {
     for(var i = 0; i < maxPages; i++) {
         var image = imageManager.readerElements[i];
-        var jImage = $(image);
-        if(jImage.data("loaded")) {
-            properlyScaleImage(image);
-            applyRotation(image);
+        if(image.data(loaded)) {
+            properlyScaleImage(image[0]);
+            applyRotation(image[0]);
         }
     }
 });
@@ -323,8 +315,10 @@ var cachedPages = {};
 function tryLoad(image, page) {
     if(page >= 0 && page < maxPages && (!image.data(loaded))) {
         if(valid(cachedPages[page])) {
-            imageElement(image, cachedPages[page].url);
+            setImageSource(image, cachedPages[page].url);
             image.data(loaded, true);
+            activateZoom(image);
+            loadNextImage();
             return;
         }
         var xhr = new XMLHttpRequest();
@@ -337,14 +331,71 @@ function tryLoad(image, page) {
             } else {
                 var url = URL.createObjectURL(xhr.response);
                 cachedPages[page] = {url: url, blob: xhr.response};
-                imageElement(image, cachedPages[page].url);
+                setImageSource(image, cachedPages[page].url);
                 image.data(loaded, true);
+                activateZoom(image);
             }
+            loadNextImage();
         };
         xhr.onerror = function(e) {
-            console.log("Error loading image: " + xhr.statusText);
+            console.error("Error loading image: " + xhr.statusText, e);
+            loadNextImage();
         };
         xhr.send();
+    } else {
+        loadNextImage();
+    }
+}
+function jqueryPageElement(page) {
+    return imageManager.readerElements[page];
+}
+function loadNextImage() {
+    function findNotLoadedPage(from, to) {
+        function shouldLoad(page) {
+            return !jqueryPageElement(page).data(loaded);
+        }
+        var i;
+        if(to > from) {
+            for (i = Math.max(from + 1, 0); i <= Math.min(to, maxPages - 1); i++) {
+                if (shouldLoad(i)) {
+                    return i;
+                }
+            }
+        } else {
+            for(i = Math.min(from - 1, maxPages - 1); i >= Math.max(to, 0); i--) {
+                if(shouldLoad(i)) {
+                    return i;
+                }
+            }
+        }
+        return null;
+    }
+    var nextPageToLoad = null;
+    if(!jqueryPageElement(parseInt(currentPage)).data(loaded)) {
+        nextPageToLoad = parseInt(currentPage);
+    }
+    //TODO Make these configurable???
+    //Search three pages ahead, then one behind, then three ahead, then one behind and so on...
+    for(var i = 1; i <= maxPages; i++) {
+        if (!valid(nextPageToLoad)) {
+            //Check next 3 pages
+            nextPageToLoad = findNotLoadedPage(parseInt(currentPage), parseInt(currentPage) + (i * 3));
+        } else {
+            break;
+        }
+        if (!valid(nextPageToLoad)) {
+            //Check previous page
+            nextPageToLoad = findNotLoadedPage(parseInt(currentPage), parseInt(currentPage) - i);
+        } else {
+            break;
+        }
+    }
+    //Load the image if there is one to load!
+    if(valid(nextPageToLoad)) {
+        console.log("Loading page: " + nextPageToLoad);
+        tryLoad(jqueryPageElement(nextPageToLoad), nextPageToLoad);
+    } else {
+        console.log("No more pages to load!");
     }
 }
 function animate(time) {
