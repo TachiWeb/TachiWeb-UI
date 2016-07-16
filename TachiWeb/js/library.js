@@ -114,7 +114,7 @@ function appendManga(manga, element) {
     card.appendChild(label);
     $(card).click(function() {
         var currentUrl = window.location.href;
-        window.location.href = "manga_info.html?id=" + manga.id + "&b=" + encodeURI(currentUrl);
+        window.location.href = "manga_info.html?id=" + manga.id + "&b=" + encodeURIComponent(currentUrl);
     });
     element.appendChild(card);
     componentHandler.upgradeElement(card);

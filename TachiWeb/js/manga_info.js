@@ -229,7 +229,7 @@ function openChapter(chapterId, lastPageRead) {
 			pageListError(chapterId);
 			console.error("Page list was not numeric!");
 		} else {
-			window.location.href = "reader/reader/reader.html?m=" + mangaId + "&c=" + chapterId + "&mp=" + xhr.responseText + "&p=" + lastPageRead + "&b=" + encodeURI(window.location.href);
+			window.location.href = "reader/reader/reader.html?m=" + mangaId + "&c=" + chapterId + "&mp=" + xhr.responseText + "&p=" + lastPageRead + "&b=" + encodeURIComponent(window.location.href);
 		}
 		rawElement(pageListDialog).close();
 	};
