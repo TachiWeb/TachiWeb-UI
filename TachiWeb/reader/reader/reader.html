@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TW - LOADING</title>
+    <!-- JQuery -->
+    <script src="../lib/jquery-3.0.0.min.js"></script>
+    <!-- Tween.JS -->
+    <script src="../lib/Tween.js"></script>
+    <!-- Featherlight -->
+    <link href="../lib/featherlight.min.css" type="text/css" rel="stylesheet" />
+    <script src="../lib/featherlight.min.js"></script>
+    <!-- FileSaver -->
+    <script src="../lib/FileSaver.min.js"></script>
+    <!-- Global CSS -->
+    <link rel="stylesheet" type="text/css" href="../global.css">
+    <!-- Reader -->
+    <script src="reader.js"></script>
+    <link rel="stylesheet" type="text/css" href="reader.css">
+    <link rel="stylesheet" href="../lib/font-awesome/css/font-awesome.min.css">
+</head>
+<body onload="onLoad()">
+<!-- TODO Noscript redirect -->
+<!-- <BUTTONS> -->
+<div id="buttons_wrapper">
+    <div id="back_button" class="rbtn rbtn_square rbtn_left rbtn_top">
+        <div class="rbtn_label">Back</div>
+        <div class="rbtn_icon"><i class="fa fa-arrow-left fa-3x"></i></div>
+    </div>
+    <div id="redownload_button" class="rbtn rbtn_square rbtn_left rbtn_bottom">
+        <div class="rbtn_label">Download</div>
+        <div class="rbtn_icon"><i class="fa fa-download fa-3x"></i></div>
+    </div>
+    <div id="fullscreen_button" class="rbtn rbtn_square rbtn_right rbtn_top">
+        <div class="rbtn_label">Fullscreen</div>
+        <div class="rbtn_icon"><i class="fa fa-arrows-alt fa-3x"></i></div>
+    </div>
+    <div id="rotate_button" class="rbtn rbtn_square rbtn_right rbtn_bottom">
+        <div class="rbtn_label">Rotate 90&deg;</div>
+        <div class="rbtn_icon"><i class="fa fa-repeat fa-3x"></i></div>
+    </div>
+    <div class="rbtn_triangle_wrapper rbtn_triangle_wrapper_left">
+        <div class="rbtn rbtn_triangle">
+            <div id="rbtn_previous_page" class="rbtn_real_triangle"></div>
+        </div>
+    </div>
+    <div class="rbtn_triangle_wrapper rbtn_triangle_wrapper_right">
+        <div class="rbtn rbtn_triangle">
+            <div id="rbtn_next_page" class="rbtn_real_triangle"></div>
+        </div>
+    </div>
+</div>
+<!-- </BUTTONS> -->
+<!-- <READER_CONTENT> -->
+<div id="rcontent">
+    <div id="loading_text">LOADING...</div>
+    <div id="reader_img_row">
+        <!-- TODO MAX IMAGE WIDTH -->
+        <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" id="reader_img_left" class="reader_img"/>
+        <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" id="reader_img_center" class="reader_img"/>
+        <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" id="reader_img_right" class="reader_img"/>
+    </div>
+</div>
+<!-- </READER_CONTENT> -->
+</body>
+</html>
