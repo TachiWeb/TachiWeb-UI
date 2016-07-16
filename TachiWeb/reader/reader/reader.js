@@ -305,8 +305,8 @@ $(window).resize(function() {
     for(var i = 0; i < maxPages; i++) {
         var image = imageManager.readerElements[i];
         if(image.data(loaded)) {
-            properlyScaleImage(image[0]);
-            applyRotation(image[0]);
+            properlyScaleImage(image);
+            applyRotation(image);
         }
     }
 });
