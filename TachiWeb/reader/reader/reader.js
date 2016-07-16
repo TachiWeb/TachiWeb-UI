@@ -73,7 +73,7 @@ function setupImageManager() {
     imageManager.animateReaderRow = function (to, onComplete) {
         var that = this;
         this.animating = true;
-        new TWEEN.Tween({x: this.readerRowTransform})
+        this.animation = new TWEEN.Tween({x: this.readerRowTransform})
             .to({x: to}, imageSlideTime)
             .onUpdate(function () {
                 that.setReaderRowLoc(this.x);
@@ -84,111 +84,69 @@ function setupImageManager() {
                 if (valid(onComplete)) {
                     onComplete();
                 }
-            }).start();
+            });
+        this.animation.start();
     };
+    //Setup reader row
     imageManager.setReaderRowLoc = function (loc) {
-        this.readerRow.css("transform", "translateX(-" + loc + "px)");
-        this.readerRowTransform = loc;
+        var that = this;
+        that.readerRow.css("transform", "translateX(-" + loc + "px)");
+        that.readerRowTransform = loc;
     };
-    imageManager.goToLeftImage = function (onComplete, animate) {
-        if (this.animating) {
-            return;
+    imageManager.readerElements = [];
+    imageManager.wrapperElements = [];
+    imageManager.setupReaderElements = function() {
+        var that = this;
+        that.docWidth = $(document).width();
+        for(var i = 0; i < imageManager.wrapperElements.length; i++) {
+            that.wrapperElements[i].style.width = (imageManager.docWidth - 200) + "px";
         }
-        this.selectedImage = 0;
-        var calculatedWidth = this.imgLeft.width() / 2;
+    };
+    for(var i = 0; i < maxPages; i++) {
+        var readerElement = document.createElement("div");
+        readerElement.className = "reader_img_wrapper";
+        imageManager.readerRow[0].appendChild(readerElement);
+        imageManager.wrapperElements.push(readerElement);
+        var nestedReaderElement = document.createElement("div");
+        nestedReaderElement.className = "reader_img";
+        imageManager.readerElements.push(nestedReaderElement);
+        readerElement.appendChild(nestedReaderElement);
+        var jqueryReaderElement = $(nestedReaderElement);
+        activateZoom(jqueryReaderElement);
+        jqueryReaderElement.data(loaded, false);
+    }
+    imageManager.setupReaderElements();
+    imageManager.goToImage = function (image, onComplete, animate) {
+        var that = this;
+        if(valid(that.animation)) {
+            that.animation.stop();
+            that.animation = null;
+        }
+        var loc = imageManager.docWidth / 2;
+        for(var i = 0; i < image; i++) {
+            loc += imageManager.docWidth;
+        }
         if (animate) {
-            this.animateReaderRow(calculatedWidth, onComplete);
+            this.animateReaderRow(loc, onComplete);
         } else {
-            this.setReaderRowLoc(calculatedWidth);
+            this.setReaderRowLoc(loc);
             if (valid(onComplete)) {
                 onComplete();
             }
         }
-        this.imgRight.animate({opacity: 0}, animate ? imageSlideTime : 0);
-        this.imgRight.css("pointer-events", "none");
-        this.imgCenter.animate({opacity: 0}, animate ? imageSlideTime : 0);
-        this.imgCenter.css("pointer-events", "none");
-        this.imgLeft.animate({opacity: 1}, animate ? imageSlideTime : 0);
-        this.imgLeft.css("pointer-events", "all");
+        currentPage = image;
     };
-    imageManager.goToCenterImage = function (onComplete, animate) {
-        if (this.animating) {
-            return;
-        }
-        this.selectedImage = 1;
-        var leftImgWidth = this.imgLeft.width();
-        var centerImgWidth = this.imgCenter.width();
-        var calculatedWidth = leftImgWidth + (centerImgWidth / 2);
-        if (animate) {
-            this.animateReaderRow(calculatedWidth, onComplete);
-        } else {
-            this.setReaderRowLoc(calculatedWidth);
-            if (valid(onComplete)) {
-                onComplete();
-            }
-        }
-        this.imgRight.animate({opacity: 0}, animate ? imageSlideTime : 0);
-        this.imgRight.css("pointer-events", "none");
-        this.imgCenter.animate({opacity: 1}, animate ? imageSlideTime : 0);
-        this.imgCenter.css("pointer-events", "all");
-        this.imgLeft.animate({opacity: 0}, animate ? imageSlideTime : 0);
-        this.imgLeft.css("pointer-events", "none");
-    };
-    imageManager.goToRightImage = function (onComplete, animate) {
-        if (this.animating) {
-            return;
-        }
-        this.selectedImage = 2;
-        var leftImgWidth = this.imgLeft.width();
-        var centerImgWidth = this.imgCenter.width();
-        var rightImgWidth = this.imgRight.width();
-        var calculatedWidth = leftImgWidth + centerImgWidth + (rightImgWidth / 2);
-        if (animate) {
-            this.animateReaderRow(calculatedWidth, onComplete);
-        } else {
-            this.setReaderRowLoc(calculatedWidth);
-            if (valid(onComplete)) {
-                onComplete();
-            }
-        }
-        this.imgRight.animate({opacity: 1}, animate ? imageSlideTime : 0);
-        this.imgRight.css("pointer-events", "all");
-        this.imgCenter.animate({opacity: 0}, animate ? imageSlideTime : 0);
-        this.imgCenter.css("pointer-events", "none");
-        this.imgLeft.animate({opacity: 0}, animate ? imageSlideTime : 0);
-        this.imgLeft.css("pointer-events", "all");
-    };
-    imageManager.goToSelectedImage = function (onComplete, animate) {
-        if (this.selectedImage == 0) {
-            this.goToLeftImage(onComplete, animate);
-        } else if (this.selectedImage == 1) {
-            this.goToCenterImage(onComplete, animate);
-        } else if (this.selectedImage == 2) {
-            this.goToRightImage(onComplete, animate);
-        }
+    imageManager.goToSelectedImage = function(onComplete, animate) {
+        this.goToImage(currentPage, onComplete, animate);
     };
     imageManager.getSelectedImage = function () {
-        if (this.selectedImage == 0) {
-            return this.imgLeft;
-        } else if (this.selectedImage == 1) {
-            return this.imgCenter;
-        } else if (this.selectedImage == 2) {
-            return this.imgRight
-        }
+        var that = this;
+        return that.readerElements[that.selectedImage];
     };
     $(window).resize(function () {
+        imageManager.setupReaderElements();
         imageManager.goToSelectedImage(null, true);
-        imageManager.docWidth = $(document).width();
     });
-    activateZoom(imageManager.imgLeft);
-    activateZoom(imageManager.imgCenter);
-    activateZoom(imageManager.imgRight);
-    // setupImage(imageManager.imgLeft);
-    // setupImage(imageManager.imgCenter);
-    // setupImage(imageManager.imgRight);
-    imageManager.imgLeft.data(loaded, false);
-    imageManager.imgCenter.data(loaded, false);
-    imageManager.imgRight.data(loaded, false);
     imageManager.goToSelectedImage(null, true);
 }
 function hasPrevPage() {
@@ -218,23 +176,15 @@ function enableButton(button) {
     button.removeClass(disabledButtonClass);
 }
 function imageUrl(page) {
-    return imgRoot + "/" + mangaId + "/" + chapterId + "/" + page + "/" + lastReqId;
-}
-function redownloadImageUrl(page) {
-    return imgRoot + "/" + mangaId + "/" + chapterId + "/" + page + "/" + (lastReqId++);
+    return imgRoot + "/" + mangaId + "/" + chapterId + "/" + page + "/" + lastReqId + "/";
 }
 function activateZoom(image) {
     image.click(function () {
         $.featherlight(`
         <div class="reader_zoom_img">
-            <img src="` + image.attr('src') + `" style="transform: ` + getRotationCSS() + `" alt="Zoomable Image"/>
+            <img src="` + image.data('src') + `" style="transform: ` + getRotationCSS() + `" alt="Zoomable Image"/>
         </div>
         `, {});
-    });
-}
-function setupImage(image) {
-    image.on("error", function () {
-        image.attr("src", brokenImage);
     });
 }
 function setupButtonManager() {
@@ -246,59 +196,16 @@ function setupButtonManager() {
     buttonManager.fullscreenBtn = $("#fullscreen_button");
     buttonManager.rotateBtn = $("#rotate_button");
     buttonManager.downloadBtn = $("#redownload_button");
-    buttonManager.loading = $("#loading_text");
     buttonManager.lock = false;
     buttonManager.nextBtn.click(function () {
-        //Locking stuff
-        if(buttonManager.lock) return;
-        buttonManager.lock = true;
-        setTimeout(function() {
-            buttonManager.lock = false;
-        }, imageSlideTime);
         if(hasNextPage()) {
-            if (imageManager.selectedImage === 0) {
-                applyRotation(imageManager.imgCenter);
-                imageManager.goToCenterImage(function() {
-                    updateRotation();
-                }, true);
-            } else if (imageManager.selectedImage === 1) {
-                applyRotation(imageManager.imgRight);
-                imageManager.goToRightImage(function () {
-                    moveImagesLeft();
-                    //TODO Consider no more images
-                    imageManager.goToCenterImage(null, false);
-                    loadImages();
-                    updateRotation();
-                }, true);
-            }
-            currentPage++;
+            imageManager.goToImage(parseInt(currentPage) + 1, null, true);
             updateButtons();
         }
     });
     buttonManager.previousBtn.click(function () {
-        //Locking stuff
-        if(buttonManager.lock) return;
-        buttonManager.lock = true;
-        setTimeout(function() {
-            buttonManager.lock = false;
-        }, imageSlideTime);
         if(hasPrevPage()) {
-            if (imageManager.selectedImage === 2) {
-                applyRotation(imageManager.imgCenter);
-                imageManager.goToCenterImage(function() {
-                    updateRotation();
-                }, true);
-            } else if (imageManager.selectedImage === 1) {
-                applyRotation(imageManager.imgLeft);
-                imageManager.goToLeftImage(function () {
-                    moveImagesRight();
-                    //TODO Consider no more images
-                    imageManager.goToCenterImage(null, false);
-                    loadImages();
-                    updateRotation();
-                }, true);
-            }
-            currentPage--;
+            imageManager.goToImage(parseInt(currentPage) - 1, null, true);
             updateButtons();
         }
     });
@@ -339,16 +246,21 @@ function rotateImage() {
     updateRotation();
 }
 function updateRotation() {
-    imageManager.imgLeft.css("transform", "");
-    imageManager.imgCenter.css("transform", "");
-    imageManager.imgRight.css("transform", "");
-    applyRotation(imageManager.getSelectedImage());
+    for(var i = 0; i < imageManager.readerElements.length; i++) {
+        applyRotation($(imageManager.readerElements[i]));
+    }
 }
 function getRotationCSS() {
     return "rotate(" + (imageManager.rotation * 90) + "deg)";
 }
 function applyRotation(image) {
     image.css("transform", getRotationCSS());
+    //Reverse dimensions
+    if(imageManager.rotation % 2) {
+        image.css("width", $(document).height() + "px");
+    } else {
+        image.css("width", "");
+    }
 }
 function toggleFullScreen() {
     if ((document.fullScreenElement && document.fullScreenElement !== null) ||
@@ -373,43 +285,45 @@ function toggleFullScreen() {
 function copySrcFromTo(i1, i2) {
     i2.attr("src", i1.attr("src"));
 }
-function moveImagesLeft() {
-    copySrcFromTo(imageManager.imgCenter, imageManager.imgLeft);
-    copySrcFromTo(imageManager.imgRight, imageManager.imgCenter);
-    imageManager.imgRight.attr("src", blankImage);
-    imageManager.imgRight.data(loaded, false);
-}
-function moveImagesRight() {
-    copySrcFromTo(imageManager.imgCenter, imageManager.imgRight);
-    copySrcFromTo(imageManager.imgLeft, imageManager.imgCenter);
-    imageManager.imgLeft.attr("src", blankImage);
-    imageManager.imgLeft.data(loaded, false);
-}
 function loadImages() {
-    if(imageManager.selectedImage === 0) {
-        tryLoad(imageManager.imgLeft, currentPage);
-        tryLoad(imageManager.imgCenter, currentPage + 1);
-        tryLoad(imageManager.imgRight, currentPage + 2);
-    } else if(imageManager.selectedImage === 1) {
-        tryLoad(imageManager.imgLeft, currentPage - 1);
-        tryLoad(imageManager.imgCenter, currentPage);
-        tryLoad(imageManager.imgRight, currentPage + 1);
-    } else if(imageManager.selectedImage === 2) {
-        tryLoad(imageManager.imgLeft, currentPage - 2);
-        tryLoad(imageManager.imgCenter, currentPage - 1);
-        tryLoad(imageManager.imgRight, currentPage);
+    for(var i = 0; i < maxPages; i++) {
+        tryLoad($(imageManager.readerElements[i]), i);
     }
 }
-function srcAttrValid(image) {
-    var src = image.attr("src");
-    return !(src === blankImage || src === brokenImage);
-
+function imageElement(image, src) {
+    image.css("background-image", "url(\"" + src + "\")");
+    image.data("src", src);
+    properlyScaleImage(image);
 }
+function properlyScaleImage(image) {
+    var src = image.data("src");
+    var img = new Image;
+    img.onload = function() {
+        if (img.width < image.width() && img.height < image.height()) {
+            image.css("background-size", "auto auto");
+        } else {
+            image.css("background-size", "contain");
+        }
+    };
+    img.src = src;
+}
+//Resacle images on window resize
+$(window).resize(function() {
+    for(var i = 0; i < maxPages; i++) {
+        var image = imageManager.readerElements[i];
+        var jImage = $(image);
+        if(jImage.data("loaded")) {
+            properlyScaleImage(image);
+            applyRotation(image);
+        }
+    }
+});
+//TODO Load them in a chain, not all at once
 var cachedPages = {};
 function tryLoad(image, page) {
-    if(page >= 0 && page < maxPages && (!image.data(loaded) || !srcAttrValid(image))) {
+    if(page >= 0 && page < maxPages && (!image.data(loaded))) {
         if(valid(cachedPages[page])) {
-            image.attr("src", cachedPages[page].url);
+            imageElement(image, cachedPages[page].url);
             image.data(loaded, true);
             return;
         }
@@ -423,25 +337,18 @@ function tryLoad(image, page) {
             } else {
                 var url = URL.createObjectURL(xhr.response);
                 cachedPages[page] = {url: url, blob: xhr.response};
-                image.attr("src", url);
+                imageElement(image, cachedPages[page].url);
                 image.data(loaded, true);
             }
-            buttonManager.loading.css("opacity", "0");
         };
         xhr.onerror = function(e) {
             console.log("Error loading image: " + xhr.statusText);
-            buttonManager.loading.css("opacity", "0");
         };
-
-        buttonManager.loading.css("opacity", "1");
         xhr.send();
     }
 }
 function animate(time) {
     requestAnimationFrame(animate);
-    if(!imageManager.animating) {
-        imageManager.goToSelectedImage(null, false);
-    }
     //Keeps Tween updated
     TWEEN.update(time);
 }

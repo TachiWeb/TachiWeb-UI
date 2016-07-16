@@ -158,11 +158,23 @@ body, html {
     display: flex;
     align-items: center;
 }
-.reader_img {
+
+.reader_img_wrapper {
     display: inline-block;
+    height: 100%;
+    width: 100%;
     margin: 0;
-    opacity: 0;
-    max-height: 100%;
+    padding: 0 100px;
+}
+/*noinspection CssOptimizeSimilarProperties*/
+.reader_img {
+    margin: 0 auto;
+    height: 100%;
+    width: 100%;
+    /** DO NOT MERGE THE STYLES BELOW **/
+    background-image: url(../img/loading.gif);
+    background-repeat: no-repeat;
+    background-position: center;
 }
 .reader_zoom_img {
     max-height: 100%;
@@ -193,17 +205,4 @@ body, html {
 .featherlight .featherlight-close:hover {
     /** https://codepen.io/sdthornton/pen/wBZdXq **/
     box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
-}
-/** Loading **/
-#loading_text {
-    position: absolute;
-    color: white;
-    background-color: rgba(0,0,0,0.8);
-    left: 50%;
-    top: 50%;
-    font-size: 50px;
-    transition: all 0.5s;
-    opacity: 0;
-    pointer-events: none;
-    transform: translate(-50%, -50%);
 }
