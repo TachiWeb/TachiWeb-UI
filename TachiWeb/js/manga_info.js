@@ -21,6 +21,8 @@ var favBtnIcon;
 var mangaDescElement;
 var mangaTitleElement;
 
+var pageListDialog;
+
 var currentInfo;
 var currentChapters;
 var mangaId = QueryString.id;
@@ -57,7 +59,9 @@ function onLoad() {
 	chaptersTab = $("#chapter_tab");
 	infoPanel = $("#info_panel");
 	chaptersPanel = $("#chapter_panel");
-	spinner = $(".loading_spinner");
+	spinner = $("#info_spinner");
+
+	pageListDialog = $("#page_list_dialog");
 
 	infoHeaderElement = $("#info_header");
 	coverImgElement = $("#cover_img");
@@ -77,6 +81,13 @@ function onLoad() {
 	setupBrowserUrlButton();
 	setupFilters();
 	setupSort();
+	setupDialogs();
+}
+function setupDialogs() {
+	//Dialog polyfills
+	if (!rawElement(pageListDialog).showModal) {
+		dialogPolyfill.registerDialog(rawElement(pageListDialog));
+	}
 }
 function setupSort() {
 	reverseOrderBtn.click(function() {
@@ -205,6 +216,30 @@ function applyFilters(chapters) {
 	}
 }
 
+function buildPageCountUrl(mangaId, chapterId) {
+	return pageCountRoot + "/" + mangaId + "/" + chapterId;
+}
+function openChapter(chapterId, lastPageRead) {
+	rawElement(pageListDialog).showModal();
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", buildPageCountUrl(mangaId, chapterId), true);
+	xhr.onload = function() {
+		var pages = xhr.responseText;
+		if(!$.isNumeric(pages)) {
+			pageListError(chapterId);
+			console.error("Page list was not numeric!");
+		} else {
+			window.location.href = "reader/reader/reader.html?m=" + mangaId + "&c=" + chapterId + "&mp=" + xhr.responseText + "&p=" + lastPageRead + "&b=" + encodeURI(window.location.href);
+		}
+		rawElement(pageListDialog).close();
+	};
+	xhr.onerror = function() {
+		pageListError(chapterId);
+		rawElement(pageListDialog).close();
+	};
+	xhr.send();
+}
+
 function updateChaptersUI(chapters) {
 	clearElement(chaptersPanel[0]);
 	for(var i = 0; i < chapters.length; i++) {
@@ -240,6 +275,11 @@ function updateChaptersUI(chapters) {
 		downloadElement.textContent = ""; //TODO Change when downloading is actually implemented
 		bottomRow.appendChild(downloadElement);
 		element.appendChild(bottomRow);
+		$(element).click(function (chapterId, lastPageRead) {
+			return function() {
+				openChapter(chapterId, lastPageRead);
+			};
+		}(chapter.id, chapter.last_page_read));
 		chaptersPanel[0].appendChild(element);
 		componentHandler.upgradeElement(element);
 	}
@@ -317,6 +357,16 @@ function chaptersUpdateError() {
 		actionText: "Retry",
 		actionHandler: function() {
 			updateChapters();
+		}
+	});
+}
+function pageListError(chapterId) {
+	snackbar.showSnackbar({
+		message: "Error getting page list!",
+		timeout: 2000,
+		actionText: "Retry",
+		actionHandler: function() {
+			openChapter(chapterId);
 		}
 	});
 }

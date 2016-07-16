@@ -82,3 +82,6 @@
   color: green;
   float: right;
 }
+.dialog_spinner_wrapper {
+  position: relative;
+}
