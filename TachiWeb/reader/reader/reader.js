@@ -39,10 +39,6 @@ if(!valid(currentPage) || currentPage < 0) {
     currentPage = 0;
 }
 var maxPages = QueryString.mp;
-var lastReqId = QueryString.r;
-if(!valid(lastReqId)) {
-    lastReqId = 0;
-}
 var hasNextChapter = QueryString.nc;
 var hasPrevChapter = QueryString.pc;
 var backLink = QueryString.b;
@@ -174,7 +170,7 @@ function enableButton(button) {
     button.removeClass(disabledButtonClass);
 }
 function imageUrl(page) {
-    return imgRoot + "/" + mangaId + "/" + chapterId + "/" + page + "/" + lastReqId + "/";
+    return imgRoot + "/" + mangaId + "/" + chapterId + "/" + page;
 }
 function activateZoom(image) {
     image.click(function () {
