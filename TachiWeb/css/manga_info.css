@@ -61,23 +61,24 @@
   float: left;
 }
 .chapter_row_bottom {
+  position: relative;
   width: 100%;
-  text-align: justify;
-  font-size: 15px;
-  height: 20px;
-}
-.chapter_row_bottom:after {
-  content: "";
-  width: 100%;
-  display: inline-block;
 }
 .chapter_row_bottom_entry {
   display: inline-block;
   vertical-align: top;
 }
+.chapter_date {
+  float: left;
+}
 .chapter_page {
+  left: 0;
+  position: absolute;
   color: grey;
+  width: 100%;
+  text-align: center;
 }
 .chapter_downloaded {
   color: green;
+  float: right;
 }

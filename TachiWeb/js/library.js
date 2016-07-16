@@ -112,6 +112,10 @@ function appendManga(manga, element) {
     label.className = "manga_card_label";
     label.textContent = manga.title;
     card.appendChild(label);
+    $(card).click(function() {
+        var currentUrl = window.location.href;
+        window.location.href = "manga_info.html?id=" + manga.id + "&b=" + encodeURI(currentUrl);
+    });
     element.appendChild(card);
     componentHandler.upgradeElement(card);
     componentHandler.upgradeElement(element);
