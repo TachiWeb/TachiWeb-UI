@@ -14,7 +14,7 @@ var QueryString = function () {
     var query_string = {};
     var query = window.location.search.substring(1);
     var vars = query.split("&");
-    for (var i=0;i<vars.length;i++) {
+    for (var i = 0; i < vars.length; i++) {
         var pair = vars[i].split("=");
         // If first entry with this name
         if (typeof query_string[pair[0]] === "undefined") {
@@ -35,13 +35,17 @@ var mangaId = QueryString.m;
 var mangaName = QueryString.mn;
 var chapterId = QueryString.c;
 var currentPage = QueryString.p;
-if(!valid(currentPage) || currentPage < 0) {
+if (!valid(currentPage) || currentPage < 0) {
     currentPage = 0;
 }
 var maxPages = QueryString.mp;
 var hasNextChapter = QueryString.nc;
 var hasPrevChapter = QueryString.pc;
 var backLink = QueryString.b;
+var rightToLeft = QueryString.rtl;
+if (!valid(rightToLeft)) {
+    rightToLeft = false;
+}
 
 function onLoad() {
     setupReader();
@@ -90,17 +94,18 @@ function setupImageManager() {
     };
     imageManager.readerElements = [];
     imageManager.wrapperElements = [];
-    imageManager.setupReaderElements = function() {
+    imageManager.setupReaderElements = function () {
         var that = this;
         that.docWidth = $(document).width();
-        for(var i = 0; i < imageManager.wrapperElements.length; i++) {
+        for (var i = 0; i < imageManager.wrapperElements.length; i++) {
             that.wrapperElements[i].css("width", (imageManager.docWidth - 200) + "px");
         }
     };
-    for(var i = 0; i < maxPages; i++) {
+    var tmpImageArray = [];
+    for (var i = 0; i < maxPages; i++) {
         var readerElement = document.createElement("div");
         readerElement.className = "reader_img_wrapper";
-        imageManager.readerRow[0].appendChild(readerElement);
+        tmpImageArray.push(readerElement);
         imageManager.wrapperElements.push($(readerElement));
         var nestedReaderElement = document.createElement("div");
         nestedReaderElement.className = "reader_img";
@@ -109,16 +114,32 @@ function setupImageManager() {
         var jqueryReaderElement = $(nestedReaderElement);
         jqueryReaderElement.data(loaded, false);
     }
+    //Deal with right to left
+    if (rightToLeft) {
+        tmpImageArray.reverse();
+    }
+    for (i = 0; i < tmpImageArray.length; i++) {
+        imageManager.readerRow[0].appendChild(tmpImageArray[i]);
+    }
     imageManager.setupReaderElements();
     imageManager.goToImage = function (image, onComplete, animate) {
         var that = this;
-        if(valid(that.animation)) {
+        if (valid(that.animation)) {
             that.animation.stop();
             that.animation = null;
         }
-        var loc = imageManager.docWidth / 2;
-        for(var i = 0; i < image; i++) {
-            loc += imageManager.docWidth;
+        var loc;
+        var i;
+        if(rightToLeft) {
+            loc = imageManager.docWidth / 2;
+            for (i = maxPages - 1; i > image; i--) {
+                loc += imageManager.docWidth;
+            }
+        } else {
+            loc = imageManager.docWidth / 2;
+            for (i = 0; i < image; i++) {
+                loc += imageManager.docWidth;
+            }
         }
         if (animate) {
             this.animateReaderRow(loc, onComplete);
@@ -130,7 +151,7 @@ function setupImageManager() {
         }
         currentPage = image;
     };
-    imageManager.goToSelectedImage = function(onComplete, animate) {
+    imageManager.goToSelectedImage = function (onComplete, animate) {
         this.goToImage(currentPage, onComplete, animate);
     };
     imageManager.getSelectedImage = function () {
@@ -151,12 +172,12 @@ function hasNextPage() {
 }
 //TODO Seamless chapters
 function updateButtons() {
-    if(hasPrevPage()) {
+    if (hasPrevPage()) {
         enableButton(buttonManager.previousBtn);
     } else {
         disableButton(buttonManager.previousBtn);
     }
-    if(hasNextPage()) {
+    if (hasNextPage()) {
         enableButton(buttonManager.nextBtn);
     } else {
         disableButton(buttonManager.nextBtn);
@@ -186,46 +207,50 @@ function setupButtonManager() {
     buttonManager = {};
     buttonManager.previousBtn = $("#rbtn_previous_page");
     buttonManager.nextBtn = $("#rbtn_next_page");
+    //Swap buttons if left to right
+    if(rightToLeft) {
+        [buttonManager.previousBtn, buttonManager.nextBtn] = [buttonManager.nextBtn, buttonManager.previousBtn];
+    }
     buttonManager.backBtn = $("#back_button");
     buttonManager.fullscreenBtn = $("#fullscreen_button");
     buttonManager.rotateBtn = $("#rotate_button");
     buttonManager.downloadBtn = $("#redownload_button");
     buttonManager.lock = false;
     buttonManager.nextBtn.click(function () {
-        if(hasNextPage()) {
+        if (hasNextPage()) {
             imageManager.goToImage(parseInt(currentPage) + 1, null, true);
             updateButtons();
         }
     });
     buttonManager.previousBtn.click(function () {
-        if(hasPrevPage()) {
+        if (hasPrevPage()) {
             imageManager.goToImage(parseInt(currentPage) - 1, null, true);
             updateButtons();
         }
     });
-    $(document).keydown(function(e) {
-        if(e.key === "ArrowRight") {
+    $(document).keydown(function (e) {
+        if (e.key === "ArrowRight") {
             buttonManager.nextBtn.click();
-        } else if(e.key === "ArrowLeft") {
+        } else if (e.key === "ArrowLeft") {
             buttonManager.previousBtn.click();
         }
     });
-    buttonManager.backBtn.click(function() {
-        if(valid(backLink)) {
+    buttonManager.backBtn.click(function () {
+        if (valid(backLink)) {
             window.location.href = backLink;
         } else {
             window.history.back();
         }
     });
-    buttonManager.fullscreenBtn.click(function() {
+    buttonManager.fullscreenBtn.click(function () {
         toggleFullScreen();
     });
-    buttonManager.rotateBtn.click(function() {
+    buttonManager.rotateBtn.click(function () {
         rotateImage();
     });
     buttonManager.downloadBtn.click(function () {
         var cached = cachedPages[currentPage];
-        if(valid(cached)) {
+        if (valid(cached)) {
             var type = cached.blob.type;
             var extension = type.substr(type.indexOf("/") + 1);
             saveAs(cached.blob, currentPage + "." + extension);
@@ -234,13 +259,13 @@ function setupButtonManager() {
 }
 function rotateImage() {
     imageManager.rotation++;
-    if(imageManager.rotation >= 4) {
+    if (imageManager.rotation >= 4) {
         imageManager.rotation = 0;
     }
     updateRotation();
 }
 function updateRotation() {
-    for(var i = 0; i < imageManager.readerElements.length; i++) {
+    for (var i = 0; i < imageManager.readerElements.length; i++) {
         applyRotation(imageManager.readerElements[i]);
     }
 }
@@ -250,7 +275,7 @@ function getRotationCSS() {
 function applyRotation(image) {
     image.css("transform", getRotationCSS());
     //Reverse dimensions
-    if(imageManager.rotation % 2) {
+    if (imageManager.rotation % 2) {
         image.css("width", $(document).height() + "px");
     } else {
         image.css("width", "");
@@ -287,7 +312,7 @@ function setImageSource(image, src) {
 function properlyScaleImage(image) {
     var src = image.data("src");
     var img = new Image;
-    img.onload = function() {
+    img.onload = function () {
         if (img.width < image.width() && img.height < image.height()) {
             image.css("background-size", "auto auto");
         } else {
@@ -297,10 +322,10 @@ function properlyScaleImage(image) {
     img.src = src;
 }
 //Rescale images on window resize
-$(window).resize(function() {
-    for(var i = 0; i < maxPages; i++) {
+$(window).resize(function () {
+    for (var i = 0; i < maxPages; i++) {
         var image = imageManager.readerElements[i];
-        if(image.data(loaded)) {
+        if (image.data(loaded)) {
             properlyScaleImage(image);
             applyRotation(image);
         }
@@ -309,8 +334,8 @@ $(window).resize(function() {
 //TODO Load them in a chain, not all at once
 var cachedPages = {};
 function tryLoad(image, page) {
-    if(page >= 0 && page < maxPages && (!image.data(loaded))) {
-        if(valid(cachedPages[page])) {
+    if (page >= 0 && page < maxPages && (!image.data(loaded))) {
+        if (valid(cachedPages[page])) {
             setImageSource(image, cachedPages[page].url);
             image.data(loaded, true);
             activateZoom(image);
@@ -321,7 +346,7 @@ function tryLoad(image, page) {
         xhr.open('GET', imageUrl(page), true);
         xhr.responseType = 'blob';
 
-        xhr.onload = function(e) {
+        xhr.onload = function (e) {
             if (this.status !== 200) {
                 console.log("Got image with bad status code: " + this.status + "!");
             } else {
@@ -333,7 +358,7 @@ function tryLoad(image, page) {
             }
             loadNextImage();
         };
-        xhr.onerror = function(e) {
+        xhr.onerror = function (e) {
             console.error("Error loading image: " + xhr.statusText, e);
             loadNextImage();
         };
@@ -350,29 +375,31 @@ function loadNextImage() {
         function shouldLoad(page) {
             return !jqueryPageElement(page).data(loaded);
         }
+
         var i;
-        if(to > from) {
+        if (to > from) {
             for (i = Math.max(from + 1, 0); i <= Math.min(to, maxPages - 1); i++) {
                 if (shouldLoad(i)) {
                     return i;
                 }
             }
         } else {
-            for(i = Math.min(from - 1, maxPages - 1); i >= Math.max(to, 0); i--) {
-                if(shouldLoad(i)) {
+            for (i = Math.min(from - 1, maxPages - 1); i >= Math.max(to, 0); i--) {
+                if (shouldLoad(i)) {
                     return i;
                 }
             }
         }
         return null;
     }
+
     var nextPageToLoad = null;
-    if(!jqueryPageElement(parseInt(currentPage)).data(loaded)) {
+    if (!jqueryPageElement(parseInt(currentPage)).data(loaded)) {
         nextPageToLoad = parseInt(currentPage);
     }
     //TODO Make these configurable???
     //Search three pages ahead, then one behind, then three ahead, then one behind and so on...
-    for(var i = 1; i <= maxPages; i++) {
+    for (var i = 1; i <= maxPages; i++) {
         if (!valid(nextPageToLoad)) {
             //Check next 3 pages
             nextPageToLoad = findNotLoadedPage(parseInt(currentPage), parseInt(currentPage) + (i * 3));
@@ -387,7 +414,7 @@ function loadNextImage() {
         }
     }
     //Load the image if there is one to load!
-    if(valid(nextPageToLoad)) {
+    if (valid(nextPageToLoad)) {
         console.log("Loading page: " + nextPageToLoad);
         tryLoad(jqueryPageElement(nextPageToLoad), nextPageToLoad);
     } else {
