@@ -171,7 +171,7 @@ function setupImageManager() {
 function updateReadingStatus(page) {
     var url;
     if (page === parseInt(maxPages) - 1) {
-        url = lastPageReadUrl(0, true);
+        url = lastPageReadUrl(page, true);
     } else {
         url = lastPageUrl(page);
     }
