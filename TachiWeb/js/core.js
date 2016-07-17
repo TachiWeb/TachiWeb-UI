@@ -5,6 +5,10 @@ var libraryRoot = apiRoot + "/library";
 var infoRoot = apiRoot + "/manga_info";
 var chaptersRoot = apiRoot + "/chapters";
 var pageCountRoot = apiRoot + "/page_count";
+var restoreRoot = apiRoot + "/restore_file";
+var backupRoot = apiRoot + "/backup";
+var faveRoot = apiRoot + "/fave";
+var readingStatusRoot = apiRoot + "/reading_status";
 var snackbar;
 var QueryString = function () {
 	// This function is anonymous, is executed immediately and

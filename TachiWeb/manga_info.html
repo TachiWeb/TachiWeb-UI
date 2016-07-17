@@ -83,6 +83,12 @@
     </label>
         <li id="clear_filters_btn" class="mdl-menu__item">Remove filter</li>
     </ul>
+    <div id="chapter_menus">
+    <ul class="mdl-menu mdl-js-ripple-effect mdl-menu--top-right mdl-js-menu">
+        <li class="mdl-menu__item">Download</li>
+        <li class="mdl-menu__item">Mark as unread/read</li>
+    </ul>
+    </div>
     <!-- Tooltips -->
     <div class="mdl-tooltip mdl-tooltip--large" for="filter_btn">
         Filter
@@ -106,6 +112,7 @@
         More
     </div>
     <main class="mdl-layout__content">
+        <div id="chapter_buttons"></div>
         <!-- Page list loading dialog -->
         <dialog id="page_list_dialog" class="mdl-dialog">
             <h3 class="mdl-dialog__title">Please wait</h3>
@@ -141,7 +148,7 @@
                 </div>
             </div>
             <!-- TODO Floating fab read button -->
-            <div class="mdl-tabs__panel tab_panel selected is-active" id="chapter_panel">
+            <div class="mdl-tabs__panel tab_panel selected is-active" id="chapter_panel" oncontextmenu="return false;">
             </div>
         </div>
         <!-- Snackbar -->

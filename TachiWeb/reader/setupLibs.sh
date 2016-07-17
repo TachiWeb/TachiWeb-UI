@@ -29,4 +29,8 @@ popd
 echo -e "\e[93m\e[1mGetting FileSaver...\e[0m"
 wget "https://raw.githubusercontent.com/eligrey/FileSaver.js/master/FileSaver.min.js" -O "FileSaver.min.js"
 
+# Dragscroll
+echo -e "\e[93m\e[1mGetting Dragscroll...\e[0m"
+wget "https://raw.githubusercontent.com/asvd/dragscroll/master/dragscroll.js" -O "dragscroll.js"
+
 echo -e "\e[92m\e[1mAll required libraries downloaded!\e[0m"

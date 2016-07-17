@@ -76,3 +76,7 @@ html,body {
   opacity: 1;
   pointer-events: none;
 }
+/** Layout **/
+.mdl-layout {
+    overflow: hidden;
+}

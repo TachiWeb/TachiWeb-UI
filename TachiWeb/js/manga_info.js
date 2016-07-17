@@ -13,6 +13,9 @@ var infoPanel;
 var chaptersPanel;
 var spinner;
 
+var chapterMenus;
+var chapterButtons;
+
 var infoHeaderElement;
 var coverImgElement;
 var headerContentElement;
@@ -61,6 +64,9 @@ function onLoad() {
 	chaptersPanel = $("#chapter_panel");
 	spinner = $("#info_spinner");
 
+	chapterMenus = $("#chapter_menus");
+	chapterButtons = $("#chapter_buttons");
+
 	pageListDialog = $("#page_list_dialog");
 
 	infoHeaderElement = $("#info_header");
@@ -82,6 +88,7 @@ function onLoad() {
 	setupFilters();
 	setupSort();
 	setupDialogs();
+	setupFaveButton();
 }
 function setupDialogs() {
 	//Dialog polyfills
@@ -93,6 +100,48 @@ function setupSort() {
 	reverseOrderBtn.click(function() {
 		sort.reverse = !sort.reverse;
 		applyAndUpdateChapters(currentChapters);
+	});
+}
+function buildFaveURL(fave) {
+	return faveRoot + "/" + mangaId + "?fave=" + fave;
+}
+function setupFaveButton() {
+	favBtn.click(function() {
+		showSpinner();
+		var xhr = new XMLHttpRequest();
+		var newFaveStatus = !currentInfo.favorite;
+		xhr.open("GET", buildFaveURL(newFaveStatus), true);
+		xhr.onload = function() {
+			try {
+				var res = JSON.parse(xhr.responseText);
+				if(res.success) {
+					currentInfo.favorite = newFaveStatus;
+					updateFaveIcon(newFaveStatus);
+				} else {
+					faveUpdateError();
+				}
+			}
+			catch (e) {
+				console.error(e);
+				faveUpdateError();
+			}
+			hideSpinner();
+		};
+		xhr.onerror = function() {
+			faveUpdateError();
+			hideSpinner();
+		};
+		xhr.send();
+	});
+}
+function faveUpdateError() {
+	snackbar.showSnackbar({
+		message: "Error setting favorite status!",
+		timeout: 2000,
+		actionText: "Retry",
+		actionHandler: function() {
+			favBtn.click();
+		}
 	});
 }
 function setupFilters() {
@@ -241,7 +290,9 @@ function openChapter(chapterId, lastPageRead) {
 }
 
 function updateChaptersUI(chapters) {
-	clearElement(chaptersPanel[0]);
+	clearElement(rawElement(chaptersPanel));
+	clearElement(rawElement(chapterMenus));
+	clearElement(rawElement(chapterButtons));
 	for(var i = 0; i < chapters.length; i++) {
 		var chapter = chapters[i];
 		var element = document.createElement("div");
@@ -255,6 +306,58 @@ function updateChaptersUI(chapters) {
 		titleElement.className = "chapter_title";
 		titleElement.textContent = chapter.name;
 		titleRow.appendChild(titleElement);
+
+		//The code below enables VERY HACKY context menus, these menus were hacked together so don't expect them to not be buggy
+		//Menu Button
+		var menuElement = document.createElement("button");
+		menuElement.className = "chapter_button mdl-button mdl-js-button";
+		menuElement.id = "chapter_button_" + i;
+		$(element).mousedown(function(menuElement, i) {
+			return function(event) {
+				if(event.which === 3) {
+					if(i === chapters.length - 1) {
+						menuElement.css("right", $(document).width() - event.pageX + "px");
+						menuElement.css("top", -$(document).height() + event.pageY + "px");
+					} else {
+						menuElement.css("left", event.pageX + "px");
+						menuElement.css("top", (event.pageY - 35) + "px");
+					}
+					menuElement.click();
+					event.preventDefault();
+				}
+			};
+		}($(menuElement), i));
+		rawElement(chapterButtons).appendChild(menuElement);
+		//Menu
+		var menu = document.createElement("ul");
+		var menuLoc;
+		//Last one opens upwards
+		if(i === chapters.length - 1) {
+			menuLoc = "mdl-menu--top-right";
+		} else {
+			menuLoc = "mdl-menu--bottom-left";
+		}
+		menu.className = "chapter_menu mdl-menu mdl-js-ripple-effect " + menuLoc + " mdl-js-menu";
+		menu.setAttribute("for", menuElement.id);
+		var menuDownloadButton = document.createElement("li");
+		menuDownloadButton.className = "mdl-menu__item";
+		menuDownloadButton.textContent = "Download";
+		menu.appendChild(menuDownloadButton);
+		var menuMarkButton = document.createElement("li");
+		menuMarkButton.className = "mdl-menu__item";
+		menuMarkButton.textContent = "Mark as " + (chapter.read ? "unread" : "read");
+		$(menuMarkButton).click(function(chapter) {
+			return function() {
+				markReadingStatus(chapter, !chapter.read);
+			};
+		}(chapter));
+		menu.appendChild(menuMarkButton);
+		rawElement(chapterMenus).appendChild(menu);
+		componentHandler.upgradeElement(menuElement);
+		componentHandler.upgradeElement(menu);
+		componentHandler.upgradeElement(menuDownloadButton);
+		componentHandler.upgradeElement(menuMarkButton);
+
 		element.appendChild(titleRow);
 		element.appendChild(document.createElement("br"));
 		element.appendChild(document.createElement("br"));
@@ -283,6 +386,40 @@ function updateChaptersUI(chapters) {
 		chaptersPanel[0].appendChild(element);
 		componentHandler.upgradeElement(element);
 	}
+}
+function buildReadingStatusUrl(chapter, read) {
+	return readingStatusRoot + "/" + mangaId + "/" + chapter.id + "?read=" + read;
+}
+function markReadingStatus(chapter, state) {
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", buildReadingStatusUrl(chapter, state), true);
+	xhr.onload = function () {
+		try {
+			var res = JSON.parse(xhr.responseText);
+			if (!res.success) {
+				readingStatusError(chapter, state);
+			} else {
+				chapter.read = state;
+				applyAndUpdateChapters(currentChapters);
+			}
+		} catch (e) {
+			readingStatusError(chapter, state);
+		}
+	};
+	xhr.onerror = function () {
+		readingStatusError(chapter, state);
+	};
+	xhr.send();
+}
+function readingStatusError(chapter, state) {
+	snackbar.showSnackbar({
+		message: "Error setting reading status!",
+		timeout: 2000,
+		actionText: "Retry",
+		actionHandler: function() {
+			markReadingStatus(chapter, state);
+		}
+	});
 }
 function updateInfoUI(info) {
 	//Set title
@@ -315,16 +452,19 @@ function updateInfoUI(info) {
 		mangaDescElement.html("<strong>Description</strong><br>" + info.description);
 	}
 	//Set favorite
-	if(info.favorite) {
-		favBtnIcon.html("turned_in");
-	} else {
-		favBtnIcon.html("turned_in_not");
-	}
+	updateFaveIcon(info.favorite);
 	if(valid(info.url) && info.url !== "") {
 		openBrowserBtn.show();
 		mangaUrl = info.url;
 	} else {
 		openBrowserBtn.hide();
+	}
+}
+function updateFaveIcon(fave) {
+	if(fave) {
+		favBtnIcon.html("turned_in");
+	} else {
+		favBtnIcon.html("turned_in_not");
 	}
 }
 function setupBrowserUrlButton() {
