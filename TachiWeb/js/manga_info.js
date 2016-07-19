@@ -89,6 +89,78 @@ function onLoad() {
     setupSort();
     setupDialogs();
     setupFaveButton();
+    setupRefreshButton();
+}
+function setupRefreshButton() {
+    refreshBtn.click(function() {
+        if(infoTab.hasClass("is-active")) {
+            updateServerInfo();
+        } else if(chaptersTab.hasClass("is-active")) {
+            updateServerChapters();
+        }
+    });
+}
+function updateServerInfo() {
+    function infoUpdateError() {
+        serverUpdateError("manga info", updateServerInfo);
+    }
+    showSpinner();
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", buildServerUpdateURL(mangaId, "INFO"), true);
+    xhr.onload = function () {
+        try {
+            var res = JSON.parse(xhr.responseText);
+            if (res.success) {
+                updateInfo(); //Grab the new updated manga info
+            } else {
+                infoUpdateError();
+            }
+        }
+        catch (e) {
+            console.error(e);
+            infoUpdateError();
+        }
+        hideSpinner();
+    };
+    xhr.onerror = function () {
+        infoUpdateError();
+        hideSpinner();
+    };
+    xhr.send();
+}
+function updateServerChapters() {
+    function chaptersUpdateError() {
+        serverUpdateError("chapters", updateServerChapters);
+    }
+    showSpinner();
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", buildServerUpdateURL(mangaId, "CHAPTERS"), true);
+    xhr.onload = function () {
+        try {
+            var res = JSON.parse(xhr.responseText);
+            if (res.success) {
+                //If there are any changes update the chapters list
+                if(res.added > 0 || res.removed > 0) {
+                    updateChapters();
+                }
+            } else {
+                chaptersUpdateError();
+            }
+        }
+        catch (e) {
+            console.error(e);
+            chaptersUpdateError();
+        }
+        hideSpinner();
+    };
+    xhr.onerror = function () {
+        chaptersUpdateError();
+        hideSpinner();
+    };
+    xhr.send();
+}
+function buildServerUpdateURL(mangaId, updateType) {
+    return updateRoot + "/" + mangaId + "/" + updateType;
 }
 function setupDialogs() {
     //Dialog polyfills
@@ -415,16 +487,6 @@ function markReadingStatus(chapter, state) {
     };
     xhr.send();
 }
-function readingStatusError(chapter, state) {
-    snackbar.showSnackbar({
-        message: "Error setting reading status!",
-        timeout: 2000,
-        actionText: "Retry",
-        actionHandler: function () {
-            markReadingStatus(chapter, state);
-        }
-    });
-}
 function updateInfoUI(info) {
     //Set title
     mangaTitleElement.text(info.title);
@@ -512,6 +574,24 @@ function pageListError(chapterId) {
         actionHandler: function () {
             openChapter(chapterId);
         }
+    });
+}
+function readingStatusError(chapter, state) {
+    snackbar.showSnackbar({
+        message: "Error setting reading status!",
+        timeout: 2000,
+        actionText: "Retry",
+        actionHandler: function () {
+            markReadingStatus(chapter, state);
+        }
+    });
+}
+function serverUpdateError(updateType, retryHandler) {
+    snackbar.showSnackbar({
+        message: "Error updating " + updateType + "!",
+        timeout: 2000,
+        actionText: "Retry",
+        actionHandler: retryHandler
     });
 }
 function showSpinner() {
