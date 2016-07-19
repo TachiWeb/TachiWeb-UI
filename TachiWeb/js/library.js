@@ -1,6 +1,6 @@
 var librarySpinner;
 var libraryWrapper;
-var currentManga;
+var currentManga = [];
 var unreadCheckbox;
 var filters;
 function resetFilters() {
@@ -34,6 +34,54 @@ function updateLibrary() {
         hideSpinner();
     };
     xhr.send();
+}
+function setupUpdateButton() {
+    $("#refresh_btn").click(function() {
+        updateServerLibrary();
+    });
+}
+function updateServerLibrary() {
+    showSpinner();
+    var currentOnComplete = function() {
+        hideSpinner();
+        updateLibrary();
+    };
+    for(var i = 0; i < currentManga.length; i++) {
+        var manga = currentManga[i];
+        currentOnComplete = function(manga, lastOnComplete) {
+            return function() {
+                updateManga(manga, lastOnComplete);
+            };
+        }(manga, currentOnComplete);
+    }
+    currentOnComplete();
+}
+function updateManga(manga, onComplete) {
+    console.log("Updating: " + manga.title + " (" + manga.id + ")");
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", buildMangaUpdateURL(manga.id), true);
+    xhr.onload = function() {
+        try {
+            var res = JSON.parse(xhr.responseText);
+            if(!res.success) {
+                mangaUpdateError(manga.title);
+            }
+        }
+        catch (e) {
+            console.error(e);
+            mangaUpdateError(manga.title);
+        }
+        onComplete();
+    };
+    xhr.onerror = function() {
+        mangaUpdateError(manga.title);
+        onComplete();
+    };
+    xhr.send();
+}
+
+function buildMangaUpdateURL(mangaId){
+    return updateRoot + "/" + mangaId + "/CHAPTERS";
 }
 
 function showSpinner() {
@@ -132,6 +180,13 @@ function libraryUpdateError() {
     });
 }
 
+function mangaUpdateError(manga) {
+    snackbar.showSnackbar({
+        message: "Error updating manga: '" + manga +"'!",
+        timeout: 500
+    });
+}
+
 function applyAndUpdate(mangas) {
     var clonedMangas = mangas.slice(0);
     applyFilters(clonedMangas);
@@ -175,5 +230,6 @@ function onLoad() {
     librarySpinner = $(".loading_spinner");
     libraryWrapper = $("#library_wrapper");
     setupFilters();
+    setupUpdateButton();
     updateLibrary();
 }
