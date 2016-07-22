@@ -32,6 +32,8 @@ var mangaId = QueryString.id;
 var backLink = QueryString.b;
 var mangaUrl;
 
+var firstUpdate = true;
+
 var unreadCheckbox;
 var clearFiltersButton;
 
@@ -303,6 +305,14 @@ function updateChapters() {
             chaptersUpdateError();
         }
         hideSpinner();
+        //If we have no chapters (on first load), refresh chapters
+        if(firstUpdate) {
+            if(currentChapters.length <= 0) {
+                console.log("No chapters on first load, updating chapters...");
+                updateServerChapters();
+                firstUpdate = false;
+            }
+        }
     };
     xhr.onerror = function () {
         chaptersUpdateError();

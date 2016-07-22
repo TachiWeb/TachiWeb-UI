@@ -10,6 +10,8 @@ var backupRoot = apiRoot + "/backup";
 var faveRoot = apiRoot + "/fave";
 var readingStatusRoot = apiRoot + "/reading_status";
 var updateRoot = apiRoot + "/update";
+var sourcesRoot = apiRoot + "/sources";
+var catalogueRoot = apiRoot + "/catalogue";
 var snackbar;
 var QueryString = function () {
 	// This function is anonymous, is executed immediately and
@@ -39,8 +41,8 @@ function buildCoverUrl(mangaId) {
 
 //Remove all children from element
 function clearElement(myNode) {
-    while (myNode.firstChild) {
-        myNode.removeChild(myNode.firstChild);
+    while (rawElement(myNode).firstChild) {
+        rawElement(myNode).removeChild(rawElement(myNode).firstChild);
     }
 }
 

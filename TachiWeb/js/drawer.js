@@ -8,6 +8,7 @@ var drawerNav;
 function setupDrawer() {
     drawerTitle.text("TachiWeb");
     insertDrawerLink("Library", "index.html");
+    insertDrawerLink("Catalogue", "catalogue.html");
 }
 
 function insertDrawerLink(text, link) {

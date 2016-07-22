@@ -15,7 +15,7 @@ function appendManga(manga, element) {
         var currentUrl = window.location.href;
         window.location.href = "manga_info.html?id=" + manga.id + "&b=" + encodeURIComponent(currentUrl);
     });
-    element.appendChild(card);
+    rawElement(element).appendChild(card);
     componentHandler.upgradeElement(card);
-    componentHandler.upgradeElement(element);
+    componentHandler.upgradeElement(rawElement(element));
 }
