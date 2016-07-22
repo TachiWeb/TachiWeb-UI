@@ -1,9 +1,18 @@
 var spinner;
 var sourcesSelect;
-var currentSources = [];
-var searchState;
 var mangaGrid;
+var scrollBox;
+var searchBox;
+
 var currentRequest = null;
+var currentSources = [];
+
+var typingTimer;
+var doneTypingInterval = 250;
+
+var scrollEndPadding = 1000;
+
+var searchState;
 function resetSearchState() {
     searchState = {
         query: null,
@@ -17,12 +26,57 @@ function onLoad() {
     spinner = $(".loading_spinner");
     sourcesSelect = $("#sources_select");
     mangaGrid = $("#manga_grid");
+    scrollBox = $("#page_wrapper");
+    searchBox = $("#search_box");
     setupSourcesSelect();
+    setupScrollBox();
+    setupSearchBox();
     refreshSources();
+}
+
+function setupSearchBox() {
+    /** http://stackoverflow.com/questions/4220126/run-javascript-function-when-user-finishes-typing-instead-of-on-key-up **/
+    searchBox.on("keyup", function() {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(performSearch, doneTypingInterval);
+    });
+    searchBox.on("keydown", function() {
+        clearTimeout(typingTimer);
+    });
+}
+
+function performSearch() {
+    searchState.page = 1;
+    searchState.lastUrl = null;
+    var searchText = rawElement(searchBox).value;
+    if(searchText.trim() !== "") {
+        searchState.query = searchText;
+    } else {
+        //Set to null if no query
+        searchState.query = null;
+    }
+    scrollBox.scrollTop(0);
+    clearElement(mangaGrid);
+    refreshCatalogue();
+}
+
+function setupScrollBox() {
+    scrollBox.on('scroll', function() {
+        if(scrollBox.scrollTop() + scrollBox.innerHeight() >= rawElement(scrollBox).scrollHeight - scrollEndPadding) {
+            if(hasNextPage()) {
+                searchState.page++;
+                refreshCatalogueIfNotRefreshing();
+            }
+        }
+    });
 }
 
 function setupSourcesSelect() {
     sourcesSelect.change(function() {
+        searchState.page = 1;
+        searchState.lastUrl = null;
+        scrollBox.scrollTop(0);
+        clearElement(mangaGrid);
         refreshCatalogue();
     });
 }
@@ -77,6 +131,17 @@ function buildCatalogueURL() {
     return currentUrl;
 }
 
+function refreshCatalogueIfNotRefreshing() {
+    if(valid(currentRequest) && !currentRequest.completed) {
+        return;
+    }
+    refreshCatalogue();
+}
+
+function hasNextPage() {
+    return !!(valid(searchState.lastUrl) && searchState.lastUrl !== "");
+}
+
 //TODO Pages and search
 function refreshCatalogue(oldRequest) {
     var request;
@@ -88,6 +153,7 @@ function refreshCatalogue(oldRequest) {
     if(currentRequest === request) {
         currentRequest.cancel();
     }
+    request.completed = false;
     currentRequest = request;
     showSpinner();
     var xhr = new XMLHttpRequest();
@@ -103,6 +169,8 @@ function refreshCatalogue(oldRequest) {
                 if(searchState.page === 1) {
                     clearElement(mangaGrid);
                 }
+                //Set new search state
+                searchState.lastUrl = res.lurl;
                 //Add on new manga
                 updateCatalogueUI(res.content);
             } else {
@@ -114,6 +182,7 @@ function refreshCatalogue(oldRequest) {
             catalogueRefreshError(request);
         }
         hideSpinner();
+        request.completed = true;
     };
     xhr.onerror = function () {
         if (request.canceled) {
@@ -121,6 +190,7 @@ function refreshCatalogue(oldRequest) {
         }
         catalogueRefreshError(request);
         hideSpinner();
+        request.completed = true;
     };
     xhr.send();
     return request;
@@ -150,7 +220,8 @@ function Request() {
     this.canceled = false;
     this.cancel = function () {
         that.canceled = true;
-    }
+    };
+    this.completed = false;
 }
 
 function sourcesRefreshError() {
