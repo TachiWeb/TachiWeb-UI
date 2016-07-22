@@ -232,7 +232,11 @@ function setupFilters() {
 function setupBackButton() {
     backButton.click(function () {
         if (valid(backLink)) {
-            window.location.href = backLink;
+        	if(backLink.toUpperCase() === "CLOSE") {
+        		window.close();
+        	} else {
+            	window.location.href = backLink;
+            }
         } else {
             window.history.back();
         }

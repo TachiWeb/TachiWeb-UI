@@ -12,12 +12,12 @@ function appendManga(manga, element, openInNewTab) {
     label.textContent = manga.title;
     card.appendChild(label);
     $(card).click(function() {
-    	var builtUrl = "manga_info.html?id=" + manga.id + "&b=" + encodeURIComponent(currentUrl);
+    	var builtUrl = "manga_info.html?id=" + manga.id + "&b=";
     	if(valid(openInNewTab) && openInNewTab) {
-    		window.open(builtUrl, '_blank');
+    		window.open(builtUrl + "CLOSE", '_blank');
     	} else {
         	var currentUrl = window.location.href;
-        	window.location.href = builtUrl;
+        	window.location.href = builtUrl + encodeURIComponent(currentUrl);
         }
     });
     rawElement(element).appendChild(card);
