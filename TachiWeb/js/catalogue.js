@@ -138,7 +138,7 @@ function updateSourcesUI() {
 
 function updateCatalogueUI(manga) {
     $.each(manga, function (index, value) {
-        appendManga(value, mangaGrid);
+        appendManga(value, mangaGrid, true);
     });
 }
 
