@@ -333,7 +333,7 @@ function refreshCurrentPage() {
     var parsedCurrentPage = parseInt(currentPage);
     jqueryPageElement(parsedCurrentPage).data(loaded, false);
     jqueryPageElement(parsedCurrentPage).css("background-image", "");
-    properlyScaleImage(image);
+    jqueryPageElement(parsedCurrentPage).css("background-size", "");
     tryLoad(jqueryPageElement(parsedCurrentPage), parsedCurrentPage);
 }
 function setupHudManager() {
