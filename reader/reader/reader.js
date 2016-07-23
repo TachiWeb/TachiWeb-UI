@@ -270,7 +270,7 @@ function setupButtonManager() {
     buttonManager.backBtn = $("#back_button");
     buttonManager.fullscreenBtn = $("#fullscreen_button");
     buttonManager.rotateBtn = $("#rotate_button");
-    buttonManager.downloadBtn = $("#redownload_button");
+    buttonManager.downloadBtn = $("#download_button");
     buttonManager.lock = false;
     buttonManager.nextBtn.click(function () {
         if (hasNextPage()) {
