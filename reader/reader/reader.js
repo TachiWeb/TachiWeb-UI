@@ -271,6 +271,7 @@ function setupButtonManager() {
     buttonManager.fullscreenBtn = $("#fullscreen_button");
     buttonManager.rotateBtn = $("#rotate_button");
     buttonManager.downloadBtn = $("#download_button");
+    buttonManager.redownloadBtn = $("#redownload_button");
     buttonManager.lock = false;
     buttonManager.nextBtn.click(function () {
         if (hasNextPage()) {
@@ -305,6 +306,35 @@ function setupButtonManager() {
             saveAs(cached.blob, currentPage + "." + extension);
         }
     });
+    buttonManager.redownloadBtn.click(function (){
+        refreshCurrentPage();
+    });
+    //Catch shift keys for changing the buttons around
+    $(window).keydown(function (e) {
+        if (e.keyCode == 16) {
+            showExtraButtons();
+        }
+    });
+    $(window).keyup(function (e) {
+        if (e.keyCode == 16) {
+            hideExtraButtons();
+        }
+    });
+}
+function showExtraButtons() {
+    buttonManager.downloadBtn.css("display", "none");
+    buttonManager.redownloadBtn.css("display", "initial");
+}
+function hideExtraButtons() {
+    buttonManager.downloadBtn.css("display", "initial");
+    buttonManager.redownloadBtn.css("display", "none");
+}
+function refreshCurrentPage() {
+    var parsedCurrentPage = parseInt(currentPage);
+    jqueryPageElement(parsedCurrentPage).data(loaded, false);
+    jqueryPageElement(parsedCurrentPage).css("background-image", "");
+    properlyScaleImage(image);
+    tryLoad(jqueryPageElement(parsedCurrentPage), parsedCurrentPage);
 }
 function setupHudManager() {
     console.log("Setting up HUD manager...");
