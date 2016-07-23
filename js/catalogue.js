@@ -138,7 +138,6 @@ function hasNextPage() {
     return !!(valid(searchState.lastUrl) && searchState.lastUrl !== "");
 }
 
-//TODO Pages and search
 function refreshCatalogue(oldRequest) {
     var request;
     if (valid(oldRequest)) {
