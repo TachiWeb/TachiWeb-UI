@@ -115,6 +115,7 @@ function setupImageManager() {
         readerElement.appendChild(nestedReaderElement);
         var jqueryReaderElement = $(nestedReaderElement);
         jqueryReaderElement.data(loaded, false);
+        jqueryReaderElement.data("zoom", false);
     }
     //Deal with right to left
     if (rightToLeft) {
@@ -230,22 +231,25 @@ function lastPageReadUrl(page, read) {
     return readingStatusRoot + "/" + mangaId + "/" + chapterId + "?lp=" + page + "&read=" + read;
 }
 function activateZoom(image) {
-    image.click(function () {
-        $.featherlight(`
+    if(!image.data("zoom")) {
+        image.data("zoom", true);
+        image.click(function () {
+            $.featherlight(`
         <div class="dragscroll reader_zoom_img">
             <img src="` + image.data('src') + `" style="transform: ` + getRotationCSS() + `" alt="Zoomable Image"/>
         </div>
         `, {});
-        var content = $(".featherlight-content");
-        content.addClass("dragscroll");
-        content.mousedown(function () {
-            content.css("cursor", "move");
+            var content = $(".featherlight-content");
+            content.addClass("dragscroll");
+            content.mousedown(function () {
+                content.css("cursor", "move");
+            });
+            content.mouseup(function () {
+                content.css("cursor", "");
+            });
+            dragscroll.reset();
         });
-        content.mouseup(function() {
-            content.css("cursor", "");
-        });
-        dragscroll.reset();
-    });
+    }
 }
 function setupButtonManager() {
     console.log("Setting up button manager...");
@@ -334,6 +338,7 @@ function refreshCurrentPage() {
     jqueryPageElement(parsedCurrentPage).data(loaded, false);
     jqueryPageElement(parsedCurrentPage).css("background-image", "");
     jqueryPageElement(parsedCurrentPage).css("background-size", "");
+    cachedPages[parsedCurrentPage] = null;
     tryLoad(jqueryPageElement(parsedCurrentPage), parsedCurrentPage);
 }
 function setupHudManager() {
