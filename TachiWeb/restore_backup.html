@@ -12,6 +12,8 @@
     <!-- Dialog Polyfill -->
     <script src="js/dialog-polyfill.js"></script>
     <link href="css/dialog-polyfill.css" rel="stylesheet">
+    <!-- Drawer JS -->
+    <script src="js/drawer.js"></script>
     <!-- Core -->
     <link href="css/core.css" rel="stylesheet">
     <script src="js/core.js"></script>
@@ -23,14 +25,17 @@
 <!-- Uses a header that contracts as the page scrolls down. -->
 <div class="mdl-layout mdl-js-layout">
     <header class="mdl-layout__header">
-        <div class="back-button mdl-layout-icon mdl-button mdl-js-button mdl-button--icon"><i class="material-icons">arrow_back</i>
-        </div>
         <!-- Top row, always visible -->
         <div class="mdl-layout__header-row">
             <!-- Title -->
             <span id="manga_title" class="mdl-layout-title">Backup/Restore</span>
         </div>
     </header>
+    <!-- Nav drawer (populated in drawer.js) -->
+    <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">Title</span>
+        <nav class="mdl-navigation"></nav>
+    </div>
     <main class="mdl-layout__content">
         <div class="page-content">
             <button id="restore_button"

@@ -63,9 +63,9 @@ function performSearch() {
 function setupScrollBox() {
     scrollBox.on('scroll', function() {
         if(scrollBox.scrollTop() + scrollBox.innerHeight() >= rawElement(scrollBox).scrollHeight - scrollEndPadding) {
-            if(hasNextPage()) {
+            if(hasNextPage() && !isRefreshing()) {
                 searchState.page++;
-                refreshCatalogueIfNotRefreshing();
+                refreshCatalogue();
             }
         }
     });
@@ -121,21 +121,17 @@ function buildCatalogueURL() {
     var usedQuestionMark = false;
     if(valid(searchState.lastUrl)) {
         currentUrl += usedQuestionMark ? "&" : "?";
-        currentUrl += "lurl=" + searchState.lastUrl;
+        currentUrl += "lurl=" + encodeURIComponent(searchState.lastUrl);
         usedQuestionMark = true;
     }
     if(valid(searchState.query)) {
         currentUrl += usedQuestionMark ? "&" : "?";
-        currentUrl += "query=" + searchState.query;
+        currentUrl += "query=" + encodeURIComponent(searchState.query);
     }
     return currentUrl;
 }
-
-function refreshCatalogueIfNotRefreshing() {
-    if(valid(currentRequest) && !currentRequest.completed) {
-        return;
-    }
-    refreshCatalogue();
+function isRefreshing() {
+    return valid(currentRequest) && !currentRequest.completed;
 }
 
 function hasNextPage() {

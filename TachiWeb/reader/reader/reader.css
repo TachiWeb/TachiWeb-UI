@@ -207,3 +207,69 @@ body, html {
     /** https://codepen.io/sdthornton/pen/wBZdXq **/
     box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
+/** HUD **/
+.hud_indicator {
+    position: absolute;
+    width: 100px;
+    z-index: 2000;
+    color: white;
+    font-size: 13px;
+    background-color: rgba(0, 0, 0, 0.87);
+    opacity: 0.5;
+    transition: all 0.5s;
+    transform-origin: 0 0;
+}
+.hud_indicator:hover {
+    opacity: 1;
+    transform: scale(2);
+}
+.hud_button:hover {
+    cursor: pointer;
+}
+.hud_inner {
+    padding: 8px;
+}
+#page_indicator_wrapper {
+    top: 0;
+    left: 0;
+    /*border-bottom: solid 2px white;*/
+}
+#page_indicator_wrapper:hover {
+    width: 50%;
+    padding-bottom: 20px; /** Extra area for cursor or it may close while the slider is being used **/
+}
+#page_indicator {
+    padding: 8px 0;
+    width: 100%;
+    text-align: center;
+}
+#page_slider_wrapper {
+    display: none;
+    width: 100%;
+    transition: opacity 1s;
+    opacity: 0;
+}
+#page_indicator_wrapper:hover > #page_slider_wrapper{
+    display: inline-block;
+    opacity: 1;
+}
+/** MDL overrides **/
+#page_slider_wrapper .mdl-slider__background-upper {
+    background-color: white;
+}
+/** Stupidly complex overrider for slider thumb **/
+.mdl-slider.is-upgraded.is-lowest-value::-webkit-slider-thumb {
+    border: 2px solid white;
+}
+
+.mdl-slider.is-upgraded.is-lowest-value::-moz-range-thumb {
+     border: 2px solid white;
+}
+.mdl-slider.is-upgraded.is-lowest-value:active::-webkit-slider-thumb {
+    /*noinspection CssFloatPxLength*/
+    border: 1.6px solid white;
+}
+.mdl-slider.is-upgraded.is-lowest-value:active::-moz-range-thumb {
+    /*noinspection CssFloatPxLength*/
+    border: 1.5px solid white;
+}

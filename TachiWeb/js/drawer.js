@@ -9,6 +9,7 @@ function setupDrawer() {
     drawerTitle.text("TachiWeb");
     insertDrawerLink("Library", "index.html");
     insertDrawerLink("Catalogue", "catalogue.html");
+    insertDrawerLink("Backup/Restore", "restore_backup.html");
 }
 
 function insertDrawerLink(text, link) {
