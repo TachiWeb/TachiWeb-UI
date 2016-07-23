@@ -2,7 +2,7 @@
 TachiWeb-UI is the web frontend for TachiServer.
 
 # About
-*TachiWeb-UI is component of TachiWeb, an attempt to port [Tachiyomi](https://github.com/inorichi/tachiyomi) to the desktop.*
+*TachiWeb-UI is a component of TachiWeb, an attempt to port [Tachiyomi](https://github.com/inorichi/tachiyomi) to the desktop.*
 
 TachiWeb-UI is a UI for TachiServer which attempts to implement as much of the functionality present in Tachiyomi as possible.
 It currently copies almost every element of it's design from Tachiyomi, optimizations to the desktop platform will be made later.
