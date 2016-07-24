@@ -14,11 +14,19 @@ function mapFiltersToUI() {
 }
 resetFilters();
 
+function onLoad() {
+    librarySpinner = $(".loading_spinner");
+    libraryWrapper = $("#library_wrapper");
+    setupFilters();
+    setupUpdateButton();
+    updateLibrary();
+}
+
 function updateLibrary() {
     showSpinner();
     var xhr = new XMLHttpRequest();
     xhr.open("GET", libraryRoot, true);
-    xhr.onload = function() {
+    xhr.onload = function () {
         try {
             currentManga = JSON.parse(xhr.responseText);
             applyAndUpdate(currentManga);
@@ -29,27 +37,27 @@ function updateLibrary() {
         }
         hideSpinner();
     };
-    xhr.onerror = function() {
+    xhr.onerror = function () {
         libraryUpdateError();
         hideSpinner();
     };
     xhr.send();
 }
 function setupUpdateButton() {
-    $("#refresh_btn").click(function() {
+    $("#refresh_btn").click(function () {
         updateServerLibrary();
     });
 }
 function updateServerLibrary() {
     showSpinner();
-    var currentOnComplete = function() {
+    var currentOnComplete = function () {
         hideSpinner();
         updateLibrary();
     };
-    for(var i = 0; i < currentManga.length; i++) {
+    for (var i = 0; i < currentManga.length; i++) {
         var manga = currentManga[i];
-        currentOnComplete = function(manga, lastOnComplete) {
-            return function() {
+        currentOnComplete = function (manga, lastOnComplete) {
+            return function () {
                 updateManga(manga, lastOnComplete);
             };
         }(manga, currentOnComplete);
@@ -60,10 +68,10 @@ function updateManga(manga, onComplete) {
     console.log("Updating: " + manga.title + " (" + manga.id + ")");
     var xhr = new XMLHttpRequest();
     xhr.open("GET", buildMangaUpdateURL(manga.id), true);
-    xhr.onload = function() {
+    xhr.onload = function () {
         try {
             var res = JSON.parse(xhr.responseText);
-            if(!res.success) {
+            if (!res.success) {
                 mangaUpdateError(manga.title);
             }
         }
@@ -73,14 +81,14 @@ function updateManga(manga, onComplete) {
         }
         onComplete();
     };
-    xhr.onerror = function() {
+    xhr.onerror = function () {
         mangaUpdateError(manga.title);
         onComplete();
     };
     xhr.send();
 }
 
-function buildMangaUpdateURL(mangaId){
+function buildMangaUpdateURL(mangaId) {
     return updateRoot + "/" + mangaId + "/CHAPTERS";
 }
 
@@ -98,7 +106,7 @@ function updateLibraryUI(mangas) {
     for (var i = 0; i < mangas.length; i++) {
         var manga = mangas[i];
         var mCategories = manga.categories.slice(0);
-        if(mCategories.length <= 0) {
+        if (mCategories.length <= 0) {
             mCategories.push("Default");
         }
         for (var a = 0; a < mCategories.length; a++) {
@@ -118,7 +126,7 @@ function updateLibraryUI(mangas) {
         //Append directly if we don't have tabs
         appendMangas(mangas, libraryWrapper[0]);
     } else {
-        for(i = 0; i < categoryKeys.length; i++) {
+        for (i = 0; i < categoryKeys.length; i++) {
             categoryName = categoryKeys[i];
             category = categories[categoryName];
             var categorySplitter = document.createElement("div");
@@ -153,7 +161,7 @@ function libraryUpdateError() {
         message: "Error getting library!",
         timeout: 2000,
         actionText: "Retry",
-        actionHandler: function() {
+        actionHandler: function () {
             updateLibrary();
         }
     });
@@ -161,7 +169,7 @@ function libraryUpdateError() {
 
 function mangaUpdateError(manga) {
     snackbar.showSnackbar({
-        message: "Error updating manga: '" + manga +"'!",
+        message: "Error updating manga: '" + manga + "'!",
         timeout: 500
     });
 }
@@ -176,13 +184,13 @@ function applyFilters(mangas) {
     for (var i = mangas.length - 1; i >= 0; i--) {
         var manga = mangas[i];
         var remove = false;
-        if(filters.onlyUnread && manga.unread <= 0) {
+        if (filters.onlyUnread && manga.unread <= 0) {
             remove = true;
         }
-        if(!remove && filters.text.trim !== "" && manga.title.toLowerCase().indexOf(filters.text.toLowerCase()) <= -1) {
+        if (!remove && filters.text.trim !== "" && manga.title.toLowerCase().indexOf(filters.text.toLowerCase()) <= -1) {
             remove = true;
         }
-        if(remove) {
+        if (remove) {
             mangas.splice(i, 1);
         }
     }
@@ -190,25 +198,17 @@ function applyFilters(mangas) {
 
 function setupFilters() {
     unreadCheckbox = $("#unread-chkbx");
-    unreadCheckbox.change(function() {
+    unreadCheckbox.change(function () {
         filters.onlyUnread = this.checked;
         applyAndUpdate(currentManga);
     });
-    $("#clear_filters_btn").click(function() {
+    $("#clear_filters_btn").click(function () {
         resetFilters();
         mapFiltersToUI();
         applyAndUpdate(currentManga);
     });
-    $("#manga_search").on('input',function(e){
+    $("#manga_search").on('input', function () {
         filters.text = $(this).val();
         applyAndUpdate(currentManga);
     });
-}
-
-function onLoad() {
-    librarySpinner = $(".loading_spinner");
-    libraryWrapper = $("#library_wrapper");
-    setupFilters();
-    setupUpdateButton();
-    updateLibrary();
 }
