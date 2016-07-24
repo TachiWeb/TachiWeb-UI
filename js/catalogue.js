@@ -136,11 +136,12 @@ function setupScrollBox() {
 function selectLoggedInSource() {
     for(var i = 0; i < currentSources.length; i++) {
         var source = currentSources[i];
-        if(!isLoggedIn(source)) {
+        if(isLoggedIn(source)) {
             selectSource(source);
             return;
         }
     }
+    refreshCatalogue();
 }
 
 function selectSource(source) {
