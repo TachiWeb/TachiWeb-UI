@@ -74,16 +74,19 @@ function setupLoginDialog() {
                     refreshSources();
                 } else {
                     sourceLoginError(res.error);
+                    selectLoggedInSource();
                 }
             } catch (e) {
                 sourceLoginError("Unknown Javascript error");
                 console.error(e);
+                selectLoggedInSource();
             }
             rawElement(loginDialog).close();
         };
         xhr.onerror = function () {
             sourceLoginError("Unknown error");
             rawElement(loginDialog).close();
+            selectLoggedInSource();
         };
         xhr.send();
     })
@@ -130,10 +133,36 @@ function setupScrollBox() {
     });
 }
 
+function selectLoggedInSource() {
+    for(var i = 0; i < currentSources.length; i++) {
+        var source = currentSources[i];
+        if(!isLoggedIn(source)) {
+            selectSource(source);
+            return;
+        }
+    }
+}
+
+function selectSource(source) {
+    for ( var i = 0; i < sourcesSelect.options.length; i++ ) {
+        if ( sourcesSelect.options[i].value == source.id ) {
+            rawElement(sourcesSelect).selectedIndex = i;
+            return;
+        }
+    }
+}
+
+function isLoggedIn(source) {
+    if(!valid(source["logged_in"])) {
+        return true;
+    }
+    return source["logged_in"];
+}
+
 function setupSourcesSelect() {
     sourcesSelect.change(function() {
         var selectedSource = getCurrentSource();
-        if(valid(selectedSource) && valid(selectedSource["logged_in"]) && !selectedSource["logged_in"]) {
+        if(valid(selectedSource) && !isLoggedIn(selectedSource)) {
             showLoginBox(selectedSource);
         } else {
             searchState.page = 1;
@@ -187,7 +216,7 @@ function refreshSources() {
             if (res.success) {
                 currentSources = res.content;
                 updateSourcesUI();
-                refreshCatalogue();
+                selectLoggedInSource();
             } else {
                 sourcesRefreshError();
             }
