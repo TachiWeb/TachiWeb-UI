@@ -144,9 +144,10 @@ function selectLoggedInSource() {
 }
 
 function selectSource(source) {
-    for ( var i = 0; i < sourcesSelect.options.length; i++ ) {
-        if ( sourcesSelect.options[i].value == source.id ) {
-            rawElement(sourcesSelect).selectedIndex = i;
+    var rawSourcesSelect = rawElement(sourcesSelect);
+    for ( var i = 0; i < rawSourcesSelect.options.length; i++ ) {
+        if ( rawSourcesSelect.options[i].value == source.id ) {
+            rawElement(rawSourcesSelect).selectedIndex = i;
             return;
         }
     }
