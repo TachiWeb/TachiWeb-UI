@@ -133,7 +133,7 @@ function setupScrollBox() {
 function setupSourcesSelect() {
     sourcesSelect.change(function() {
         var selectedSource = getCurrentSource();
-        if(valid(selectedSource) && !selectedSource["logged_in"]) {
+        if(valid(selectedSource) && valid(selectedSource["logged_in"]) && !selectedSource["logged_in"]) {
             showLoginBox(selectedSource);
         } else {
             searchState.page = 1;
