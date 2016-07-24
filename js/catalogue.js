@@ -58,6 +58,7 @@ function setupLoginDialog() {
     }
     loginDialogClose.click(function() {
         rawElement(loginDialog).close();
+        selectLoggedInSource();
     });
     loginDialogLogin.click(function() {
         loginDialogClose.prop("disabled", true);
