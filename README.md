@@ -10,9 +10,10 @@ It currently copies almost every element of it's design from Tachiyomi, optimiza
 TachiWeb is not officially supported by Tachiyomi or it's contributors.
 
 # Live demo
-A live demo is available here: [http://45.62.240.130:4567/](http://45.62.240.130:4567/)
-**NOTE**: Kissmanga is very unstable and Batoto is not usable at the project's current state.
-Be nice and don't do bad things on it...
+A live demo is available here: [http://64.137.238.70:4567/](http://64.137.238.70:4567/)
+**NOTE**: Kissmanga is very unstable. Batoto normally requires log in but in the demo, I will use my own credentials. Restoring is disabled in the demo for performance reasons.
+The demo server is also very cheap so don't expect images to load very fast.
+Please don't destroy the live demo.
 
 # Architecture
 The Javascript code is not very neat and currently needs a lot of refactoring, although I know how to write Javascript, I am not well-acquainted with it's best practices and design patterns.
