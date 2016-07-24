@@ -94,7 +94,7 @@ function setupLoginDialog() {
 }
 
 function buildLoginUrl() {
-    return sourceLoginRoot + "/" + rawElement(sourcesSelect).value + "?username=" + encodeURIComponent(loginDialogUsername.val()) + "&password=" + encodeURIComponent(loginDialogPassword);
+    return sourceLoginRoot + "/" + rawElement(sourcesSelect).value + "?username=" + encodeURIComponent(loginDialogUsername.val()) + "&password=" + encodeURIComponent(loginDialogPassword.val());
 }
 
 function setupSearchBox() {
