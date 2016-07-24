@@ -138,10 +138,10 @@ function selectLoggedInSource() {
         var source = currentSources[i];
         if(isLoggedIn(source)) {
             selectSource(source);
+            refreshCatalogue();
             return;
         }
     }
-    refreshCatalogue();
 }
 
 function selectSource(source) {
