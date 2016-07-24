@@ -81,7 +81,7 @@ function setupButtons() {
         rawElement(restoreDialog).close();
         rawElement(busyDialog).showModal();
         var xhr = new XMLHttpRequest();
-        xhr.onload = function(e) {
+        xhr.onload = function() {
             var result = JSON.parse(xhr.responseText);
             rawElement(busyDialog).close();
             if(result.success) {
