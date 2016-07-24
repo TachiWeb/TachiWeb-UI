@@ -21,6 +21,9 @@
 .page_button_icon {
     font-size: 200px;
 }
+.dialog_spinner_wrapper {
+    position: relative;
+}
 /** File attachment field **/
 .mdl-button--file input {
     cursor: pointer;
