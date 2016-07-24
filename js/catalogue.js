@@ -4,6 +4,14 @@ var mangaGrid;
 var scrollBox;
 var searchBox;
 
+var loginDialog;
+var loginDialogTitle;
+var loginDialogUsername;
+var loginDialogPassword;
+var loginDialogClose;
+var loginDialogLogin;
+var dialogSpinner;
+
 var currentRequest = null;
 var currentSources = [];
 
@@ -23,15 +31,70 @@ function resetSearchState() {
 resetSearchState();
 
 function onLoad() {
-    spinner = $(".loading_spinner");
+    spinner = $("#catalogue_spinner");
     sourcesSelect = $("#sources_select");
     mangaGrid = $("#manga_grid");
     scrollBox = $("#page_wrapper");
     searchBox = $("#search_box");
+
+    loginDialog = $("#login_dialog");
+    loginDialogTitle = $("#login_dialog_title");
+    loginDialogUsername = $("#login_dialog_username");
+    loginDialogPassword = $("#login_dialog_password");
+    loginDialogClose = $("#login_dialog_close");
+    loginDialogLogin = $("#login_dialog_login");
+    dialogSpinner = $("#login_loading_spinner");
+
+    setupLoginDialog();
     setupSourcesSelect();
     setupScrollBox();
     setupSearchBox();
     refreshSources();
+}
+
+function setupLoginDialog() {
+    if (!rawElement(loginDialog).showModal) {
+        dialogPolyfill.registerDialog(rawElement(loginDialog));
+    }
+    loginDialogClose.click(function() {
+        rawElement(loginDialog).close();
+        selectLoggedInSource();
+    });
+    loginDialogLogin.click(function() {
+        loginDialogClose.prop("disabled", true);
+        loginDialogLogin.prop("disabled", true);
+        loginDialogUsername.prop("disabled", true);
+        loginDialogPassword.prop("disabled", true);
+        dialogSpinner.css("display", "block");
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", buildLoginUrl(), true);
+        xhr.onload = function () {
+            try {
+                var res = JSON.parse(xhr.responseText);
+                if (res.success) {
+                    refreshSources();
+                } else {
+                    sourceLoginError(res.error);
+                    selectLoggedInSource();
+                }
+            } catch (e) {
+                sourceLoginError("Unknown Javascript error");
+                console.error(e);
+                selectLoggedInSource();
+            }
+            rawElement(loginDialog).close();
+        };
+        xhr.onerror = function () {
+            sourceLoginError("Unknown error");
+            rawElement(loginDialog).close();
+            selectLoggedInSource();
+        };
+        xhr.send();
+    })
+}
+
+function buildLoginUrl() {
+    return sourceLoginRoot + "/" + rawElement(sourcesSelect).value + "?username=" + encodeURIComponent(loginDialogUsername.val()) + "&password=" + encodeURIComponent(loginDialogPassword.val());
 }
 
 function setupSearchBox() {
@@ -71,14 +134,71 @@ function setupScrollBox() {
     });
 }
 
+function selectLoggedInSource() {
+    for(var i = 0; i < currentSources.length; i++) {
+        var source = currentSources[i];
+        if(isLoggedIn(source)) {
+            selectSource(source);
+            refreshCatalogue();
+            return;
+        }
+    }
+}
+
+function selectSource(source) {
+    var rawSourcesSelect = rawElement(sourcesSelect);
+    for ( var i = 0; i < rawSourcesSelect.options.length; i++ ) {
+        if ( rawSourcesSelect.options[i].value == source.id ) {
+            rawElement(rawSourcesSelect).selectedIndex = i;
+            return;
+        }
+    }
+}
+
+function isLoggedIn(source) {
+    if(!valid(source["logged_in"])) {
+        return true;
+    }
+    return source["logged_in"];
+}
+
 function setupSourcesSelect() {
     sourcesSelect.change(function() {
-        searchState.page = 1;
-        searchState.lastUrl = null;
-        scrollBox.scrollTop(0);
-        clearElement(mangaGrid);
-        refreshCatalogue();
+        var selectedSource = getCurrentSource();
+        if(valid(selectedSource) && !isLoggedIn(selectedSource)) {
+            showLoginBox(selectedSource);
+        } else {
+            searchState.page = 1;
+            searchState.lastUrl = null;
+            scrollBox.scrollTop(0);
+            clearElement(mangaGrid);
+            refreshCatalogue();
+        }
     });
+}
+
+function showLoginBox(source) {
+    loginDialogTitle.text(source.name + " Login");
+    loginDialogUsername.val("");
+    loginDialogPassword.val("");
+    loginDialogClose.prop('disabled', false);
+    loginDialogLogin.prop('disabled', false);
+    loginDialogUsername.prop("disabled", false);
+    loginDialogPassword.prop("disabled", false);
+    loginDialog.data("source", source);
+    dialogSpinner.css("display", "");
+    rawElement(loginDialog).showModal();
+}
+
+function getCurrentSource() {
+    var currentSourceID = parseInt(rawElement(sourcesSelect).value);
+    for(var i = 0; i < currentSources.length; i++) {
+        var currentSource = currentSources[i];
+        if(currentSource.id === currentSourceID) {
+            return currentSource;
+        }
+    }
+    return null;
 }
 
 function showSpinner() {
@@ -99,7 +219,7 @@ function refreshSources() {
             if (res.success) {
                 currentSources = res.content;
                 updateSourcesUI();
-                refreshCatalogue();
+                selectLoggedInSource();
             } else {
                 sourcesRefreshError();
             }
@@ -238,5 +358,12 @@ function catalogueRefreshError(request) {
         actionHandler: function () {
             refreshCatalogue(request);
         }
+    });
+}
+
+function sourceLoginError(message) {
+    snackbar.showSnackbar({
+        message: "Error logging in (" + message + ")!",
+        timeout: 2000
     });
 }
