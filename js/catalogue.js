@@ -56,7 +56,7 @@ function setupLoginDialog() {
     if (!rawElement(loginDialog).showModal) {
         dialogPolyfill.registerDialog(rawElement(loginDialog));
     }
-    loginDialogClose.text(function() {
+    loginDialogClose.click(function() {
         rawElement(loginDialog).close();
     });
     loginDialogLogin.click(function() {
