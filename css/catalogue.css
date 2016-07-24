@@ -19,3 +19,7 @@
 #search_box_wrapper > .mdl-textfield__label {
     color: rgb(255,255,255);
 }
+/** Loading dialog **/
+#login_loading_spinner {
+    display: none;
+}

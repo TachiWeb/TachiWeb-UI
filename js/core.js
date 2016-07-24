@@ -13,7 +13,7 @@ var updateRoot = apiRoot + "/update";
 var sourcesRoot = apiRoot + "/sources";
 var catalogueRoot = apiRoot + "/catalogue";
 var listLoginSourcesRoot = apiRoot + "/list_login_sources";
-var loginRoot = apiRoot + "/source_login";
+var sourceLoginRoot = apiRoot + "/source_login";
 var snackbar;
 var QueryString = function () {
 	// This function is anonymous, is executed immediately and

@@ -12,6 +12,9 @@
     <script src="js/mdl-selectfield.min.js"></script>
     <!-- Material Fonts -->
     <link href="css/material_fonts.css" rel="stylesheet">
+    <!-- Dialog Polyfill -->
+    <script src="js/dialog-polyfill.js"></script>
+    <link href="css/dialog-polyfill.css" rel="stylesheet">
     <!-- Core -->
     <link href="css/core.css" rel="stylesheet">
     <script src="js/core.js"></script>
@@ -48,6 +51,30 @@
         <span class="mdl-layout-title">Title</span>
         <nav class="mdl-navigation"></nav>
     </div>
+    <!-- Login dialog -->
+    <dialog id="login_dialog" class="mdl-dialog">
+        <h4 id="login_dialog_title" class="mdl-dialog__title"></h4>
+        <div class="mdl-dialog__content">
+            <p id="login_dialog_content"></p>
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input class="mdl-textfield__input" type="text" id="login_dialog_username">
+                <label class="mdl-textfield__label" for="login_dialog_username">Username</label>
+            </div>
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input class="mdl-textfield__input" type="password" id="login_dialog_password">
+                <label class="mdl-textfield__label" for="login_dialog_password">Password</label>
+            </div>
+            <div id="login_loading_spinner" class="dialog_spinner_wrapper">
+                <div class="loading_spinner">
+                    <div class="mdl-spinner mdl-js-spinner is-active"></div>
+                </div>
+            </div>
+        </div>
+        <div class="mdl-dialog__actions">
+            <button id="login_dialog_close" type="button" class="mdl-button close">Cancel</button>
+            <button id="login_dialog_login" type="button" class="mdl-button">Login</button>
+        </div>
+    </dialog>
     <main id="page_wrapper" class="mdl-layout__content">
         <!-- NOTE: This wrapper is necessary, don't touch it! -->
         <div class="loading_spinner">

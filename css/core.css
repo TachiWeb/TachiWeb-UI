@@ -76,6 +76,9 @@ html,body {
   opacity: 1;
   pointer-events: none;
 }
+.dialog_spinner_wrapper {
+    position: relative;
+}
 /** Layout **/
 .mdl-layout {
     overflow: hidden;
