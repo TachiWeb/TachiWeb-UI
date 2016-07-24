@@ -31,7 +31,7 @@ function resetSearchState() {
 resetSearchState();
 
 function onLoad() {
-    spinner = $(".loading_spinner");
+    spinner = $("#catalogue_spinner");
     sourcesSelect = $("#sources_select");
     mangaGrid = $("#manga_grid");
     scrollBox = $("#page_wrapper");
@@ -65,7 +65,7 @@ function setupLoginDialog() {
         loginDialogLogin.prop("disabled", true);
         loginDialogUsername.prop("disabled", true);
         loginDialogPassword.prop("disabled", true);
-        dialogSpinner.css("display", "initial");
+        dialogSpinner.css("display", "block");
         var xhr = new XMLHttpRequest();
         xhr.open("GET", buildLoginUrl(), true);
         xhr.onload = function () {

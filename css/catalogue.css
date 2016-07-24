@@ -22,4 +22,5 @@
 /** Loading dialog **/
 #login_loading_spinner {
     display: none;
+    position: relative;
 }
