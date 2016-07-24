@@ -23,4 +23,5 @@
 #login_loading_spinner {
     display: none;
     position: relative;
+    margin-top: 10px;
 }
