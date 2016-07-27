@@ -1,6 +1,7 @@
-html,body {
+html, body {
     height: 100%;
 }
+
 .mdl-layout__header-row .mdl-navigation__link:last-of-type {
     padding-right: 0;
 }
@@ -33,7 +34,7 @@ html,body {
 
 /** Page content **/
 .page-content {
-  position: relative;
+    position: relative;
 }
 
 /** Cards **/
@@ -58,27 +59,31 @@ html,body {
     padding: 8px;
     bottom: 0;
 }
+
 /** List headers **/
 .list_header {
     width: 100%;
-    background: rgb(96,125,139);
+    background: rgb(96, 125, 139);
     padding: 8px;
     color: white;
     font-size: 20px;
 }
+
 /** Spinners **/
 .loading_spinner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  transition: opacity 0.5s;
-  opacity: 1;
-  pointer-events: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.5s;
+    opacity: 1;
+    pointer-events: none;
 }
+
 .dialog_spinner_wrapper {
     position: relative;
 }
+
 /** Layout **/
 .mdl-layout {
     overflow: hidden;

@@ -5,25 +5,32 @@
     position: absolute;
     font-size: 50px;
 }
+
 #restore_button {
     left: 16px;
 }
+
 #backup_button {
     right: 16px;
 }
+
 .page-content {
     height: 100%;
     width: 100%;
 }
+
 .mdl-layout__content {
     height: 100%;
 }
+
 .page_button_icon {
     font-size: 200px;
 }
+
 .dialog_spinner_wrapper {
     position: relative;
 }
+
 /** File attachment field **/
 .mdl-button--file input {
     cursor: pointer;
@@ -40,6 +47,7 @@
     box-sizing: border-box;
     width: calc(100% - 32px);
 }
+
 .mdl-textfield--file .mdl-button--file {
     right: 0;
 }

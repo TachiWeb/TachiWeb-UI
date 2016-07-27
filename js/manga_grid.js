@@ -11,13 +11,13 @@ function appendManga(manga, element, openInNewTab) {
     label.className = "manga_card_label";
     label.textContent = manga.title;
     card.appendChild(label);
-    $(card).click(function() {
-    	var builtUrl = "manga_info.html?id=" + manga.id + "&b=";
-    	if(openInNewTab) {
-    		window.open(builtUrl + "CLOSE", '_blank');
-    	} else {
-        	var currentUrl = window.location.href;
-        	window.location.href = builtUrl + encodeURIComponent(currentUrl);
+    $(card).click(function () {
+        var builtUrl = "manga_info.html?id=" + manga.id + "&b=";
+        if (openInNewTab) {
+            window.open(builtUrl + "CLOSE", '_blank');
+        } else {
+            var currentUrl = window.location.href;
+            window.location.href = builtUrl + encodeURIComponent(currentUrl);
         }
     });
     rawElement(element).appendChild(card);

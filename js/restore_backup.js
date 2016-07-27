@@ -42,9 +42,9 @@ function onLoad() {
     setupButtons();
     setupBackButton();
 }
-function setupBackButton () {
+function setupBackButton() {
     backButton.click(function () {
-        if(backLink) {
+        if (backLink) {
             window.location.href = backLink;
         } else {
             window.history.back();
@@ -64,33 +64,33 @@ function setupDialogs() {
     }
 }
 function setupButtons() {
-    restoreButton.click(function() {
+    restoreButton.click(function () {
         rawElement(restoreDialog).showModal();
     });
-    backupButton.click(function() {
+    backupButton.click(function () {
         window.location.href = backupRoot + "?force-download=true";
     });
-    rawElement(uploadButton).onchange = function() {
+    rawElement(uploadButton).onchange = function () {
         selectedFile = rawElement(uploadButton).files[0];
         rawElement(uploadFileName).value = selectedFile.name;
     };
-    restoreSubmitButton.click(function() {
-        if(!selectedFile) {
+    restoreSubmitButton.click(function () {
+        if (!selectedFile) {
             return;
         }
         rawElement(restoreDialog).close();
         rawElement(busyDialog).showModal();
         var xhr = new XMLHttpRequest();
-        xhr.onload = function() {
+        xhr.onload = function () {
             var result = JSON.parse(xhr.responseText);
             rawElement(busyDialog).close();
-            if(result.success) {
+            if (result.success) {
                 showRestoreSuccessDialog();
             } else {
                 showRestoreErrorDialog();
             }
         };
-        xhr.onerror = function(e) {
+        xhr.onerror = function (e) {
             console.log(busyDialog);
             rawElement(busyDialog).close();
             showRestoreErrorDialog();
@@ -101,10 +101,10 @@ function setupButtons() {
         formData.append("uploaded_file", selectedFile);
         xhr.send(formData);
     });
-    restoreCloseButton.click(function() {
+    restoreCloseButton.click(function () {
         rawElement(restoreDialog).close();
     });
-    restoreResCloseButton.click(function() {
+    restoreResCloseButton.click(function () {
         rawElement(restoreResDialog).close();
     });
 }

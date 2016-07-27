@@ -20,12 +20,12 @@ function insertDrawerLink(text, link) {
     rawElement(drawerNav).appendChild(drawerElementLink);
 }
 
-$(document).ready(function(){
+$(document).ready(function () {
     drawer = $(".mdl-layout__drawer");
-    if(elementExists(drawer)) {
+    if (elementExists(drawer)) {
         drawerTitle = drawer.find(".mdl-layout-title");
         drawerNav = drawer.find(".mdl-navigation");
-        if(elementExists(drawerTitle) && elementExists(drawerNav)) {
+        if (elementExists(drawerTitle) && elementExists(drawerNav)) {
             setupDrawer();
             return;
         }

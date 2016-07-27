@@ -56,11 +56,11 @@ function setupLoginDialog() {
     if (!rawElement(loginDialog).showModal) {
         dialogPolyfill.registerDialog(rawElement(loginDialog));
     }
-    loginDialogClose.click(function() {
+    loginDialogClose.click(function () {
         rawElement(loginDialog).close();
         selectLoggedInSource();
     });
-    loginDialogLogin.click(function() {
+    loginDialogLogin.click(function () {
         loginDialogClose.prop("disabled", true);
         loginDialogLogin.prop("disabled", true);
         loginDialogUsername.prop("disabled", true);
@@ -99,11 +99,11 @@ function buildLoginUrl() {
 
 function setupSearchBox() {
     /** http://stackoverflow.com/questions/4220126/run-javascript-function-when-user-finishes-typing-instead-of-on-key-up **/
-    searchBox.on("keyup", function() {
+    searchBox.on("keyup", function () {
         clearTimeout(typingTimer);
         typingTimer = setTimeout(performSearch, doneTypingInterval);
     });
-    searchBox.on("keydown", function() {
+    searchBox.on("keydown", function () {
         clearTimeout(typingTimer);
     });
 }
@@ -112,7 +112,7 @@ function performSearch() {
     searchState.page = 1;
     searchState.lastUrl = null;
     var searchText = rawElement(searchBox).value;
-    if(searchText.trim() !== "") {
+    if (searchText.trim() !== "") {
         searchState.query = searchText;
     } else {
         //Set to null if no query
@@ -124,9 +124,9 @@ function performSearch() {
 }
 
 function setupScrollBox() {
-    scrollBox.on('scroll', function() {
-        if(scrollBox.scrollTop() + scrollBox.innerHeight() >= rawElement(scrollBox).scrollHeight - scrollEndPadding) {
-            if(hasNextPage() && !isRefreshing()) {
+    scrollBox.on('scroll', function () {
+        if (scrollBox.scrollTop() + scrollBox.innerHeight() >= rawElement(scrollBox).scrollHeight - scrollEndPadding) {
+            if (hasNextPage() && !isRefreshing()) {
                 searchState.page++;
                 refreshCatalogue();
             }
@@ -135,9 +135,9 @@ function setupScrollBox() {
 }
 
 function selectLoggedInSource() {
-    for(var i = 0; i < currentSources.length; i++) {
+    for (var i = 0; i < currentSources.length; i++) {
         var source = currentSources[i];
-        if(isLoggedIn(source)) {
+        if (isLoggedIn(source)) {
             selectSource(source);
             refreshCatalogue();
             return;
@@ -147,8 +147,8 @@ function selectLoggedInSource() {
 
 function selectSource(source) {
     var rawSourcesSelect = rawElement(sourcesSelect);
-    for ( var i = 0; i < rawSourcesSelect.options.length; i++ ) {
-        if ( rawSourcesSelect.options[i].value == source.id ) {
+    for (var i = 0; i < rawSourcesSelect.options.length; i++) {
+        if (rawSourcesSelect.options[i].value == source.id) {
             rawElement(rawSourcesSelect).selectedIndex = i;
             return;
         }
@@ -156,16 +156,16 @@ function selectSource(source) {
 }
 
 function isLoggedIn(source) {
-    if(!source["logged_in"]) {
+    if (!source["logged_in"]) {
         return true;
     }
     return source["logged_in"];
 }
 
 function setupSourcesSelect() {
-    sourcesSelect.change(function() {
+    sourcesSelect.change(function () {
         var selectedSource = getCurrentSource();
-        if(selectedSource && !isLoggedIn(selectedSource)) {
+        if (selectedSource && !isLoggedIn(selectedSource)) {
             showLoginBox(selectedSource);
         } else {
             searchState.page = 1;
@@ -192,9 +192,9 @@ function showLoginBox(source) {
 
 function getCurrentSource() {
     var currentSourceID = parseInt(rawElement(sourcesSelect).value);
-    for(var i = 0; i < currentSources.length; i++) {
+    for (var i = 0; i < currentSources.length; i++) {
         var currentSource = currentSources[i];
-        if(currentSource.id === currentSourceID) {
+        if (currentSource.id === currentSourceID) {
             return currentSource;
         }
     }
@@ -211,13 +211,13 @@ function hideSpinner() {
 
 function refreshSources() {
     showSpinner();
-    TWApi.Commands.Sources.execute(function(res) {
+    TWApi.Commands.Sources.execute(function (res) {
         currentSources = res.content;
         updateSourcesUI();
         selectLoggedInSource();
-    }, function() {
+    }, function () {
         sourcesRefreshError();
-    }, null, function() {
+    }, null, function () {
         hideSpinner();
     });
 }
@@ -225,12 +225,12 @@ function refreshSources() {
 function buildCatalogueURL() {
     var currentUrl = catalogueRoot + "/" + rawElement(sourcesSelect).value + "/" + searchState.page;
     var usedQuestionMark = false;
-    if(searchState.lastUrl) {
+    if (searchState.lastUrl) {
         currentUrl += usedQuestionMark ? "&" : "?";
         currentUrl += "lurl=" + encodeURIComponent(searchState.lastUrl);
         usedQuestionMark = true;
     }
-    if(searchState.query) {
+    if (searchState.query) {
         currentUrl += usedQuestionMark ? "&" : "?";
         currentUrl += "query=" + encodeURIComponent(searchState.query);
     }
@@ -251,7 +251,7 @@ function refreshCatalogue(oldRequest) {
     } else {
         request = new Request();
     }
-    if(currentRequest === request) {
+    if (currentRequest === request) {
         currentRequest.cancel();
     }
     request.completed = false;
@@ -265,9 +265,9 @@ function refreshCatalogue(oldRequest) {
         }
         try {
             var res = JSON.parse(xhr.responseText);
-            if(res.success) {
+            if (res.success) {
                 //Clear catalogue if page 1
-                if(searchState.page === 1) {
+                if (searchState.page === 1) {
                     clearElement(mangaGrid);
                 }
                 //Set new search state
@@ -302,7 +302,7 @@ function updateSourcesUI() {
     $.each(currentSources, function (index, value) {
         sourcesSelect.append($('<option/>', {
             value: value.id,
-            text : value.name
+            text: value.name
         }));
     });
 }
