@@ -4,7 +4,7 @@ function appendManga(manga, element, openInNewTab) {
     card.className = "mdl-card mdl-shadow--4dp manga_card mdl-cell mdl-cell--2-col mdl-button mdl-js-button mdl-js-ripple-effect";
     var img = document.createElement("img");
     img.className = "manga_card_img";
-    img.src = buildCoverUrl(manga.id);
+    img.src = TWApi.Commands.Cover.buildUrl({mangaId: manga.id});
     img.alt = manga.title;
     card.appendChild(img);
     var label = document.createElement("div");

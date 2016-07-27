@@ -21,12 +21,14 @@ var TWApi = {
             that.Endpoints[name] = endpoint;
             built[name] = this;
             var objectBeingConstructed = this;
+            //Setup URL builder
             if (!customUrlBuilder) {
                 customUrlBuilder = function () {
                     return objectBeingConstructed.endpoint();
                 }
             }
             this.buildUrl = customUrlBuilder;
+            //API Request function
             this.execute = function (onSuccess, onError, parameters, onComplete, rawResponseProcessor, preProcessor) {
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", objectBeingConstructed.buildUrl(parameters), true);
@@ -39,7 +41,7 @@ var TWApi = {
                             if (res.success) {
                                 onSuccess(res, xhr);
                             } else {
-                                onError();
+                                onError(res.error);
                             }
                         }
                     }
@@ -61,7 +63,10 @@ var TWApi = {
             }
         }
 
-        new ApiCommand("Cover", "/cover");
+        //Add API commands
+        new ApiCommand("Cover", "/cover", function(parameters) {
+            return this.endpoint() + "/" + parameters.mangaId;
+        });
         new ApiCommand("Library", "/library");
         new ApiCommand("MangaInfo", "/manga_info");
         new ApiCommand("Chapters", "/chapters");
@@ -72,9 +77,26 @@ var TWApi = {
         new ApiCommand("ReadingStatus", "/reading_status");
         new ApiCommand("Update", "/update");
         new ApiCommand("Sources", "/sources");
-        new ApiCommand("Catalogue", "/catalogue");
+        new ApiCommand("Catalogue", "/catalogue", function (parameters) {
+            var currentUrl = this.endpoint() + "/" + parameters.sourceId + "/" + parameters.page;
+            var usedQuestionMark = false;
+            if (parameters.lastUrl) {
+                currentUrl += usedQuestionMark ? "&" : "?";
+                currentUrl += "lurl=" + encodeURIComponent(parameters.lastUrl);
+                usedQuestionMark = true;
+            }
+            if (parameters.query) {
+                currentUrl += usedQuestionMark ? "&" : "?";
+                currentUrl += "query=" + encodeURIComponent(parameters.query);
+            }
+            return currentUrl;
+        });
         new ApiCommand("LoginSources", "/list_login_sources");
-        new ApiCommand("SourceLogin", "/source_login");
+        new ApiCommand("SourceLogin", "/source_login", function (parameters) {
+            return this.endpoint() + "/" + parameters.sourceId
+                + "?username=" + encodeURIComponent(parameters.username)
+                + "&password=" + encodeURIComponent(parameters.password);
+        });
         return built;
     }
 }.init();

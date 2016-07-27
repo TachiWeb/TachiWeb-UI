@@ -66,35 +66,19 @@ function setupLoginDialog() {
         loginDialogUsername.prop("disabled", true);
         loginDialogPassword.prop("disabled", true);
         dialogSpinner.css("display", "block");
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", buildLoginUrl(), true);
-        xhr.onload = function () {
-            try {
-                var res = JSON.parse(xhr.responseText);
-                if (res.success) {
-                    refreshSources();
-                } else {
-                    sourceLoginError(res.error);
-                    selectLoggedInSource();
-                }
-            } catch (e) {
-                sourceLoginError("Unknown Javascript error");
-                console.error(e);
-                selectLoggedInSource();
-            }
-            rawElement(loginDialog).close();
-        };
-        xhr.onerror = function () {
-            sourceLoginError("Unknown error");
-            rawElement(loginDialog).close();
+        TWApi.Commands.SourceLogin.execute(function() {
+            refreshSources();
+        }, function(error) {
+            sourceLoginError(error);
             selectLoggedInSource();
-        };
-        xhr.send();
+        }, {
+            sourceId: rawElement(sourcesSelect).value,
+            username: loginDialogUsername.val(),
+            password: loginDialogPassword.val()
+        }, function() {
+            rawElement(loginDialog).close();
+        });
     })
-}
-
-function buildLoginUrl() {
-    return sourceLoginRoot + "/" + rawElement(sourcesSelect).value + "?username=" + encodeURIComponent(loginDialogUsername.val()) + "&password=" + encodeURIComponent(loginDialogPassword.val());
 }
 
 function setupSearchBox() {
@@ -222,20 +206,6 @@ function refreshSources() {
     });
 }
 
-function buildCatalogueURL() {
-    var currentUrl = catalogueRoot + "/" + rawElement(sourcesSelect).value + "/" + searchState.page;
-    var usedQuestionMark = false;
-    if (searchState.lastUrl) {
-        currentUrl += usedQuestionMark ? "&" : "?";
-        currentUrl += "lurl=" + encodeURIComponent(searchState.lastUrl);
-        usedQuestionMark = true;
-    }
-    if (searchState.query) {
-        currentUrl += usedQuestionMark ? "&" : "?";
-        currentUrl += "query=" + encodeURIComponent(searchState.query);
-    }
-    return currentUrl;
-}
 function isRefreshing() {
     return currentRequest && !currentRequest.completed;
 }
@@ -257,43 +227,32 @@ function refreshCatalogue(oldRequest) {
     request.completed = false;
     currentRequest = request;
     showSpinner();
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", buildCatalogueURL(), true);
-    xhr.onload = function () {
-        if (request.canceled) {
-            return;
-        }
-        try {
-            var res = JSON.parse(xhr.responseText);
-            if (res.success) {
-                //Clear catalogue if page 1
-                if (searchState.page === 1) {
-                    clearElement(mangaGrid);
-                }
-                //Set new search state
-                searchState.lastUrl = res.lurl;
-                //Add on new manga
-                updateCatalogueUI(res.content);
-            } else {
-                catalogueRefreshError(request);
+    TWApi.Commands.Catalogue.execute(function (res) {
+        if (!request.canceled) {
+            //Clear catalogue if page 1
+            if (searchState.page === 1) {
+                clearElement(mangaGrid);
             }
+            //Set new search state
+            searchState.lastUrl = res.lurl;
+            //Add on new manga
+            updateCatalogueUI(res.content);
         }
-        catch (e) {
-            console.error(e);
+    }, function () {
+        if (!request.canceled) {
             catalogueRefreshError(request);
         }
-        hideSpinner();
-        request.completed = true;
-    };
-    xhr.onerror = function () {
-        if (request.canceled) {
-            return;
+    }, {
+        sourceId: rawElement(sourcesSelect).value,
+        page: searchState.page,
+        lastUrl: searchState.lastUrl,
+        query: searchState.query
+    }, function() {
+        if (!request.canceled) {
+            hideSpinner();
+            request.completed = true;
         }
-        catalogueRefreshError(request);
-        hideSpinner();
-        request.completed = true;
-    };
-    xhr.send();
+    });
     return request;
 }
 
