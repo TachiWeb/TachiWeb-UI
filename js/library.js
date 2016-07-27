@@ -24,24 +24,14 @@ function onLoad() {
 
 function updateLibrary() {
     showSpinner();
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", libraryRoot, true);
-    xhr.onload = function () {
-        try {
-            currentManga = JSON.parse(xhr.responseText);
-            applyAndUpdate(currentManga);
-        }
-        catch (e) {
-            console.error(e);
-            libraryUpdateError();
-        }
-        hideSpinner();
-    };
-    xhr.onerror = function () {
+    TWApi.Commands.Library.execute(function(res) {
+        currentManga = res.content;
+        applyAndUpdate(currentManga);
+    }, function() {
         libraryUpdateError();
+    }, null, function() {
         hideSpinner();
-    };
-    xhr.send();
+    });
 }
 function setupUpdateButton() {
     $("#refresh_btn").click(function () {
@@ -66,30 +56,12 @@ function updateServerLibrary() {
 }
 function updateManga(manga, onComplete) {
     console.log("Updating: " + manga.title + " (" + manga.id + ")");
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", buildMangaUpdateURL(manga.id), true);
-    xhr.onload = function () {
-        try {
-            var res = JSON.parse(xhr.responseText);
-            if (!res.success) {
-                mangaUpdateError(manga.title);
-            }
-        }
-        catch (e) {
-            console.error(e);
-            mangaUpdateError(manga.title);
-        }
-        onComplete();
-    };
-    xhr.onerror = function () {
+    TWApi.Commands.Update.execute(null, function() {
         mangaUpdateError(manga.title);
-        onComplete();
-    };
-    xhr.send();
-}
-
-function buildMangaUpdateURL(mangaId) {
-    return updateRoot + "/" + mangaId + "/CHAPTERS";
+    }, {
+        mangaId: manga.id,
+        updateType: "CHAPTERS"
+    }, onComplete);
 }
 
 function showSpinner() {

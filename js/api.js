@@ -29,9 +29,26 @@ var TWApi = {
             }
             this.buildUrl = customUrlBuilder;
             //API Request function
-            this.execute = function (onSuccess, onError, parameters, onComplete, rawResponseProcessor, preProcessor) {
-                var xhr = new XMLHttpRequest();
-                xhr.open("GET", objectBeingConstructed.buildUrl(parameters), true);
+            this.execute = function (onSuccess, onError, parameters, onComplete, rawResponseProcessor, preProcessor, xhrBuilder, xhrSender) {
+                var onSuccessWrapper = function(res, xhr) {
+                    if(onSuccess) onSuccess(res, xhr);
+                };
+                var onErrorWrapper = function(e, xhr) {
+                    if(onError) onError(e, xhr);
+                };
+                var onCompleteWrapper = function() {
+                    if(onComplete) onComplete();
+                };
+                var builtUrl = objectBeingConstructed.buildUrl(parameters);
+                var xhr;
+                //Override XHR creation
+                if(xhrBuilder) {
+                    xhr = xhrBuilder(builtUrl);
+                }
+                if(!xhr) {
+                    xhr = new XMLHttpRequest();
+                    xhr.open("GET", builtUrl, true);
+                }
                 xhr.onload = function () {
                     try {
                         if (rawResponseProcessor) {
@@ -39,27 +56,32 @@ var TWApi = {
                         } else {
                             var res = JSON.parse(xhr.responseText);
                             if (res.success) {
-                                onSuccess(res, xhr);
+                                onSuccessWrapper(res, xhr);
                             } else {
-                                onError(res.error);
+                                onErrorWrapper(res.error);
                             }
                         }
                     }
                     catch (e) {
                         console.error("Error processing API response!", e);
-                        onError(e);
+                        onErrorWrapper(e);
                     }
-                    onComplete();
+                    onCompleteWrapper();
                 };
                 xhr.onerror = function (e) {
                     console.error("Error getting API response!", e);
-                    onError(e, xhr);
-                    onComplete();
+                    onErrorWrapper(e, xhr);
+                    onCompleteWrapper();
                 };
                 if (preProcessor) {
                     preProcessor(xhr);
                 }
-                xhr.send();
+                //Override XHR sending
+                if(xhrSender) {
+                    xhrSender(xhr);
+                } else {
+                    xhr.send();
+                }
             }
         }
 
@@ -75,7 +97,9 @@ var TWApi = {
         new ApiCommand("Backup", "/backup");
         new ApiCommand("Favorite", "/fave");
         new ApiCommand("ReadingStatus", "/reading_status");
-        new ApiCommand("Update", "/update");
+        new ApiCommand("Update", "/update", function(parameters) {
+            return this.endpoint() + "/" + parameters.mangaId + "/" + parameters.updateType;
+        });
         new ApiCommand("Sources", "/sources");
         new ApiCommand("Catalogue", "/catalogue", function (parameters) {
             var currentUrl = this.endpoint() + "/" + parameters.sourceId + "/" + parameters.page;

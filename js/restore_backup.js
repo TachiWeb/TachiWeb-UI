@@ -68,7 +68,7 @@ function setupButtons() {
         rawElement(restoreDialog).showModal();
     });
     backupButton.click(function () {
-        window.location.href = backupRoot + "?force-download=true";
+        window.location.href = TWApi.Endpoints.Backup + "?force-download=true";
     });
     rawElement(uploadButton).onchange = function () {
         selectedFile = rawElement(uploadButton).files[0];
@@ -80,26 +80,19 @@ function setupButtons() {
         }
         rawElement(restoreDialog).close();
         rawElement(busyDialog).showModal();
-        var xhr = new XMLHttpRequest();
-        xhr.onload = function () {
-            var result = JSON.parse(xhr.responseText);
-            rawElement(busyDialog).close();
-            if (result.success) {
-                showRestoreSuccessDialog();
-            } else {
-                showRestoreErrorDialog();
-            }
-        };
-        xhr.onerror = function (e) {
-            console.log(busyDialog);
-            rawElement(busyDialog).close();
-            showRestoreErrorDialog();
-            console.error(e);
-        };
-        xhr.open('post', restoreRoot, true);
-        var formData = new FormData();
-        formData.append("uploaded_file", selectedFile);
-        xhr.send(formData);
+        TWApi.Commands.RestoreFile.execute(
+            showRestoreSuccessDialog,
+            showRestoreErrorDialog, null, function () {
+                rawElement(busyDialog).close();
+            }, null, null, function (builtUrl) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", builtUrl, true);
+                return xhr;
+            }, function (xhr) {
+                var formData = new FormData();
+                formData.append("uploaded_file", selectedFile);
+                xhr.send(formData);
+            });
     });
     restoreCloseButton.click(function () {
         rawElement(restoreDialog).close();
