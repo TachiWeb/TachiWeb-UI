@@ -44,7 +44,7 @@ function onLoad() {
 }
 function setupBackButton () {
     backButton.click(function () {
-        if(valid(backLink)) {
+        if(backLink) {
             window.location.href = backLink;
         } else {
             window.history.back();
@@ -75,7 +75,7 @@ function setupButtons() {
         rawElement(uploadFileName).value = selectedFile.name;
     };
     restoreSubmitButton.click(function() {
-        if(!valid(selectedFile)) {
+        if(!selectedFile) {
             return;
         }
         rawElement(restoreDialog).close();

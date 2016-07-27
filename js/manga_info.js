@@ -119,7 +119,7 @@ function setupSort() {
 }
 function setupBrowserUrlButton() {
     openBrowserBtn.click(function () {
-        if (valid(mangaUrl)) {
+        if (mangaUrl) {
             openInNewTab(mangaUrl);
         }
     });
@@ -245,7 +245,7 @@ function setupFilters() {
 }
 function setupBackButton() {
     backButton.click(function () {
-        if (valid(backLink)) {
+        if (backLink) {
             if (backLink.toUpperCase() === "CLOSE") {
                 window.close();
             } else {
@@ -559,7 +559,7 @@ function updateChaptersUI(chapters) {
  */
 function buildReadingStatusUrl(chapter, read, lastReadPage) {
     return readingStatusRoot + "/" + mangaId + "/" + chapter.id + "?read=" + read
-        + (valid(lastReadPage) ? ("&lp=" + lastReadPage) : "");
+        + (lastReadPage ? ("&lp=" + lastReadPage) : "");
 }
 /**
  * Mark the reading status of chapter as read/unread
@@ -608,28 +608,28 @@ function updateInfoUI(info) {
     coverImgElement.attr("src", coverUrl);
     //Build header content
     var headerContentArray = [];
-    if (valid(info.author)) {
+    if (info.author) {
         headerContentArray.push(generateHeaderEntry("Author", info.author));
     }
-    if (valid(info.artist)) {
+    if (info.artist) {
         headerContentArray.push(generateHeaderEntry("Artist", info.artist));
     }
     headerContentArray.push(generateHeaderEntry("Chapters", info.chapters));
     headerContentArray.push(generateHeaderEntry("Status", info.status));
-    if (valid(info.source)) {
+    if (info.source) {
         headerContentArray.push(generateHeaderEntry("Source", info.source));
     }
-    if (valid(info.genres)) {
+    if (info.genres) {
         headerContentArray.push(generateHeaderEntry("Genres", info.genres))
     }
     headerContentElement.html(headerContentArray.join("<br>"));
     //Set description
-    if (valid(info.description)) {
+    if (info.description) {
         mangaDescElement.html("<strong>Description</strong><br>" + info.description);
     }
     //Set favorite
     updateFaveIcon(info.favorite);
-    if (valid(info.url) && info.url !== "") {
+    if (info.url !== "") {
         openBrowserBtn.show();
         mangaUrl = info.url;
     } else {

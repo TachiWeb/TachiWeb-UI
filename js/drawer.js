@@ -22,7 +22,13 @@ function insertDrawerLink(text, link) {
 
 $(document).ready(function(){
     drawer = $(".mdl-layout__drawer");
-    drawerTitle = drawer.find(".mdl-layout-title");
-    drawerNav = drawer.find(".mdl-navigation");
-    setupDrawer();
+    if(elementExists(drawer)) {
+        drawerTitle = drawer.find(".mdl-layout-title");
+        drawerNav = drawer.find(".mdl-navigation");
+        if(elementExists(drawerTitle) && elementExists(drawerNav)) {
+            setupDrawer();
+            return;
+        }
+    }
+    console.warn("Could not find drawer, not setting it up!");
 });

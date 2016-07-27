@@ -13,7 +13,7 @@ function appendManga(manga, element, openInNewTab) {
     card.appendChild(label);
     $(card).click(function() {
     	var builtUrl = "manga_info.html?id=" + manga.id + "&b=";
-    	if(valid(openInNewTab) && openInNewTab) {
+    	if(openInNewTab) {
     		window.open(builtUrl + "CLOSE", '_blank');
     	} else {
         	var currentUrl = window.location.href;

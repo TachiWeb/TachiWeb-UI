@@ -156,7 +156,7 @@ function selectSource(source) {
 }
 
 function isLoggedIn(source) {
-    if(!valid(source["logged_in"])) {
+    if(!source["logged_in"]) {
         return true;
     }
     return source["logged_in"];
@@ -165,7 +165,7 @@ function isLoggedIn(source) {
 function setupSourcesSelect() {
     sourcesSelect.change(function() {
         var selectedSource = getCurrentSource();
-        if(valid(selectedSource) && !isLoggedIn(selectedSource)) {
+        if(selectedSource && !isLoggedIn(selectedSource)) {
             showLoginBox(selectedSource);
         } else {
             searchState.page = 1;
@@ -239,28 +239,28 @@ function refreshSources() {
 function buildCatalogueURL() {
     var currentUrl = catalogueRoot + "/" + rawElement(sourcesSelect).value + "/" + searchState.page;
     var usedQuestionMark = false;
-    if(valid(searchState.lastUrl)) {
+    if(searchState.lastUrl) {
         currentUrl += usedQuestionMark ? "&" : "?";
         currentUrl += "lurl=" + encodeURIComponent(searchState.lastUrl);
         usedQuestionMark = true;
     }
-    if(valid(searchState.query)) {
+    if(searchState.query) {
         currentUrl += usedQuestionMark ? "&" : "?";
         currentUrl += "query=" + encodeURIComponent(searchState.query);
     }
     return currentUrl;
 }
 function isRefreshing() {
-    return valid(currentRequest) && !currentRequest.completed;
+    return currentRequest && !currentRequest.completed;
 }
 
 function hasNextPage() {
-    return !!(valid(searchState.lastUrl) && searchState.lastUrl !== "");
+    return !!(searchState.lastUrl && searchState.lastUrl !== "");
 }
 
 function refreshCatalogue(oldRequest) {
     var request;
-    if (valid(oldRequest)) {
+    if (oldRequest) {
         request = oldRequest;
     } else {
         request = new Request();

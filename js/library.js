@@ -112,7 +112,7 @@ function updateLibraryUI(mangas) {
         for (var a = 0; a < mCategories.length; a++) {
             var categoryName = mCategories[a];
             var category = categories[categoryName];
-            if (!valid(category)) {
+            if (!category) {
                 category = [];
                 categories[categoryName] = category;
             }
