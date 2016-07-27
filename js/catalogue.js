@@ -211,29 +211,15 @@ function hideSpinner() {
 
 function refreshSources() {
     showSpinner();
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", sourcesRoot, true);
-    xhr.onload = function () {
-        try {
-            var res = JSON.parse(xhr.responseText);
-            if (res.success) {
-                currentSources = res.content;
-                updateSourcesUI();
-                selectLoggedInSource();
-            } else {
-                sourcesRefreshError();
-            }
-        } catch (e) {
-            console.error(e);
-            sourcesRefreshError();
-        }
-        hideSpinner();
-    };
-    xhr.onerror = function () {
+    TWApi.Commands.Sources.execute(function(res) {
+        currentSources = res.content;
+        updateSourcesUI();
+        selectLoggedInSource();
+    }, function() {
         sourcesRefreshError();
+    }, null, function() {
         hideSpinner();
-    };
-    xhr.send();
+    });
 }
 
 function buildCatalogueURL() {
