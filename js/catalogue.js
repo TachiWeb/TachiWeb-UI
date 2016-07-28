@@ -66,18 +66,17 @@ function setupLoginDialog() {
         loginDialogUsername.prop("disabled", true);
         loginDialogPassword.prop("disabled", true);
         dialogSpinner.css("display", "block");
-        TWApi.Commands.SourceLogin.execute(function() {
-            refreshSources();
-        }, function(error) {
-            sourceLoginError(error);
-            selectLoggedInSource();
-        }, {
-            sourceId: rawElement(sourcesSelect).value,
-            username: loginDialogUsername.val(),
-            password: loginDialogPassword.val()
-        }, function() {
-            rawElement(loginDialog).close();
-        });
+        TWApi.Commands.SourceLogin.execute(refreshSources,
+            function (error) {
+                sourceLoginError(error);
+                selectLoggedInSource();
+            }, {
+                sourceId: rawElement(sourcesSelect).value,
+                username: loginDialogUsername.val(),
+                password: loginDialogPassword.val()
+            }, function () {
+                rawElement(loginDialog).close();
+            });
     })
 }
 
@@ -196,14 +195,12 @@ function hideSpinner() {
 function refreshSources() {
     showSpinner();
     TWApi.Commands.Sources.execute(function (res) {
-        currentSources = res.content;
-        updateSourcesUI();
-        selectLoggedInSource();
-    }, function () {
-        sourcesRefreshError();
-    }, null, function () {
-        hideSpinner();
-    });
+            currentSources = res.content;
+            updateSourcesUI();
+            selectLoggedInSource();
+        }, sourcesRefreshError,
+        null,
+        hideSpinner);
 }
 
 function isRefreshing() {
@@ -247,7 +244,7 @@ function refreshCatalogue(oldRequest) {
         page: searchState.page,
         lastUrl: searchState.lastUrl,
         query: searchState.query
-    }, function() {
+    }, function () {
         if (!request.canceled) {
             hideSpinner();
             request.completed = true;

@@ -27,11 +27,7 @@ function updateLibrary() {
     TWApi.Commands.Library.execute(function(res) {
         currentManga = res.content;
         applyAndUpdate(currentManga);
-    }, function() {
-        libraryUpdateError();
-    }, null, function() {
-        hideSpinner();
-    });
+    }, libraryUpdateError, null, hideSpinner);
 }
 function setupUpdateButton() {
     $("#refresh_btn").click(function () {

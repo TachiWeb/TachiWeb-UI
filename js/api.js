@@ -7,7 +7,7 @@ var TWApi = {
     },
     //API Endpoints
     Endpoints: {
-        Root: "/api"
+        Root: "http://localhost:4567/api"
     },
     Commands: function () {
         var that = this;
@@ -58,6 +58,7 @@ var TWApi = {
                             if (res.success) {
                                 onSuccessWrapper(res, xhr);
                             } else {
+                                console.error("API error!", res.error);
                                 onErrorWrapper(res.error);
                             }
                         }
@@ -90,13 +91,34 @@ var TWApi = {
             return this.endpoint() + "/" + parameters.mangaId;
         });
         new ApiCommand("Library", "/library");
-        new ApiCommand("MangaInfo", "/manga_info");
-        new ApiCommand("Chapters", "/chapters");
-        new ApiCommand("PageCount", "/page_count");
+        new ApiCommand("MangaInfo", "/manga_info", function(parameters) {
+            return this.endpoint() + "/" + parameters.mangaId;
+        });
+        new ApiCommand("Chapters", "/chapters", function(parameters) {
+            return this.endpoint() + "/" + parameters.mangaId;
+        });
+        new ApiCommand("PageCount", "/page_count", function(parameters) {
+            return this.endpoint() + "/" + parameters.mangaId + "/" + parameters.chapterId;
+        });
         new ApiCommand("RestoreFile", "/restore_file");
         new ApiCommand("Backup", "/backup");
-        new ApiCommand("Favorite", "/fave");
-        new ApiCommand("ReadingStatus", "/reading_status");
+        new ApiCommand("Favorite", "/fave", function(parameters) {
+            return this.endpoint() + "/" + parameters.mangaId + "?fave=" + parameters.favorite;
+        });
+        new ApiCommand("ReadingStatus", "/reading_status", function(parameters) {
+            var currentUrl = this.endpoint() + "/" + parameters.mangaId + "/" + parameters.chapterId;
+            var usedQuestionMark = false;
+            if (parameters.read) {
+                currentUrl += usedQuestionMark ? "&" : "?";
+                currentUrl += "read=" + parameters.read;
+                usedQuestionMark = true;
+            }
+            if (parameters.lastReadPage) {
+                currentUrl += usedQuestionMark ? "&" : "?";
+                currentUrl += "lp=" + parameters.lastReadPage;
+            }
+            return currentUrl;
+        });
         new ApiCommand("Update", "/update", function(parameters) {
             return this.endpoint() + "/" + parameters.mangaId + "/" + parameters.updateType;
         });

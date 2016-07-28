@@ -128,77 +128,31 @@ function setupBrowserUrlButton() {
  * Get new manga info from the source.
  */
 function updateServerInfo() {
-    function infoUpdateError() {
-        serverUpdateError("manga info", updateServerInfo);
-    }
-
     showSpinner();
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", buildServerUpdateURL(mangaId, "INFO"), true);
-    xhr.onload = function () {
-        try {
-            var res = JSON.parse(xhr.responseText);
-            if (res.success) {
-                updateInfo(); //Grab the new updated manga info
-            } else {
-                infoUpdateError();
-            }
-        }
-        catch (e) {
-            console.error(e);
-            infoUpdateError();
-        }
-        hideSpinner();
-    };
-    xhr.onerror = function () {
-        infoUpdateError();
-        hideSpinner();
-    };
-    xhr.send();
+    TWApi.Commands.Update.execute(updateInfo, function () {
+        serverUpdateError("manga info", updateServerInfo);
+    }, {
+        mangaId: mangaId,
+        updateType: "INFO"
+    }, hideSpinner);
+
 }
 /**
  * Get new chapter info from the source
  */
 function updateServerChapters() {
-    function chaptersUpdateError() {
-        serverUpdateError("chapters", updateServerChapters);
-    }
-
     showSpinner();
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", buildServerUpdateURL(mangaId, "CHAPTERS"), true);
-    xhr.onload = function () {
-        try {
-            var res = JSON.parse(xhr.responseText);
-            if (res.success) {
-                //If there are any changes update the chapters list
-                if (res.added > 0 || res.removed > 0) {
-                    updateChapters();
-                }
-            } else {
-                chaptersUpdateError();
-            }
+    TWApi.Commands.Update.execute(function (res) {
+        //If there are any changes update the chapters list
+        if (res.added > 0 || res.removed > 0) {
+            updateChapters();
         }
-        catch (e) {
-            console.error(e);
-            chaptersUpdateError();
-        }
-        hideSpinner();
-    };
-    xhr.onerror = function () {
-        chaptersUpdateError();
-        hideSpinner();
-    };
-    xhr.send();
-}
-/**
- * Build the update URL used to get new info from the source
- * @param mangaId The ID of the manga to update.
- * @param updateType The type of update to perform (INFO/CHAPTERS)
- * @returns {string} The built update URL
- */
-function buildServerUpdateURL(mangaId, updateType) {
-    return updateRoot + "/" + mangaId + "/" + updateType;
+    }, function() {
+        serverUpdateError("chapters", updateServerChapters);
+    }, {
+        mangaId: mangaId,
+        updateType: "CHAPTERS"
+    }, hideSpinner);
 }
 function buildFaveURL(fave) {
     return faveRoot + "/" + mangaId + "?fave=" + fave;
@@ -206,30 +160,14 @@ function buildFaveURL(fave) {
 function setupFaveButton() {
     favBtn.click(function () {
         showSpinner();
-        var xhr = new XMLHttpRequest();
         var newFaveStatus = !currentInfo.favorite;
-        xhr.open("GET", buildFaveURL(newFaveStatus), true);
-        xhr.onload = function () {
-            try {
-                var res = JSON.parse(xhr.responseText);
-                if (res.success) {
-                    currentInfo.favorite = newFaveStatus;
-                    updateFaveIcon(newFaveStatus);
-                } else {
-                    faveUpdateError();
-                }
-            }
-            catch (e) {
-                console.error(e);
-                faveUpdateError();
-            }
-            hideSpinner();
-        };
-        xhr.onerror = function () {
-            faveUpdateError();
-            hideSpinner();
-        };
-        xhr.send();
+        TWApi.Commands.Favorite.execute(function() {
+            currentInfo.favorite = newFaveStatus;
+            updateFaveIcon(newFaveStatus);
+        }, faveUpdateError, {
+            mangaId: mangaId,
+            favorite: newFaveStatus
+        }, hideSpinner);
     });
 }
 function setupFilters() {
@@ -316,56 +254,34 @@ function buildPageCountUrl(mangaId, chapterId) {
  */
 function updateInfo() {
     showSpinner();
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", buildInfoUrl(mangaId), true);
-    xhr.onload = function () {
-        try {
-            currentInfo = JSON.parse(xhr.responseText);
-            updateInfoUI(currentInfo);
-        }
-        catch (e) {
-            console.error(e);
-            infoUpdateError();
-        }
-        hideSpinner();
-    };
-    xhr.onerror = function () {
-        infoUpdateError();
-        hideSpinner();
-    };
-    xhr.send();
+    TWApi.Commands.MangaInfo.execute(function (res) {
+        currentInfo = res;
+        updateInfoUI(currentInfo);
+    }, infoUpdateError, {
+        mangaId: mangaId
+    }, hideSpinner);
 }
 /**
  * Get the cached chapters on the server
  */
 function updateChapters() {
     showSpinner();
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", buildChaptersUrl(mangaId), true);
-    xhr.onload = function () {
-        try {
-            currentChapters = JSON.parse(xhr.responseText);
-            applyAndUpdateChapters(currentChapters);
-        }
-        catch (e) {
-            console.error(e);
-            chaptersUpdateError();
-        }
+    TWApi.Commands.Chapters.execute(function (res) {
+        currentChapters = res.content;
+        applyAndUpdateChapters(currentChapters);
+    }, chaptersUpdateError, {
+        mangaId: mangaId
+    }, function() {
         hideSpinner();
         //If we have no chapters (on first load), refresh chapters
         if (firstUpdate) {
-            if (currentChapters.length <= 0) {
+            if (currentChapters && currentChapters.length <= 0) {
                 console.log("No chapters on first load, updating chapters...");
                 updateServerChapters();
                 firstUpdate = false;
             }
         }
-    };
-    xhr.onerror = function () {
-        chaptersUpdateError();
-        hideSpinner();
-    };
-    xhr.send();
+    });
 }
 /**
  * Apply any sorting rules and filters to a list of chapters and then update the UI with the new chapters
@@ -414,23 +330,16 @@ function applyFilters(chapters) {
  */
 function openChapter(chapterId, lastPageRead) {
     rawElement(pageListDialog).showModal();
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", buildPageCountUrl(mangaId, chapterId), true);
-    xhr.onload = function () {
-        var pages = xhr.responseText;
-        if (!$.isNumeric(pages)) {
-            pageListError(chapterId);
-            console.error("Page list was not numeric!");
-        } else {
-            window.location.href = "reader/reader/reader.html?m=" + mangaId + "&c=" + chapterId + "&mp=" + xhr.responseText + "&p=" + lastPageRead + "&b=" + encodeURIComponent(window.location.href);
-        }
-        rawElement(pageListDialog).close();
-    };
-    xhr.onerror = function () {
+    TWApi.Commands.PageCount.execute(function(res) {
+        window.location.href = "reader/reader/reader.html?m=" + mangaId + "&c=" + chapterId + "&mp=" + res.page_count + "&p=" + lastPageRead + "&b=" + encodeURIComponent(window.location.href);
+    }, function() {
         pageListError(chapterId);
+    }, {
+        mangaId: mangaId,
+        chapterId: chapterId
+    }, function() {
         rawElement(pageListDialog).close();
-    };
-    xhr.send();
+    });
 }
 /**
  * Update the chapter tab UI
@@ -567,31 +476,22 @@ function buildReadingStatusUrl(chapter, read, lastReadPage) {
  * @param state Whether or not the chapter is read
  */
 function markReadingStatus(chapter, state) {
-    var xhr = new XMLHttpRequest();
-    //The last read page is set to 0 when marking as unread
-    xhr.open("GET", buildReadingStatusUrl(chapter, state, !state ? 0 : null), true);
-    xhr.onload = function () {
-        try {
-            var res = JSON.parse(xhr.responseText);
-            if (!res.success) {
-                readingStatusError(chapter, state);
-            } else {
-                //Update the local chapter state
-                chapter.read = state;
-                if (!state) {
-                    chapter.last_page_read = 0;
-                }
-                //Update the UI to reflect this change
-                applyAndUpdateChapters(currentChapters);
-            }
-        } catch (e) {
-            readingStatusError(chapter, state);
+    TWApi.Commands.ReadingStatus.execute(function() {
+        //Update the local chapter state
+        chapter.read = state;
+        if (!state) {
+            chapter.last_page_read = 0;
         }
-    };
-    xhr.onerror = function () {
+        //Update the UI to reflect this change
+        applyAndUpdateChapters(currentChapters);
+    }, function() {
         readingStatusError(chapter, state);
-    };
-    xhr.send();
+    }, {
+        mangaId: mangaId,
+        chapterId: chapter.id,
+        read: state,
+        lastReadPage: !state ? 0 : null
+    });
 }
 /**
  * Update the info tab UI
@@ -601,7 +501,7 @@ function updateInfoUI(info) {
     //Set title
     mangaTitleElement.text(info.title);
     //Set cover images
-    var coverUrl = buildCoverUrl(mangaId);
+    var coverUrl = TWApi.Commands.Cover.buildUrl({mangaId: mangaId});
     infoHeaderElement.css("background", generateHeaderBackgroundCSS(coverUrl));
     //TODO Make this shorthand (does anybody know how to do this?)
     infoHeaderElement.css("background-size", "100% auto");
