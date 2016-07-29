@@ -154,6 +154,9 @@ var TWApi = {
             return this.endpoint() + "/" + parameters.operation;
         });
         new ApiCommand("GetDownloads", "/get_downloads");
+        new ApiCommand("SetFlag", "/set_flag", function (parameters) {
+            return this.endpoint() + "/" + parameters.mangaId + "/" + parameters.flag + "/" + parameters.state;
+        });
         return built;
     }
 }.init();

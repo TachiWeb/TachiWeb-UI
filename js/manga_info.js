@@ -34,7 +34,7 @@ var downloadBtnAll;
 var downloadBtnClose;
 
 var currentInfo;
-var currentChapters;
+var currentChapters = [];
 var mangaId = QueryString.id;
 var backLink = QueryString.b;
 var mangaUrl;
@@ -138,6 +138,7 @@ function setupDialogs() {
 function setupSort() {
     reverseOrderBtn.click(function () {
         sort.reverse = !sort.reverse;
+        setServerFlag("SORT_DIRECTION", sort.reverse ? "DESCENDING" : "ASCENDING");
         applyAndUpdateChapters(currentChapters);
     });
 }
@@ -284,13 +285,17 @@ function setupFilters() {
     unreadCheckbox.change(function () {
         filters.onlyUnread = this.checked;
         applyAndUpdateChapters(currentChapters);
+        setServerFlag("READ_FILTER", filters.onlyUnread ? "UNREAD" : "ALL");
     });
     downloadedCheckbox.change(function () {
         filters.onlyDownloaded = this.checked;
         applyAndUpdateChapters(currentChapters);
+        setServerFlag("DOWNLOADED_FILTER", filters.onlyDownloaded ? "DOWNLOADED" : "ALL");
     });
     clearFiltersButton.click(function () {
         resetFilters();
+        setServerFlag("READ_FILTER", "ALL");
+        setServerFlag("DOWNLOADED_FILTER", "ALL");
         mapFiltersToUI();
         applyAndUpdateChapters(currentChapters);
     });
@@ -339,38 +344,16 @@ function selectChapterTab() {
     refreshTooltip.text("Refresh Chapters");
 }
 /**
- * Build the URL used to get the cached manga info on the server
- * @param mangaId The ID of the manga to get the cached info of
- * @returns {string} The generated URL
- */
-function buildInfoUrl(mangaId) {
-    return infoRoot + "/" + mangaId;
-}
-/**
- * Build the URL used to get the cached chapters on the server
- * @param mangaId The ID of the manga to get the cached chapters of
- * @returns {string} The generated URL
- */
-function buildChaptersUrl(mangaId) {
-    return chaptersRoot + "/" + mangaId;
-}
-/**
- * Build the URL used to determine how many pages a chapter has
- * @param mangaId The ID of the manga the chapter is part of
- * @param chapterId The ID of the chapter to count pages of
- * @returns {string} The generated URL
- */
-function buildPageCountUrl(mangaId, chapterId) {
-    return pageCountRoot + "/" + mangaId + "/" + chapterId;
-}
-/**
  * Get the cached manga info on the server
  */
 function updateInfo() {
     showSpinner();
     TWApi.Commands.MangaInfo.execute(function (res) {
         currentInfo = res;
+        mapFlagsToRules(res.flags);
+        mapFiltersToUI();
         updateInfoUI(currentInfo);
+        applyAndUpdateChapters(currentChapters);
     }, infoUpdateError, {
         mangaId: mangaId
     }, hideSpinner);
@@ -460,6 +443,20 @@ function applyFilters(chapters) {
             chapters.splice(i, 1);
         }
     }
+}
+function mapFlagsToRules(flags) {
+    sort.reverse = flags.SORT_DIRECTION === "DESCENDING";
+    filters.onlyUnread = flags.READ_FILTER === "UNREAD";
+    filters.onlyDownloaded = flags.DOWNLOADED_FILTER === "DOWNLOADED";
+}
+function setServerFlag(flag, state) {
+    TWApi.Commands.SetFlag.execute(null, function () {
+        setServerFlagError(flag, state);
+    }, {
+        mangaId: mangaId,
+        flag: flag,
+        state: state
+    });
 }
 /**
  * Open the reader to a specific chapter
@@ -642,17 +639,6 @@ function deleteChapter(chapter, onSuccess) {
     });
 }
 /**
- * Build the URL used to set the reading status of a chapter on the server side
- * @param chapter The chapter to set the reading status of
- * @param read Whether or not the chapter is read
- * @param lastReadPage The new last read page (or null to leave it the same)
- * @returns {string} The built URL
- */
-function buildReadingStatusUrl(chapter, read, lastReadPage) {
-    return readingStatusRoot + "/" + mangaId + "/" + chapter.id + "?read=" + read
-        + (lastReadPage ? ("&lp=" + lastReadPage) : "");
-}
-/**
  * Mark the reading status of chapter as read/unread
  * @param chapter The chapter to update
  * @param state Whether or not the chapter is read
@@ -825,6 +811,16 @@ function downloadDeleteError(chapter, onSuccess) {
         actionText: "Retry",
         actionHandler: function () {
             deleteChapter(chapter, onSuccess);
+        }
+    });
+}
+function setServerFlagError(flag, state) {
+    snackbar.showSnackbar({
+        message: "Error saving filters/sorting rules!",
+        timeout: 2000,
+        actionText: "Retry",
+        actionHandler: function () {
+            setServerFlag(flag, state);
         }
     });
 }
