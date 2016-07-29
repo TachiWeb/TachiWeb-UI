@@ -97,3 +97,28 @@ html, body {
 .mdl-layout {
     overflow: hidden;
 }
+
+.mdl-layout__header {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+/** Small screens fix **/
+@media screen and (max-width: 1024px) {
+    .mdl-layout__container {
+        position: static;
+    }
+
+    .mdl-layout__header {
+        display: block;
+    }
+
+    .mdl-layout__header-row {
+        height: 56px;
+        padding: 0 5px 0 80px;
+    }
+
+    .mdl-layout__header > .mdl-layout-icon {
+        left: 40px;
+    }
+}
