@@ -2,15 +2,18 @@ var librarySpinner;
 var libraryWrapper;
 var currentManga = [];
 var unreadCheckbox;
+var downloadedCheckbox;
 var filters;
 function resetFilters() {
     filters = {
         onlyUnread: false,
+        onlyDownloaded: false,
         text: ""
     };
 }
 function mapFiltersToUI() {
     mdlCheckboxCheck(unreadCheckbox, filters.onlyUnread);
+    mdlCheckboxCheck(downloadedCheckbox, filters.onlyDownloaded);
 }
 resetFilters();
 
@@ -19,7 +22,12 @@ function onLoad() {
     libraryWrapper = $("#library_wrapper");
     setupFilters();
     setupUpdateButton();
+    setupFavoriteListener();
     updateLibrary();
+}
+
+function setupFavoriteListener() {
+    BrowserCommand.Favorite.on(updateLibrary);
 }
 
 function updateLibrary() {
@@ -155,6 +163,9 @@ function applyFilters(mangas) {
         if (filters.onlyUnread && manga.unread <= 0) {
             remove = true;
         }
+        if (!remove && filters.onlyDownloaded && !manga.downloaded) {
+            remove = true;
+        }
         if (!remove && filters.text.trim !== "" && manga.title.toLowerCase().indexOf(filters.text.toLowerCase()) <= -1) {
             remove = true;
         }
@@ -168,6 +179,11 @@ function setupFilters() {
     unreadCheckbox = $("#unread-chkbx");
     unreadCheckbox.change(function () {
         filters.onlyUnread = this.checked;
+        applyAndUpdate(currentManga);
+    });
+    downloadedCheckbox = $("#download-chkbx");
+    downloadedCheckbox.change(function () {
+        filters.onlyDownloaded = this.checked;
         applyAndUpdate(currentManga);
     });
     $("#clear_filters_btn").click(function () {

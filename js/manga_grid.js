@@ -23,4 +23,5 @@ function appendManga(manga, element, openInNewTab) {
     rawElement(element).appendChild(card);
     componentHandler.upgradeElement(card);
     componentHandler.upgradeElement(rawElement(element));
+    return card;
 }

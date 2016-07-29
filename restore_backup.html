@@ -11,7 +11,7 @@
     <script src="bower_components/dialog-polyfill/dialog-polyfill.js"></script>
     <link href="bower_components/dialog-polyfill/dialog-polyfill.css" rel="stylesheet">
     <!-- Material Fonts -->
-    <link href="css/material_fonts.css" rel="stylesheet">
+    <link href="bower_components/material-design-icons/iconfont/material-icons.css" rel="stylesheet">
     <!-- API -->
     <script src="js/api.js"></script>
     <!-- Drawer JS -->
@@ -51,51 +51,6 @@
                 Backup
             </button>
         </div>
-        <!-- Dialogs -->
-        <dialog id="busy_dialog" class="mdl-dialog">
-            <h3 class="mdl-dialog__title">Please wait</h3>
-            <div class="loading_dialog mdl-dialog__content">
-                <p>
-                    Performing operation...
-                </p>
-                <br>
-                <div class="dialog_spinner_wrapper">
-                    <div class="loading_spinner">
-                        <div class="mdl-spinner mdl-js-spinner is-active"></div>
-                    </div>
-                </div>
-            </div>
-        </dialog>
-        <dialog id="restore_dialog" class="mdl-dialog">
-            <h3 class="mdl-dialog__title">Restore</h3>
-            <div class="loading_dialog mdl-dialog__content">
-                <div class="mdl-textfield mdl-js-textfield mdl-textfield--file">
-                    <input class="mdl-textfield__input" placeholder="File" type="text" id="upload_file_name" readonly/>
-                    <div class="mdl-button mdl-button--primary mdl-button--icon mdl-button--file">
-                        <i class="material-icons">attach_file</i><input type="file" id="uploadBtn"
-                                                                        name="uploaded_file">
-                    </div>
-                </div>
-            </div>
-            <div class="mdl-dialog__actions">
-                <button type="submit" id="restore_submit" class="mdl-button mdl-js-button mdl-js-ripple-effect">
-                    Submit
-                </button>
-                <button id="restore_close_button" class="mdl-button mdl-js-button mdl-js-ripple-effect close">Close
-                </button>
-            </div>
-        </dialog>
-        <dialog id="restore_res_dialog" class="mdl-dialog">
-            <h3 id="restore_res_title" class="mdl-dialog__title"></h3>
-            <div class="loading_dialog mdl-dialog__content">
-                <p id="restore_res_body"></p>
-            </div>
-            <div class="mdl-dialog__actions">
-                <button id="restore_res_close_button" class="mdl-button mdl-js-button mdl-js-ripple-effect close">
-                    Close
-                </button>
-            </div>
-        </dialog>
         <!-- Snackbar -->
         <div id="snackbar" class="mdl-js-snackbar mdl-snackbar">
             <div class="mdl-snackbar__text"></div>
@@ -103,5 +58,50 @@
         </div>
     </main>
 </div>
+<!-- Dialogs -->
+<dialog id="busy_dialog" class="mdl-dialog">
+    <h3 class="mdl-dialog__title">Please wait</h3>
+    <div class="loading_dialog mdl-dialog__content">
+        <p>
+            Performing operation...
+        </p>
+        <br>
+        <div class="dialog_spinner_wrapper">
+            <div class="loading_spinner">
+                <div class="mdl-spinner mdl-js-spinner is-active"></div>
+            </div>
+        </div>
+    </div>
+</dialog>
+<dialog id="restore_dialog" class="mdl-dialog">
+    <h3 class="mdl-dialog__title">Restore</h3>
+    <div class="loading_dialog mdl-dialog__content">
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--file">
+            <input class="mdl-textfield__input" placeholder="File" type="text" id="upload_file_name" readonly/>
+            <div class="mdl-button mdl-button--primary mdl-button--icon mdl-button--file">
+                <i class="material-icons">attach_file</i><input type="file" id="uploadBtn"
+                                                                name="uploaded_file">
+            </div>
+        </div>
+    </div>
+    <div class="mdl-dialog__actions">
+        <button type="submit" id="restore_submit" class="mdl-button mdl-js-button mdl-js-ripple-effect">
+            Submit
+        </button>
+        <button id="restore_close_button" class="mdl-button mdl-js-button mdl-js-ripple-effect close">Close
+        </button>
+    </div>
+</dialog>
+<dialog id="restore_res_dialog" class="mdl-dialog">
+    <h3 id="restore_res_title" class="mdl-dialog__title"></h3>
+    <div class="loading_dialog mdl-dialog__content">
+        <p id="restore_res_body"></p>
+    </div>
+    <div class="mdl-dialog__actions">
+        <button id="restore_res_close_button" class="mdl-button mdl-js-button mdl-js-ripple-effect close">
+            Close
+        </button>
+    </div>
+</dialog>
 </body>
 </html>

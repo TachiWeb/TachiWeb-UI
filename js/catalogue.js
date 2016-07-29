@@ -14,6 +14,7 @@ var dialogSpinner;
 
 var currentRequest = null;
 var currentSources = [];
+var currentManga = {};
 
 var typingTimer;
 var doneTypingInterval = 250;
@@ -49,6 +50,7 @@ function onLoad() {
     setupSourcesSelect();
     setupScrollBox();
     setupSearchBox();
+    setupFavoriteListener();
     refreshSources();
 }
 
@@ -102,7 +104,7 @@ function performSearch() {
         searchState.query = null;
     }
     scrollBox.scrollTop(0);
-    clearElement(mangaGrid);
+    clearMangas();
     refreshCatalogue();
 }
 
@@ -154,9 +156,25 @@ function setupSourcesSelect() {
             searchState.page = 1;
             searchState.lastUrl = null;
             scrollBox.scrollTop(0);
-            clearElement(mangaGrid);
+            clearMangas();
             refreshCatalogue();
         }
+    });
+}
+
+function clearMangas() {
+    clearElement(mangaGrid);
+    currentManga = {};
+}
+
+function updateCatalogueFavoriteStatus(mangaId, newFave) {
+    var mangaElement = currentManga[mangaId];
+    mangaElement.style.opacity = newFave ? 0.5 : 1;
+}
+
+function setupFavoriteListener() {
+    BrowserCommand.Favorite.on(function (data) {
+        updateCatalogueFavoriteStatus(data.mangaId, data.favorite);
     });
 }
 
@@ -228,7 +246,7 @@ function refreshCatalogue(oldRequest) {
         if (!request.canceled) {
             //Clear catalogue if page 1
             if (searchState.page === 1) {
-                clearElement(mangaGrid);
+                clearMangas();
             }
             //Set new search state
             searchState.lastUrl = res.lurl;
@@ -265,7 +283,8 @@ function updateSourcesUI() {
 
 function updateCatalogueUI(manga) {
     $.each(manga, function (index, value) {
-        appendManga(value, mangaGrid, true);
+        currentManga[value.id] = appendManga(value, mangaGrid, true);
+        updateCatalogueFavoriteStatus(value.id, value.favorite);
     });
 }
 

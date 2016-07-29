@@ -20,6 +20,8 @@
     "material-design-lite": "^1.1.3",
     "moment": "^2.14.1",
     "dialog-polyfill": "^0.4.3",
-    "mdl-select-component": "git://github.com/MEYVN-digital/mdl-selectfield.git#30ea39196a3f2d21f3363804344f367e19640283"
+    "mdl-select-component": "git://github.com/MEYVN-digital/mdl-selectfield.git#30ea39196a3f2d21f3363804344f367e19640283",
+    "material-design-icons": "^2.2.3",
+    "intercom": "^0.1.4"
   }
 }

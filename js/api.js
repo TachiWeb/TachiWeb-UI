@@ -7,7 +7,7 @@ var TWApi = {
     },
     //API Endpoints
     Endpoints: {
-        Root: "http://localhost:4567/api"
+        Root: "/api"
     },
     Commands: function () {
         var that = this;
@@ -108,12 +108,12 @@ var TWApi = {
         new ApiCommand("ReadingStatus", "/reading_status", function(parameters) {
             var currentUrl = this.endpoint() + "/" + parameters.mangaId + "/" + parameters.chapterId;
             var usedQuestionMark = false;
-            if (parameters.read) {
+            if (parameters.read !== undefined && parameters.read !== null) {
                 currentUrl += usedQuestionMark ? "&" : "?";
                 currentUrl += "read=" + parameters.read;
                 usedQuestionMark = true;
             }
-            if (parameters.lastReadPage) {
+            if (parameters.lastReadPage !== undefined && parameters.lastReadPage !== null) {
                 currentUrl += usedQuestionMark ? "&" : "?";
                 currentUrl += "lp=" + parameters.lastReadPage;
             }
@@ -143,6 +143,17 @@ var TWApi = {
                 + "?username=" + encodeURIComponent(parameters.username)
                 + "&password=" + encodeURIComponent(parameters.password);
         });
+        new ApiCommand("Download", "/download", function (parameters) {
+            var builtUrl = this.endpoint() + "/" + parameters.mangaId + "/" + parameters.chapterId;
+            if (parameters.del) {
+                builtUrl += "?delete=true";
+            }
+            return builtUrl;
+        });
+        new ApiCommand("DownloadsOperation", "/downloads_op", function (parameters) {
+            return this.endpoint() + "/" + parameters.operation;
+        });
+        new ApiCommand("GetDownloads", "/get_downloads");
         return built;
     }
 }.init();

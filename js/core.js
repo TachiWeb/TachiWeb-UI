@@ -14,6 +14,8 @@ var catalogueRoot = apiRoot + "/catalogue";
 var listLoginSourcesRoot = apiRoot + "/list_login_sources";
 var sourceLoginRoot = apiRoot + "/source_login";
 var snackbar;
+
+var fadeSpeed = 250;
 var QueryString = function () {
     // This function is anonymous, is executed immediately and
     // the return value is assigned to QueryString!

@@ -16,7 +16,11 @@
     <script src="bower_components/dialog-polyfill/dialog-polyfill.js"></script>
     <link href="bower_components/dialog-polyfill/dialog-polyfill.css" rel="stylesheet">
     <!-- Material Fonts -->
-    <link href="css/material_fonts.css" rel="stylesheet">
+    <link href="bower_components/material-design-icons/iconfont/material-icons.css" rel="stylesheet">
+    <!-- Intercom -->
+    <script src="bower_components/intercom/intercom.min.js"></script>
+    <!-- Command API -->
+    <script src="js/cmd.js"></script>
     <!-- API -->
     <script src="js/api.js"></script>
     <!-- Core -->
@@ -115,21 +119,6 @@
     </div>
     <main class="mdl-layout__content">
         <div id="chapter_buttons"></div>
-        <!-- Page list loading dialog -->
-        <dialog id="page_list_dialog" class="mdl-dialog">
-            <h3 class="mdl-dialog__title">Please wait</h3>
-            <div class="loading_dialog mdl-dialog__content">
-                <p>
-                    Please wait while we download the page list for this manga...
-                </p>
-                <br>
-                <div class="dialog_spinner_wrapper">
-                    <div class="loading_spinner">
-                        <div class="mdl-spinner mdl-js-spinner is-active"></div>
-                    </div>
-                </div>
-            </div>
-        </dialog>
         <!-- NOTE: This wrapper is necessary, don't touch it! -->
         <div id="info_spinner" class="loading_spinner">
             <div class="mdl-spinner mdl-js-spinner is-active"></div>
@@ -160,5 +149,40 @@
         </div>
     </main>
 </div>
+<!-- Page list loading dialog -->
+<dialog id="page_list_dialog" class="mdl-dialog">
+    <h3 class="mdl-dialog__title">Please wait</h3>
+    <div class="loading_dialog mdl-dialog__content">
+        <p>
+            Please wait while we download the page list for this manga...
+        </p>
+        <br>
+        <div class="dialog_spinner_wrapper">
+            <div class="loading_spinner">
+                <div class="mdl-spinner mdl-js-spinner is-active"></div>
+            </div>
+        </div>
+    </div>
+</dialog>
+<!-- Download dialog -->
+<dialog id="download_dialog" class="mdl-dialog">
+    <h3 class="mdl-dialog__title">Download</h3>
+    <div class="mdl-dialog__actions mdl-dialog__actions--full-width">
+        <button id="download_btn_1" type="button" class="mdl-button mdl-js-button mdl-js-ripple-effect">Download 1
+        </button>
+        <button id="download_btn_5" type="button" class="mdl-button mdl-js-button mdl-js-ripple-effect">Download 5
+        </button>
+        <button id="download_btn_10" type="button" class="mdl-button mdl-js-button mdl-js-ripple-effect">Download 10
+        </button>
+        <button id="download_btn_unread" type="button" class="mdl-button mdl-js-button mdl-js-ripple-effect">Download
+            unread
+        </button>
+        <button id="download_btn_all" type="button" class="mdl-button mdl-js-button mdl-js-ripple-effect">Download all
+        </button>
+        <button id="download_btn_close" type="button" class="mdl-button mdl-js-button close mdl-js-ripple-effect">
+            Close
+        </button>
+    </div>
+</dialog>
 </body>
 </html>		

@@ -8,7 +8,6 @@ var openBrowserBtn;
 var moreBtn;
 var infoTab;
 var chaptersTab;
-var fadeSpeed = 250;
 var infoPanel;
 var chaptersPanel;
 var spinner;
@@ -25,6 +24,14 @@ var mangaDescElement;
 var mangaTitleElement;
 
 var pageListDialog;
+var downloadDialog;
+
+var downloadBtn1;
+var downloadBtn5;
+var downloadBtn10;
+var downloadBtnUnread;
+var downloadBtnAll;
+var downloadBtnClose;
 
 var currentInfo;
 var currentChapters;
@@ -35,21 +42,26 @@ var mangaUrl;
 var firstUpdate = true;
 
 var unreadCheckbox;
+var downloadedCheckbox;
 var clearFiltersButton;
 
 var filters;
 function resetFilters() {
     filters = {
-        onlyUnread: false
+        onlyUnread: false,
+        onlyDownloaded: false
     };
 }
 resetFilters();
 function mapFiltersToUI() {
     mdlCheckboxCheck(unreadCheckbox, filters.onlyUnread);
+    mdlCheckboxCheck(downloadedCheckbox, filters.onlyDownloaded);
 }
 var sort = {
     reverse: false
 };
+
+const CHAPTER_UPDATE_FREQ = 1000;
 
 function onLoad() {
     //Grab references to required HTML elements
@@ -71,6 +83,14 @@ function onLoad() {
     chapterButtons = $("#chapter_buttons");
 
     pageListDialog = $("#page_list_dialog");
+    downloadDialog = $("#download_dialog");
+
+    downloadBtn1 = $("#download_btn_1");
+    downloadBtn5 = $("#download_btn_5");
+    downloadBtn10 = $("#download_btn_10");
+    downloadBtnUnread = $("#download_btn_unread");
+    downloadBtnAll = $("#download_btn_all");
+    downloadBtnClose = $("#download_btn_close");
 
     infoHeaderElement = $("#info_header");
     coverImgElement = $("#cover_img");
@@ -81,12 +101,12 @@ function onLoad() {
     mangaTitleElement = $("#manga_title");
 
     unreadCheckbox = $("#unread-chkbx");
+    downloadedCheckbox = $("#download-chkbx");
     clearFiltersButton = $("#clear_filters_btn");
 
     //Setup various components
     setupTabs();
     updateInfo();
-    updateChapters();
     setupBackButton();
     setupBrowserUrlButton();
     setupFilters();
@@ -94,6 +114,9 @@ function onLoad() {
     setupDialogs();
     setupFaveButton();
     setupRefreshButton();
+    setupFaveCommandListener();
+    setupDownloadDialog();
+    startUpdatingChapters();
 }
 
 function setupRefreshButton() {
@@ -109,6 +132,7 @@ function setupDialogs() {
     //Dialog polyfills
     if (!rawElement(pageListDialog).showModal) {
         dialogPolyfill.registerDialog(rawElement(pageListDialog));
+        dialogPolyfill.registerDialog(rawElement(downloadDialog));
     }
 }
 function setupSort() {
@@ -123,6 +147,81 @@ function setupBrowserUrlButton() {
             openInNewTab(mangaUrl);
         }
     });
+}
+function startUpdatingChapters() {
+    var realUpdateChapters = function () {
+        var onComplete = function () {
+            setTimeout(realUpdateChapters, CHAPTER_UPDATE_FREQ);
+        };
+        //Only update if context menu is not open
+        if (!elementExists($(".mdl-menu__container.is-visible"))) {
+            updateChapters(false, onComplete);
+        } else {
+            onComplete();
+        }
+    };
+    realUpdateChapters();
+}
+function setupDownloadDialog() {
+    downloadBtn.click(function () {
+        rawElement(downloadDialog).showModal();
+    });
+    var sortedNotDownloadedOnly = function () {
+        var filtered = [];
+        for (var i = 0; i < currentChapters.length; i++) {
+            var chapter = currentChapters[i];
+            if (chapter.download_status === "NOT_DOWNLOADED") {
+                filtered.push(chapter);
+            }
+        }
+        applySort(filtered);
+        return filtered;
+    };
+    downloadBtn1.click(function () {
+        downloadChapterArray(sortedNotDownloadedOnly().slice(0, 1));
+        rawElement(downloadDialog).close();
+    });
+    downloadBtn5.click(function () {
+        downloadChapterArray(sortedNotDownloadedOnly().slice(0, 5));
+        rawElement(downloadDialog).close();
+    });
+    downloadBtn10.click(function () {
+        downloadChapterArray(sortedNotDownloadedOnly().slice(0, 10));
+        rawElement(downloadDialog).close();
+    });
+    downloadBtnUnread.click(function () {
+        var sortedNotDownloaded = sortedNotDownloadedOnly();
+        var filtered = [];
+        for (var i = 0; i < sortedNotDownloaded.length; i++) {
+            var chapter = sortedNotDownloaded[i];
+            if (!chapter.read) {
+                filtered.push(chapter);
+            }
+        }
+        downloadChapterArray(filtered);
+        rawElement(downloadDialog).close();
+    });
+    downloadBtnAll.click(function () {
+        downloadChapterArray(sortedNotDownloadedOnly());
+        rawElement(downloadDialog).close();
+    });
+    downloadBtnClose.click(function () {
+        rawElement(downloadDialog).close();
+    });
+}
+function downloadChapterArray(array) {
+    var prev = function () {
+        updateChapters();
+    };
+    for (var i = array.length - 1; i >= 0; i--) {
+        prev = function (i, prev) {
+            return function () {
+                updateChapters();
+                downloadChapter(array[i], prev);
+            };
+        }(i, prev);
+    }
+    prev();
 }
 /**
  * Get new manga info from the source.
@@ -154,8 +253,15 @@ function updateServerChapters() {
         updateType: "CHAPTERS"
     }, hideSpinner);
 }
-function buildFaveURL(fave) {
-    return faveRoot + "/" + mangaId + "?fave=" + fave;
+function setupFaveCommandListener() {
+    BrowserCommand.Favorite.on(function (data) {
+        if (data.mangaId === mangaId) {
+            if (currentInfo) {
+                currentInfo.favorite = data.favorite;
+                updateFaveIcon(currentInfo.favorite);
+            }
+        }
+    });
 }
 function setupFaveButton() {
     favBtn.click(function () {
@@ -164,6 +270,10 @@ function setupFaveButton() {
         TWApi.Commands.Favorite.execute(function() {
             currentInfo.favorite = newFaveStatus;
             updateFaveIcon(newFaveStatus);
+            BrowserCommand.Favorite.send({
+                mangaId: mangaId,
+                favorite: newFaveStatus
+            });
         }, faveUpdateError, {
             mangaId: mangaId,
             favorite: newFaveStatus
@@ -173,6 +283,10 @@ function setupFaveButton() {
 function setupFilters() {
     unreadCheckbox.change(function () {
         filters.onlyUnread = this.checked;
+        applyAndUpdateChapters(currentChapters);
+    });
+    downloadedCheckbox.change(function () {
+        filters.onlyDownloaded = this.checked;
         applyAndUpdateChapters(currentChapters);
     });
     clearFiltersButton.click(function () {
@@ -264,15 +378,22 @@ function updateInfo() {
 /**
  * Get the cached chapters on the server
  */
-function updateChapters() {
-    showSpinner();
+function updateChapters(useSpinner, onComplete) {
+    if (useSpinner === null || useSpinner === undefined) {
+        useSpinner = true;
+    }
+    if (useSpinner) {
+        showSpinner();
+    }
     TWApi.Commands.Chapters.execute(function (res) {
         currentChapters = res.content;
         applyAndUpdateChapters(currentChapters);
     }, chaptersUpdateError, {
         mangaId: mangaId
     }, function() {
-        hideSpinner();
+        if (useSpinner) {
+            hideSpinner();
+        }
         //If we have no chapters (on first load), refresh chapters
         if (firstUpdate) {
             if (currentChapters && currentChapters.length <= 0) {
@@ -281,7 +402,24 @@ function updateChapters() {
                 firstUpdate = false;
             }
         }
+        //Call onComplete if necessary
+        if (onComplete) {
+            onComplete();
+        }
     });
+}
+/**
+ * Apply any sorting rules and filters to a list of chapters
+ *
+ * NOTE: The originally supplied list will be kept intact
+ * @param chapters The chapters to apply the rules to
+ * @return A new array of chapters with the rules applied
+ */
+function applyRules(chapters) {
+    var clonedChapters = chapters.slice(0);
+    applyFilters(clonedChapters);
+    applySort(clonedChapters);
+    return clonedChapters;
 }
 /**
  * Apply any sorting rules and filters to a list of chapters and then update the UI with the new chapters
@@ -290,10 +428,7 @@ function updateChapters() {
  * @param chapters The chapters to update the UI with
  */
 function applyAndUpdateChapters(chapters) {
-    var clonedChapters = chapters.slice(0);
-    applyFilters(clonedChapters);
-    applySort(clonedChapters);
-    updateChaptersUI(clonedChapters);
+    updateChaptersUI(applyRules(chapters));
 }
 /**
  * Apply any user specified sorting rules to a list of chapters
@@ -316,6 +451,9 @@ function applyFilters(chapters) {
         var chapter = chapters[i];
         var remove = false;
         if (filters.onlyUnread && chapter.read) {
+            remove = true;
+        }
+        if (!remove && filters.onlyDownloaded && chapter.download_status !== "DOWNLOADED") {
             remove = true;
         }
         if (remove) {
@@ -353,6 +491,7 @@ function updateChaptersUI(chapters) {
     clearElement(rawElement(chapterButtons));
     for (var i = 0; i < chapters.length; i++) {
         var chapter = chapters[i];
+
         //Generate the list item
         var element = document.createElement("div");
         element.className = "chapter_entry mdl-button mdl-js-button mdl-js-ripple-effect";
@@ -377,11 +516,11 @@ function updateChaptersUI(chapters) {
                 if (event.which === 3) {
                     if (i === chapters.length - 1) {
                         //The context menu for the last chapter opens upward (or else the user cannot click the last button)
-                        menuElement.css("right", $(document).width() - event.pageX + "px");
-                        menuElement.css("top", -$(document).height() + event.pageY + "px");
+                        menuElement.css("right", ($(document).width() - 1) - event.pageX + "px");
+                        menuElement.css("top", (-$(document).height() + 2) + event.pageY + "px");
                     } else {
-                        menuElement.css("left", event.pageX + "px");
-                        menuElement.css("top", (event.pageY - 35) + "px");
+                        menuElement.css("left", (event.pageX - 3) + "px");
+                        menuElement.css("top", (event.pageY - 38) + "px");
                     }
                     menuElement.click();
                     event.preventDefault();
@@ -402,10 +541,32 @@ function updateChaptersUI(chapters) {
         menu.setAttribute("for", menuElement.id);
         //Generate the menu items
         //Download button
-        var menuDownloadButton = document.createElement("li");
-        menuDownloadButton.className = "mdl-menu__item";
-        menuDownloadButton.textContent = "Download";
-        menu.appendChild(menuDownloadButton);
+        var menuDownloadButton;
+        if (chapter.download_status === "NOT_DOWNLOADED") {
+            menuDownloadButton = document.createElement("li");
+            menuDownloadButton.className = "mdl-menu__item";
+            menuDownloadButton.textContent = "Download";
+            $(menuDownloadButton).click(function (chapter) {
+                return function () {
+                    downloadChapter(chapter, function () {
+                        updateChapters();
+                    });
+                };
+            }(chapter));
+            menu.appendChild(menuDownloadButton);
+        } else if (chapter.download_status === "DOWNLOADED") {
+            menuDownloadButton = document.createElement("li");
+            menuDownloadButton.className = "mdl-menu__item";
+            menuDownloadButton.textContent = "Delete";
+            $(menuDownloadButton).click(function (chapter) {
+                return function () {
+                    deleteChapter(chapter, function () {
+                        updateChapters();
+                    });
+                };
+            }(chapter));
+            menu.appendChild(menuDownloadButton);
+        }
         //Mark as read button
         var menuMarkButton = document.createElement("li");
         menuMarkButton.className = "mdl-menu__item";
@@ -420,7 +581,9 @@ function updateChaptersUI(chapters) {
         //Notify MDL about the new menu
         componentHandler.upgradeElement(menuElement);
         componentHandler.upgradeElement(menu);
-        componentHandler.upgradeElement(menuDownloadButton);
+        if (menuDownloadButton) {
+            componentHandler.upgradeElement(menuDownloadButton);
+        }
         componentHandler.upgradeElement(menuMarkButton);
 
         element.appendChild(titleRow);
@@ -445,7 +608,9 @@ function updateChaptersUI(chapters) {
         //Downloaded indicator (not enabled because downloading has not been implemented yet)
         var downloadElement = document.createElement("div");
         downloadElement.className = "chapter_downloaded chapter_row_bottom_entry";
-        downloadElement.textContent = ""; //TODO Change when downloading is actually implemented
+        if (chapter.download_status !== "NOT_DOWNLOADED") {
+            downloadElement.textContent = chapter.download_status;
+        }
         bottomRow.appendChild(downloadElement);
         element.appendChild(bottomRow);
         //When the user clicks the list item, the reader should open
@@ -458,6 +623,23 @@ function updateChaptersUI(chapters) {
         //Notify MDL about this new list item
         componentHandler.upgradeElement(element);
     }
+}
+function downloadChapter(chapter, onSuccess) {
+    TWApi.Commands.Download.execute(onSuccess, function () {
+        downloadStartError(chapter, onSuccess);
+    }, {
+        mangaId: mangaId,
+        chapterId: chapter.id
+    });
+}
+function deleteChapter(chapter, onSuccess) {
+    TWApi.Commands.Download.execute(onSuccess, function () {
+        downloadDeleteError(chapter, onSuccess);
+    }, {
+        mangaId: mangaId,
+        chapterId: chapter.id,
+        del: true
+    });
 }
 /**
  * Build the URL used to set the reading status of a chapter on the server side
@@ -623,6 +805,26 @@ function faveUpdateError() {
         actionText: "Retry",
         actionHandler: function () {
             favBtn.click();
+        }
+    });
+}
+function downloadStartError(chapter, onSuccess) {
+    snackbar.showSnackbar({
+        message: "Error starting download!",
+        timeout: 2000,
+        actionText: "Retry",
+        actionHandler: function () {
+            downloadChapter(chapter, onSuccess);
+        }
+    });
+}
+function downloadDeleteError(chapter, onSuccess) {
+    snackbar.showSnackbar({
+        message: "Error deleting download!",
+        timeout: 2000,
+        actionText: "Retry",
+        actionHandler: function () {
+            deleteChapter(chapter, onSuccess);
         }
     });
 }
