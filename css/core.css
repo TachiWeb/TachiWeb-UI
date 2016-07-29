@@ -60,6 +60,15 @@ html, body {
     bottom: 0;
 }
 
+.badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: blue;
+    color: white;
+    padding: 3px;
+}
+
 /** List headers **/
 .list_header {
     width: 100%;

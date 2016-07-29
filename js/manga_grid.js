@@ -1,5 +1,5 @@
 /** Shared Manga Grid lib that allows displaying Manga in a grid format **/
-function appendManga(manga, element, openInNewTab) {
+function appendManga(manga, element, openInNewTab, showUnreadBadge) {
     var card = document.createElement("div");
     card.className = "mdl-card mdl-shadow--4dp manga_card mdl-cell mdl-cell--2-col mdl-button mdl-js-button mdl-js-ripple-effect";
     var img = document.createElement("img");
@@ -20,6 +20,12 @@ function appendManga(manga, element, openInNewTab) {
             window.location.href = builtUrl + encodeURIComponent(currentUrl);
         }
     });
+    if (showUnreadBadge && manga.unread > 0) {
+        var badge = document.createElement("div");
+        badge.className = "badge";
+        badge.textContent = manga.unread;
+        card.appendChild(badge);
+    }
     rawElement(element).appendChild(card);
     componentHandler.upgradeElement(card);
     componentHandler.upgradeElement(rawElement(element));

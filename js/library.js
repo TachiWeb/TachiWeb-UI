@@ -121,7 +121,7 @@ function appendMangas(mangas, rootElement) {
     var libraryGrid = createGrid();
     rootElement.appendChild(libraryGrid);
     for (var i = 0; i < mangas.length; i++) {
-        appendManga(mangas[i], libraryGrid);
+        appendManga(mangas[i], libraryGrid, false, true);
     }
     componentHandler.upgradeElement(libraryGrid);
 }
