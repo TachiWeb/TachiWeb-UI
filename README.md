@@ -11,9 +11,27 @@ TachiWeb is not officially supported by Tachiyomi or it's contributors.
 
 # Live demo
 A live demo is available here: [http://64.137.238.70:4567/](http://64.137.238.70:4567/)
-**NOTE**: Kissmanga is very unstable. Batoto normally requires log in but in the demo, I will use my own credentials. Restoring is disabled in the demo for performance reasons.
+**NOTE**: Kissmanga is very unstable. Batoto normally requires log in but in the demo, I will use my own credentials.
 The demo server is also very cheap so don't expect images to load very fast.
 Please don't destroy the live demo.
+
+# Features
+- Almost the entire Tachiyomi UI has been implemented!
+- Simple RTL and LTR paging reader implemented.
+- Full support for chapter downloading and download management.
+- Add new manga from the catalogue (essentially fully implemented).
+- Backup/export and restore/import your library to and from Tachiyomi!
+- Run the server software on any server for remote access to your library (read manga anywhere with a internet connection!)
+
+# Planned Features
+- Authentication
+- Settings UI (only UI not implemented!)
+- Persistent library filters
+- Category editing
+- Multi-select in all UIs
+- Display and sorting mode customization in chapters UI
+- Better cross-tab/window syncing
+- Seamless sync with Tachiyomi
 
 # Architecture
 The Javascript code is not very neat and currently needs a lot of refactoring, although I know how to write Javascript, I am not well-acquainted with it's best practices and design patterns.
