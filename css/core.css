@@ -121,4 +121,9 @@ html, body {
     .mdl-layout__header > .mdl-layout-icon {
         left: 40px;
     }
+
+    .mdl-layout__drawer-button {
+        margin: 10px 12px;
+        color: rgb(255, 255, 255);
+    }
 }

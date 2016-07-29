@@ -31,3 +31,8 @@
     position: relative;
     margin-top: 10px;
 }
+
+/** Show source select **/
+.mdl-layout__header {
+    overflow: visible; /** Source dropdown breaks without this for some weird reason **/
+}
