@@ -38,8 +38,8 @@ if (!valid(currentPage) || currentPage < 0) {
     currentPage = 0;
 }
 var maxPages = QueryString.mp;
-var hasNextChapter = QueryString.nc;
-var hasPrevChapter = QueryString.pc;
+var hasNextChapter = QueryString.nc === "true";
+var hasPrevChapter = QueryString.pc === "true";
 var backLink = QueryString.b;
 var rightToLeft = QueryString.rtl;
 if (!valid(rightToLeft)) {
@@ -203,21 +203,32 @@ function hasNextPage() {
 function updateButtons() {
     if (hasPrevPage()) {
         enableButton(buttonManager.previousBtn);
-    } else {
+    } else if (!hasPrevChapter) {
         disableButton(buttonManager.previousBtn);
+    } else {
+        crossChapterButton(buttonManager.previousBtn);
     }
     if (hasNextPage()) {
         enableButton(buttonManager.nextBtn);
-    } else {
+    } else if (!hasNextChapter) {
         disableButton(buttonManager.nextBtn);
+    } else {
+        crossChapterButton(buttonManager.nextBtn);
     }
 }
 var disabledButtonClass = "rbtn_disabled";
+var crossChapterButtonClass = "rbtn_cross_chapter";
 function disableButton(button) {
     button.addClass(disabledButtonClass);
+    button.removeClass(crossChapterButtonClass);
 }
 function enableButton(button) {
     button.removeClass(disabledButtonClass);
+    button.removeClass(crossChapterButtonClass);
+}
+function crossChapterButton(button) {
+    button.removeClass(disabledButtonClass);
+    button.addClass(crossChapterButtonClass);
 }
 function imageUrl(page) {
     return imgRoot + "/" + mangaId + "/" + chapterId + "/" + page;
@@ -249,6 +260,11 @@ function activateZoom(image) {
         });
     }
 }
+
+function goToChapter(offset) {
+    window.location.href = "../../manga_info.html?b=CLOSE&id=" + mangaId + "&lc=" + chapterId + "&lb=" + encodeURIComponent(backLink) + "&nco=" + offset;
+}
+
 function setupButtonManager() {
     console.log("Setting up button manager...");
     buttonManager = {};
@@ -279,12 +295,16 @@ function setupButtonManager() {
         if (hasNextPage()) {
             imageManager.goToImage(parseInt(currentPage) + 1, null, true);
             updateButtons();
+        } else if (hasNextChapter) {
+            goToChapter(1);
         }
     });
     buttonManager.previousBtn.click(function () {
         if (hasPrevPage()) {
             imageManager.goToImage(parseInt(currentPage) - 1, null, true);
             updateButtons();
+        } else if (hasPrevChapter) {
+            goToChapter(-1);
         }
     });
     buttonManager.backBtn.click(function () {

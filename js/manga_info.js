@@ -37,6 +37,15 @@ var currentInfo;
 var currentChapters = [];
 var mangaId = QueryString.id;
 var backLink = QueryString.b;
+var lastChapter = QueryString.lc;
+if (lastChapter !== null && lastChapter !== undefined) {
+    lastChapter = parseInt(lastChapter);
+}
+var lastBackLink = QueryString.lb;
+var nextChapterOffset = QueryString.nco;
+if (nextChapterOffset !== null && nextChapterOffset !== undefined) {
+    nextChapterOffset = parseInt(nextChapterOffset);
+}
 var mangaUrl;
 
 var firstUpdate = true;
@@ -369,21 +378,35 @@ function updateChapters(useSpinner, onComplete) {
         showSpinner();
     }
     TWApi.Commands.Chapters.execute(function (res) {
-        currentChapters = res.content;
+        currentChapters = sortChapters(res.content);
         applyAndUpdateChapters(currentChapters);
-    }, chaptersUpdateError, {
-        mangaId: mangaId
-    }, function() {
-        if (useSpinner) {
-            hideSpinner();
-        }
-        //If we have no chapters (on first load), refresh chapters
+        //If we have no chapters (on first update), refresh chapters
         if (firstUpdate) {
             if (currentChapters && currentChapters.length <= 0) {
                 console.log("No chapters on first load, updating chapters...");
                 updateServerChapters();
-                firstUpdate = false;
             }
+            //Open next chapter if requested
+            if (currentChapters && lastChapter && lastBackLink) {
+                //Find next chapter
+                var lastChapterIndex = findChapterIndex(lastChapter);
+                if (lastChapterIndex !== undefined && lastChapterIndex !== null) {
+                    var nextChapterIndex = lastChapterIndex + nextChapterOffset;
+                    var nextChapter = currentChapters[nextChapterIndex];
+                    if (nextChapter) {
+                        openChapter(nextChapter.id, nextChapterOffset >= 1 ? 0 : -1, lastBackLink, nextChapterIndex);
+                    }
+                } else {
+                    console.error("Could not find index of last chapter!");
+                }
+            }
+            firstUpdate = false;
+        }
+    }, chaptersUpdateError, {
+        mangaId: mangaId
+    }, function () {
+        if (useSpinner) {
+            hideSpinner();
         }
         //Call onComplete if necessary
         if (onComplete) {
@@ -391,6 +414,16 @@ function updateChapters(useSpinner, onComplete) {
         }
     });
 }
+
+function findChapterIndex(chapterId) {
+    for (var i = 0; i < currentChapters.length; i++) {
+        if (currentChapters[i].id === chapterId) {
+            return i;
+        }
+    }
+    return null;
+}
+
 /**
  * Apply any sorting rules and filters to a list of chapters
  *
@@ -418,12 +451,16 @@ function applyAndUpdateChapters(chapters) {
  * @param chapters The chapters to apply the sorting rules to
  */
 function applySort(chapters) {
-    chapters.sort(function (a, b) {
-        return a.chapter_number - b.chapter_number;
-    });
+    sortChapters(chapters);
     if (sort.reverse) {
         chapters.reverse();
     }
+}
+function sortChapters(chapters) {
+    chapters.sort(function (a, b) {
+        return a.chapter_number - b.chapter_number;
+    });
+    return chapters;
 }
 /**
  * Apply any user specified filters to a list of chapters
@@ -462,13 +499,24 @@ function setServerFlag(flag, state) {
  * Open the reader to a specific chapter
  * @param chapterId The ID of the chapter to read
  * @param lastPageRead The last read page in the chapter (the reader will start on this page)
+ * @param backLink What page to show when the back button is pressed on the reader
+ * @param chapterIndex The index of the chapter to open in the currentChapter array (used to notify reader of next/previous chapters)
  */
-function openChapter(chapterId, lastPageRead) {
+function openChapter(chapterId, lastPageRead, backLink, chapterIndex) {
     rawElement(pageListDialog).showModal();
+    var nextPreviousChapterParams = "";
+    if (chapterIndex !== null && chapterIndex !== undefined) {
+        var hasNext = !!currentChapters[chapterIndex + 1];
+        var hasPrev = !!currentChapters[chapterIndex - 1];
+        nextPreviousChapterParams = "&nc=" + hasNext + "&pc=" + hasPrev;
+    }
     TWApi.Commands.PageCount.execute(function(res) {
-        window.location.href = "reader/reader/reader.html?m=" + mangaId + "&c=" + chapterId + "&mp=" + res.page_count + "&p=" + lastPageRead + "&b=" + encodeURIComponent(window.location.href);
+        if (lastPageRead === -1) {
+            lastPageRead = res.page_count - 1;
+        }
+        window.location.href = "reader/reader/reader.html?m=" + mangaId + "&c=" + chapterId + "&mp=" + res.page_count + "&p=" + lastPageRead + nextPreviousChapterParams + "&b=" + encodeURIComponent(backLink);
     }, function() {
-        pageListError(chapterId);
+        pageListError(chapterId, lastPageRead, backLink, chapterIndex);
     }, {
         mangaId: mangaId,
         chapterId: chapterId
@@ -613,7 +661,7 @@ function updateChaptersUI(chapters) {
         //When the user clicks the list item, the reader should open
         $(element).click(function (chapterId, lastPageRead) {
             return function () {
-                openChapter(chapterId, lastPageRead);
+                openChapter(chapterId, lastPageRead, window.location.href, findChapterIndex(chapterId));
             };
         }(chapter.id, chapter.last_page_read));
         chaptersPanel[0].appendChild(element);
@@ -756,13 +804,13 @@ function chaptersUpdateError() {
         }
     });
 }
-function pageListError(chapterId) {
+function pageListError(chapterId, lastPageRead, backLink, chapterIndex) {
     snackbar.showSnackbar({
         message: "Error getting page list!",
         timeout: 2000,
         actionText: "Retry",
         actionHandler: function () {
-            openChapter(chapterId);
+            openChapter(chapterId, lastPageRead, backLink, chapterIndex);
         }
     });
 }

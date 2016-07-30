@@ -137,6 +137,10 @@ body, html {
     box-shadow: none !important;
     background: #616161 !important;
 }
+
+.rbtn_cross_chapter {
+    background: #76ff03 !important;
+}
 /** READER **/
 #rcontent {
     overflow-x: hidden;
