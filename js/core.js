@@ -1,18 +1,3 @@
-var apiRoot = "/api";
-var coverRoot = apiRoot + "/cover";
-var libraryRoot = apiRoot + "/library";
-var infoRoot = apiRoot + "/manga_info";
-var chaptersRoot = apiRoot + "/chapters";
-var pageCountRoot = apiRoot + "/page_count";
-var restoreRoot = apiRoot + "/restore_file";
-var backupRoot = apiRoot + "/backup";
-var faveRoot = apiRoot + "/fave";
-var readingStatusRoot = apiRoot + "/reading_status";
-var updateRoot = apiRoot + "/update";
-var sourcesRoot = apiRoot + "/sources";
-var catalogueRoot = apiRoot + "/catalogue";
-var listLoginSourcesRoot = apiRoot + "/list_login_sources";
-var sourceLoginRoot = apiRoot + "/source_login";
 var snackbar;
 
 var fadeSpeed = 250;
@@ -36,11 +21,6 @@ var QueryString = function () {
     }
     return query_string;
 }();
-
-//Api functions
-function buildCoverUrl(mangaId) {
-    return coverRoot + "/" + mangaId;
-}
 
 //Remove all children from element
 function clearElement(myNode) {
