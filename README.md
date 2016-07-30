@@ -33,6 +33,9 @@ Please don't destroy the live demo.
 - Better cross-tab/window syncing
 - Seamless sync with Tachiyomi
 
+# Installation
+See the [TachiWeb-Server README](https://github.com/TachiWeb/TachiWeb-Server#installation).
+
 # Architecture
 The Javascript code is not very neat and currently needs a lot of refactoring, although I know how to write Javascript, I am not well-acquainted with it's best practices and design patterns.
 
