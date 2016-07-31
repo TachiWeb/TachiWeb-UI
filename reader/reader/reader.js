@@ -243,11 +243,7 @@ function activateZoom(image) {
     if(!image.data("zoom")) {
         image.data("zoom", true);
         image.click(function () {
-            $.featherlight(`
-        <div class="dragscroll reader_zoom_img">
-            <img src="` + image.data('src') + `" style="transform: ` + getRotationCSS() + `" alt="Zoomable Image"/>
-        </div>
-        `, {});
+            $.featherlight('<div class="dragscroll reader_zoom_img"><img src="' + image.data('src') + '" style="transform: ' + getRotationCSS() + '" alt="Zoomable Image"/></div>', {});
             var content = $(".featherlight-content");
             content.addClass("dragscroll");
             content.mousedown(function () {
