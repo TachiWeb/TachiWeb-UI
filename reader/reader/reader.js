@@ -34,10 +34,10 @@ var mangaId = QueryString.m;
 var mangaName = QueryString.mn;
 var chapterId = QueryString.c;
 var currentPage = QueryString.p;
-if (!valid(currentPage) || currentPage < 0) {
+var maxPages = parseInt(QueryString.mp);
+if (!valid(currentPage) || currentPage < 0 || currentPage >= maxPages) {
     currentPage = 0;
 }
-var maxPages = QueryString.mp;
 var hasNextChapter = QueryString.nc === "true";
 var hasPrevChapter = QueryString.pc === "true";
 var backLink = QueryString.b;
