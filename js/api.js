@@ -157,6 +157,14 @@ var TWApi = {
         new ApiCommand("SetFlag", "/set_flag", function (parameters) {
             return this.endpoint() + "/" + parameters.mangaId + "/" + parameters.flag + "/" + parameters.state;
         });
+        new ApiCommand("GetPrefs", "/prefs");
+        new ApiCommand("SetPref", "/set_pref", function (parameters) {
+            var string = this.endpoint() + "/" + parameters.key + "/" + parameters.type;
+            if (parameters.value !== null && parameters.value !== undefined) {
+                string += "?value=" + encodeURIComponent(parameters.value);
+            }
+            return string;
+        });
         return built;
     }
 }.init();

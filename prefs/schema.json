@@ -1,0 +1,84 @@
+[
+  {
+    "label": "General",
+    "type": "nested",
+    "prefs": []
+  },
+  {
+    "label": "Reader",
+    "type": "nested",
+    "prefs": [
+      {
+        "label": "Default viewer",
+        "type": "select-single",
+        "default": "left_to_right",
+        "key": "pref_default_viewer_key",
+        "choices": {
+          "left_to_right": "Left to right",
+          "right_to_left": "Right to left"
+        }
+      },
+      {
+        "label": "Background color",
+        "type": "select-single",
+        "default": "white",
+        "key": "pref_reader_theme_key",
+        "choices": {
+          "white": "White",
+          "black": "Black"
+        }
+      },
+      {
+        "label": "Start in fullscreen mode",
+        "description": "Automatically switch to fullscreen when the reader is launched.",
+        "default": false,
+        "key": "pref_reader_fullscreen",
+        "type": "switch"
+      },
+      {
+        "label": "Enable transitions",
+        "description": "Play an animation when flipping pages.",
+        "default": true,
+        "key": "pref_reader_enable_transitions",
+        "type": "switch"
+      }
+    ]
+  },
+  {
+    "label": "Downloads",
+    "type": "nested",
+    "prefs": [
+      {
+        "label": "Simultaneous downloads",
+        "type": "select-single",
+        "default": "3",
+        "key": "pref_download_slots_key",
+        "choices": {
+          "1": "1",
+          "2": "2",
+          "3": "3"
+        }
+      }
+    ]
+  },
+  {
+    "label": "Sources",
+    "type": "nested",
+    "prefs": []
+  },
+  {
+    "label": "Sync",
+    "type": "nested",
+    "prefs": []
+  },
+  {
+    "label": "Advanced",
+    "type": "nested",
+    "prefs": []
+  },
+  {
+    "label": "About",
+    "type": "nested",
+    "prefs": []
+  }
+]

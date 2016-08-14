@@ -10,6 +10,7 @@ function setupDrawer() {
     insertDrawerLink("Library", "index.html");
     insertDrawerLink("Catalogue", "catalogue.html");
     insertDrawerLink("Downloads", "downloads.html");
+    insertDrawerLink("Settings", "options.html");
     insertDrawerLink("Backup/Restore", "restore_backup.html");
 }
 
