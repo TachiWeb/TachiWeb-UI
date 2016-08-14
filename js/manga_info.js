@@ -514,7 +514,21 @@ function openChapter(chapterId, lastPageRead, backLink, chapterIndex) {
         if (lastPageRead === -1) {
             lastPageRead = res.page_count - 1;
         }
-        window.location.href = "reader/reader/reader.html?m=" + mangaId + "&c=" + chapterId + "&mp=" + res.page_count + "&p=" + lastPageRead + nextPreviousChapterParams + "&b=" + encodeURIComponent(backLink);
+        var readerTypePref = OptionsApi.pref_default_viewer_key;
+        var readerType;
+        if (readerTypePref === "left_to_right") {
+            readerType = "rtl=false";
+        } else if (readerTypePref === "right_to_left") {
+            readerType = "rtl=true";
+        } else {
+            throw "Invalid reader type!";
+        }
+        window.location.href = "reader/reader/reader.html?m=" + mangaId
+            + "&c=" + chapterId
+            + "&mp=" + res.page_count
+            + "&p=" + lastPageRead + nextPreviousChapterParams
+            + "&b=" + encodeURIComponent(backLink)
+            + "&" + readerType;
     }, function() {
         pageListError(chapterId, lastPageRead, backLink, chapterIndex);
     }, {
