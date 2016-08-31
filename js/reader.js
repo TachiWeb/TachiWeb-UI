@@ -30,6 +30,12 @@ function onLoad() {
     updateButtons();
     loadNextImage();
     requestAnimationFrame(animate);
+    setupOptions();
+}
+function setupOptions() {
+    OptionsApi.onReady(function () {
+        $("body").css("background", OptionsApi.pref_reader_theme_key);
+    });
 }
 function setupReader() {
     console.log("Setting up reader...");
@@ -43,25 +49,30 @@ function setupImageManager() {
     imageManager.imgCenter = $("#reader_img_center");
     imageManager.imgRight = $("#reader_img_right");
     imageManager.selectedImage = 0;
-    imageManager.animating = false;
     imageManager.readerRowTransform = 0;
     imageManager.docWidth = $(document).width();
     imageManager.rotation = 0;
     imageManager.animateReaderRow = function (to, onComplete) {
         var that = this;
-        this.animation = new TWEEN.Tween({x: this.readerRowTransform})
-            .to({x: to}, imageSlideTime)
-            .onUpdate(function () {
-                that.setReaderRowLoc(this.x);
-            })
-            .easing(TWEEN.Easing.Quartic.Out)
-            .onComplete(function () {
-                that.animating = false;
-                if (valid(onComplete)) {
-                    onComplete();
-                }
-            });
-        this.animation.start();
+        if (OptionsApi.pref_reader_enable_transitions) {
+            this.animation = new TWEEN.Tween({x: this.readerRowTransform})
+                .to({x: to}, imageSlideTime)
+                .onUpdate(function () {
+                    that.setReaderRowLoc(this.x);
+                })
+                .easing(TWEEN.Easing.Quartic.Out)
+                .onComplete(function () {
+                    if (valid(onComplete)) {
+                        onComplete();
+                    }
+                });
+            this.animation.start();
+        } else {
+            that.setReaderRowLoc(to);
+            if (valid(onComplete)) {
+                onComplete();
+            }
+        }
     };
     //Setup reader row
     imageManager.setReaderRowLoc = function (loc) {
@@ -404,21 +415,29 @@ function applyRotation(image) {
 function toggleFullScreen() {
     if ((document.fullScreenElement && document.fullScreenElement !== null) ||
         (!document.mozFullScreen && !document.webkitIsFullScreen)) {
-        if (document.documentElement.requestFullScreen) {
-            document.documentElement.requestFullScreen();
-        } else if (document.documentElement.mozRequestFullScreen) {
-            document.documentElement.mozRequestFullScreen();
-        } else if (document.documentElement.webkitRequestFullScreen) {
-            document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-        }
+        enterFullscreen();
     } else {
-        if (document.cancelFullScreen) {
-            document.cancelFullScreen();
-        } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-        } else if (document.webkitCancelFullScreen) {
-            document.webkitCancelFullScreen();
-        }
+        leaveFullscreen();
+    }
+}
+function leaveFullscreen() {
+    buttonManager.fullscreenBtn.find(".material-icons").text("fullscreen");
+    if (document.cancelFullScreen) {
+        document.cancelFullScreen();
+    } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+    } else if (document.webkitCancelFullScreen) {
+        document.webkitCancelFullScreen();
+    }
+}
+function enterFullscreen() {
+    buttonManager.fullscreenBtn.find(".material-icons").text("fullscreen_exit");
+    if (document.documentElement.requestFullScreen) {
+        document.documentElement.requestFullScreen();
+    } else if (document.documentElement.mozRequestFullScreen) {
+        document.documentElement.mozRequestFullScreen();
+    } else if (document.documentElement.webkitRequestFullScreen) {
+        document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
     }
 }
 function setImageSource(image, src) {

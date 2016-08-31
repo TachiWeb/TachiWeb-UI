@@ -29,13 +29,6 @@
         }
       },
       {
-        "label": "Start in fullscreen mode",
-        "description": "Automatically switch to fullscreen when the reader is launched.",
-        "default": false,
-        "key": "pref_reader_fullscreen",
-        "type": "switch"
-      },
-      {
         "label": "Enable transitions",
         "description": "Play an animation when flipping pages.",
         "default": true,
