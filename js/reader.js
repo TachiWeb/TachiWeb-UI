@@ -5,7 +5,7 @@ var hudManager = {};
 const imageSlideTime = 350;
 const loaded = "loaded";
 const SCROLL_LIMIT = 5;
-const SCROLL_STEP = 0.5;
+const SCROLL_STEP = 0.2;
 
 var mangaId = QueryString.m;
 var mangaName = QueryString.mn;
@@ -217,35 +217,32 @@ function activateZoom(image) {
                 content_image.css("transform", getRotationCSS() + " scale(" + zoom + ")");
             }
 
-            var tween;
             content.mousewheel(function (event) {
-                zoom = Math.min(Math.max(zoom + SCROLL_STEP * event.deltaY, 1), SCROLL_LIMIT);
-                updateZoom();
-                //Make sure we don't somehow scroll offscreen (apparently possible)
-                //TODO Fix scrolling so we scroll into the centre of the screen
-                var width = content.width();
-                var height = content.height();
-                var xLimit = rawElement(content_image).width * zoom;
-                var yLimit = rawElement(content_image).height * zoom;
-                var nextScrollLeft = content.scrollLeft();
-                if (content.scrollLeft() + width > xLimit) {
-                    nextScrollLeft = xLimit - width;
+                var scrollDiff = SCROLL_STEP * event.deltaY;
+                var oldZoom = zoom;
+                zoom = Math.min(Math.max(zoom + scrollDiff, 1), SCROLL_LIMIT);
+                if (oldZoom !== zoom) {
+                    updateZoom();
+                    //Make sure we don't somehow scroll offscreen (apparently possible) and scroll towards center of screen
+                    var iWidth = rawElement(content_image).width;
+                    var iHeight = rawElement(content_image).height;
+                    var xDiff = scrollDiff * iWidth / 2;
+                    var yDiff = scrollDiff * iHeight / 2;
+                    var nextScrollLeft = content.scrollLeft() + xDiff;
+                    var nextScrollTop = content.scrollTop() + yDiff;
+                    var width = content.width();
+                    var height = content.height();
+                    var xLimit = iWidth * zoom;
+                    var yLimit = iHeight * zoom;
+                    if (nextScrollLeft + width > xLimit) {
+                        nextScrollLeft = xLimit - width;
+                    }
+                    if (nextScrollTop + height > yLimit) {
+                        nextScrollTop = yLimit - height;
+                    }
+                    content.scrollLeft(nextScrollLeft);
+                    content.scrollTop(nextScrollTop);
                 }
-                var nextScrollTop = content.scrollTop();
-                if (content.scrollTop() + height > yLimit) {
-                    nextScrollTop = yLimit - height;
-                }
-                if (valid(tween)) {
-                    tween.stop();
-                }
-                tween = new TWEEN.Tween({sl: content.scrollLeft(), st: content.scrollTop()})
-                    .to({sl: nextScrollLeft, st: nextScrollTop}, 450)
-                    .onUpdate(function () {
-                        content.scrollLeft(this.sl);
-                        content.scrollTop(this.st);
-                    })
-                    .easing(TWEEN.Easing.Quadratic.InOut);
-                tween.start();
                 return false;
             });
             dragscroll.reset();

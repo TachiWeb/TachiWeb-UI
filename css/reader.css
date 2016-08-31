@@ -188,7 +188,6 @@ body, html {
 
 .reader_zoom_img_content {
     display: block;
-    transition: all 0.5s cubic-bezier(0.455, 0.030, 0.515, 0.955);
     transform-origin: 0 0;
 }
 /** From official featherlight site **/
