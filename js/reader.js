@@ -281,6 +281,8 @@ function setupButtonManager() {
     buttonManager.redownloadBtn = $("#redownload_button");
     buttonManager.lock = false;
     buttonManager.nextBtn.click(function () {
+        //Close featherlight
+        $(".featherlight-close").click();
         if (hasNextPage()) {
             imageManager.goToImage(parseInt(currentPage) + 1, null, true);
             updateButtons();
@@ -289,6 +291,8 @@ function setupButtonManager() {
         }
     });
     buttonManager.previousBtn.click(function () {
+        //Close featherlight
+        $(".featherlight-close").click();
         if (hasPrevPage()) {
             imageManager.goToImage(parseInt(currentPage) - 1, null, true);
             updateButtons();
