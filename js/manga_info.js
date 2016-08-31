@@ -523,7 +523,7 @@ function openChapter(chapterId, lastPageRead, backLink, chapterIndex) {
         } else {
             throw "Invalid reader type!";
         }
-        window.location.href = "reader/reader/reader.html?m=" + mangaId
+        window.location.href = "reader.html?m=" + mangaId
             + "&c=" + chapterId
             + "&mp=" + res.page_count
             + "&p=" + lastPageRead + nextPreviousChapterParams

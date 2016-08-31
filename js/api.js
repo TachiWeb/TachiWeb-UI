@@ -87,6 +87,9 @@ var TWApi = {
         }
 
         //Add API commands
+        new ApiCommand("Image", "/img", function (parameters) {
+            return this.endpoint() + "/" + parameters.mangaId + "/" + parameters.chapterId + "/" + parameters.page;
+        });
         new ApiCommand("Cover", "/cover", function(parameters) {
             return this.endpoint() + "/" + parameters.mangaId;
         });

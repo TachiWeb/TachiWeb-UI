@@ -1,5 +1,9 @@
+@import url(../bower_components/roboto-fontface/css/roboto/roboto-fontface.css);
+@import url(../bower_components/roboto-fontface/css/roboto-condensed/roboto-condensed-fontface.css);
+
 html, body {
     height: 100%;
+    font-family: Roboto, Ubuntu, "Trebuchet MS", sans-serif;
 }
 
 .mdl-layout__header-row .mdl-navigation__link:last-of-type {
@@ -126,4 +130,21 @@ html, body {
         margin: 10px 12px;
         color: rgb(255, 255, 255);
     }
+}
+
+/** Material icons sizing **/
+.material-icons.md-18 {
+    font-size: 18px;
+}
+
+.material-icons.md-24 {
+    font-size: 24px;
+}
+
+.material-icons.md-36 {
+    font-size: 36px;
+}
+
+.material-icons.md-48 {
+    font-size: 48px;
 }

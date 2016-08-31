@@ -2,34 +2,7 @@ var imageManager = {};
 var buttonManager = {};
 var hudManager = {};
 const imageSlideTime = 350;
-const apiRoot = "/api";
-var readingStatusRoot = apiRoot + "/reading_status";
-const imgRoot = apiRoot + "/img";
-const loaded = "loaded;";
-/** http://stackoverflow.com/questions/979975/how-to-get-the-value-from-the-url-parameter **/
-var QueryString = function () {
-    // This function is anonymous, is executed immediately and
-    // the return value is assigned to QueryString!
-    var query_string = {};
-    var query = window.location.search.substring(1);
-    var vars = query.split("&");
-    for (var i = 0; i < vars.length; i++) {
-        var pair = vars[i].split("=");
-        // If first entry with this name
-        if (typeof query_string[pair[0]] === "undefined") {
-            query_string[pair[0]] = decodeURIComponent(pair[1]);
-            // If second entry with this name
-        } else if (typeof query_string[pair[0]] === "string") {
-            query_string[pair[0]] = [query_string[pair[0]], decodeURIComponent(pair[1])];
-        } else {
-            query_string[pair[0]].push(decodeURIComponent(pair[1]));
-        }
-    }
-    return query_string;
-}();
-function valid(v) {
-    return v !== undefined && v !== null;
-}
+const loaded = "loaded";
 var mangaId = QueryString.m;
 var mangaName = QueryString.mn;
 var chapterId = QueryString.c;
@@ -170,28 +143,18 @@ function setupImageManager() {
     imageManager.goToSelectedImage(null, true);
 }
 function updateReadingStatus(page) {
-    var url;
+    var parameters = {
+        mangaId: mangaId,
+        chapterId: chapterId,
+        lastReadPage: page
+    };
+    //Set read if we are at last page
     if (page === parseInt(maxPages) - 1) {
-        url = lastPageReadUrl(page, true);
-    } else {
-        url = lastPageUrl(page);
+        parameters.read = true
     }
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", url, true);
-    xhr.onload = function () {
-        try {
-            var res = JSON.parse(xhr.responseText);
-            if (!res.success) {
-                console.warn("Failed to set reading status!");
-            }
-        } catch (e) {
-            console.warn("Failed to set reading status!", e);
-        }
-    };
-    xhr.onerror = function () {
+    TWApi.Commands.ReadingStatus.execute(null, function () {
         console.warn("Failed to set reading status!");
-    };
-    xhr.send();
+    }, parameters)
 }
 function hasPrevPage() {
     return currentPage > 0;
@@ -230,17 +193,8 @@ function crossChapterButton(button) {
     button.removeClass(disabledButtonClass);
     button.addClass(crossChapterButtonClass);
 }
-function imageUrl(page) {
-    return imgRoot + "/" + mangaId + "/" + chapterId + "/" + page;
-}
-function lastPageUrl(page) {
-    return readingStatusRoot + "/" + mangaId + "/" + chapterId + "?lp=" + page;
-}
-function lastPageReadUrl(page, read) {
-    return readingStatusRoot + "/" + mangaId + "/" + chapterId + "?lp=" + page + "&read=" + read;
-}
 function activateZoom(image) {
-    if(!image.data("zoom")) {
+    if (!image.data("zoom")) {
         image.data("zoom", true);
         image.click(function () {
             $.featherlight('<div class="dragscroll reader_zoom_img"><img src="' + image.data('src') + '" style="transform: ' + getRotationCSS() + '" alt="Zoomable Image"/></div>', {});
@@ -258,7 +212,7 @@ function activateZoom(image) {
 }
 
 function goToChapter(offset) {
-    window.location.href = "../../manga_info.html?b=CLOSE&id=" + mangaId + "&lc=" + chapterId + "&lb=" + encodeURIComponent(backLink) + "&nco=" + offset;
+    window.location.href = "manga_info.html?b=CLOSE&id=" + mangaId + "&lc=" + chapterId + "&lb=" + encodeURIComponent(backLink) + "&nco=" + offset;
 }
 
 function setupButtonManager() {
@@ -268,7 +222,7 @@ function setupButtonManager() {
     buttonManager.nextBtn = $("#rbtn_next_page");
     //Do this before the buttons are switched so after they are switched the keyboard buttons work properly
     $(document).keydown(function (nextBtn, previousBtn) {
-        return function(e) {
+        return function (e) {
             //Right or space will go to next page
             if (e.key === "ArrowRight" || (!rightToLeft && (e.keyCode === 0 || e.keyCode === 32))) {
                 nextBtn.click();
@@ -324,7 +278,7 @@ function setupButtonManager() {
             saveAs(cached.blob, currentPage + "." + extension);
         }
     });
-    buttonManager.redownloadBtn.click(function (){
+    buttonManager.redownloadBtn.click(function () {
         refreshCurrentPage();
     });
     //Catch shift keys for changing the buttons around
@@ -362,12 +316,12 @@ function setupHudManager() {
     hudManager.pageSlider = $("#page_slider");
     hudManager.pageSlider.attr("min", 1);
     hudManager.pageSlider.attr("max", maxPages);
-    hudManager.pageSlider.on("input change", function() {
+    hudManager.pageSlider.on("input change", function () {
         imageManager.goToImage(hudManager.pageSlider[0].value - 1, null, true);
         updateButtons();
     });
     //Rotate slider if RTL
-    if(rightToLeft) {
+    if (rightToLeft) {
         $("#page_slider_wrapper").css("transform", "rotate(180deg)");
     }
     componentHandler.upgradeElement(hudManager.pageSlider[0]);
@@ -462,7 +416,11 @@ function tryLoad(image, page) {
             return;
         }
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', imageUrl(page), true);
+        xhr.open('GET', TWApi.Commands.Image.buildUrl({
+            mangaId: mangaId,
+            chapterId: chapterId,
+            page: page
+        }), true);
         xhr.responseType = 'blob';
 
         xhr.onload = function () {

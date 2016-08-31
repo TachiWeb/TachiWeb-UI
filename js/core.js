@@ -41,6 +41,10 @@ function elementExists(element) {
     return !!rawElement(element);
 }
 
+function valid(v) {
+    return v !== undefined && v !== null;
+}
+
 function mdlCheckboxCheck(checkbox, check) {
     //For some stupid reason, we need the parent label to change the checkbox!
     if (check) {
@@ -63,7 +67,7 @@ window.onload = function () {
         snackbar = snackbar.MaterialSnackbar;
     }
     //Call other onload listeners
-    if (onLoad) {
+    if (valid(onLoad)) {
         onLoad();
     }
 };

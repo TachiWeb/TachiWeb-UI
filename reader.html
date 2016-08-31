@@ -3,50 +3,56 @@
 <head>
     <title>TachiWeb - Reader</title><!-- TODO Manga title later -->
     <!-- JQuery -->
-    <script src="../lib/jquery-3.0.0.min.js"></script>
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <!-- Tween.JS -->
-    <script src="../lib/Tween.js"></script>
+    <script src="bower_components/tween.js/src/Tween.js"></script>
     <!-- Featherlight -->
-    <link href="../lib/featherlight.min.css" type="text/css" rel="stylesheet" />
-    <script src="../lib/featherlight.min.js"></script>
+    <link href="bower_components/featherlight/release/featherlight.min.css" type="text/css" rel="stylesheet"/>
+    <script src="bower_components/featherlight/release/featherlight.min.js"></script>
     <!-- FileSaver -->
-    <script src="../lib/FileSaver.min.js"></script>
+    <script src="bower_components/file-saver/FileSaver.min.js"></script>
     <!-- Dragscroll -->
-    <script src="../lib/dragscroll.js"></script>
+    <script src="bower_components/dragscroll/dragscroll.js"></script>
     <!-- MDL -->
-    <link href="../../css/material.min.css" type="text/css" rel="stylesheet" />
-    <script src="../../bower_components/material-design-lite/material.min.js"></script>
-    <!-- Global CSS -->
-    <link rel="stylesheet" type="text/css" href="../global.css">
+    <link href="css/material.min.css" type="text/css" rel="stylesheet"/>
+    <script src="bower_components/material-design-lite/material.min.js"></script>
+    <!-- Material Fonts -->
+    <link href="bower_components/material-design-icons/iconfont/material-icons.css" rel="stylesheet">
+    <!-- Core -->
+    <link rel="stylesheet" type="text/css" href="css/core.css">
+    <script src="js/core.js"></script>
+    <!-- API -->
+    <script src="js/api.js"></script>
+    <!-- Options -->
+    <script src="js/options_api.js"></script>
     <!-- Reader -->
-    <script src="reader.js"></script>
-    <link rel="stylesheet" type="text/css" href="reader.css">
-    <link rel="stylesheet" href="../lib/font-awesome/css/font-awesome.min.css">
+    <script src="js/reader.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/reader.css">
 </head>
-<body onload="onLoad()">
+<body>
 <!-- TODO Noscript redirect -->
 <!-- <BUTTONS> -->
 <div id="buttons_wrapper">
     <div id="back_button" class="rbtn rbtn_square rbtn_left rbtn_top">
         <div class="rbtn_label">Back</div>
-        <div class="rbtn_icon"><i class="fa fa-arrow-left fa-3x"></i></div>
+        <div class="rbtn_icon"><i class="material-icons md-48">arrow_back</i></div>
     </div>
     <div id="download_button" class="rbtn rbtn_square rbtn_left rbtn_bottom">
         <div class="rbtn_label">Download</div>
-        <div class="rbtn_icon"><i class="fa fa-download fa-3x"></i></div>
+        <div class="rbtn_icon"><i class="material-icons md-48">file_download</i></div>
     </div>
     <!-- Redownload button -->
     <div style="display: none" id="redownload_button" class="rbtn rbtn_square rbtn_left rbtn_bottom">
         <div class="rbtn_label">Refresh Image</div>
-        <div class="rbtn_icon"><i class="fa fa-refresh fa-3x"></i></div>
+        <div class="rbtn_icon"><i class="material-icons md-48">refresh</i></div>
     </div>
     <div id="fullscreen_button" class="rbtn rbtn_square rbtn_right rbtn_top">
         <div class="rbtn_label">Fullscreen</div>
-        <div class="rbtn_icon"><i class="fa fa-arrows-alt fa-3x"></i></div>
+        <div class="rbtn_icon"><i class="material-icons md-48">fullscreen</i></div>
     </div>
     <div id="rotate_button" class="rbtn rbtn_square rbtn_right rbtn_bottom">
         <div class="rbtn_label">Rotate 90&deg;</div>
-        <div class="rbtn_icon"><i class="fa fa-repeat fa-3x"></i></div>
+        <div class="rbtn_icon"><i class="material-icons md-48">rotate_right</i></div>
     </div>
     <div class="rbtn_triangle_wrapper rbtn_triangle_wrapper_left">
         <div class="rbtn rbtn_triangle">
