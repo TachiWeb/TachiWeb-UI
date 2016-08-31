@@ -1,8 +1,12 @@
 var imageManager = {};
 var buttonManager = {};
 var hudManager = {};
+
 const imageSlideTime = 350;
 const loaded = "loaded";
+const SCROLL_LIMIT = 5;
+const SCROLL_STEP = 0.5;
+
 var mangaId = QueryString.m;
 var mangaName = QueryString.mn;
 var chapterId = QueryString.c;
@@ -197,14 +201,52 @@ function activateZoom(image) {
     if (!image.data("zoom")) {
         image.data("zoom", true);
         image.click(function () {
-            $.featherlight('<div class="dragscroll reader_zoom_img"><img src="' + image.data('src') + '" style="transform: ' + getRotationCSS() + '" alt="Zoomable Image"/></div>', {});
+            $.featherlight('<div class="dragscroll reader_zoom_img"><img class="reader_zoom_img_content" src="' + image.data('src') + '" style="transform: ' + getRotationCSS() + '" alt="Zoomable Image"/></div>', {});
             var content = $(".featherlight-content");
+            var content_image = content.find(".reader_zoom_img_content");
             content.addClass("dragscroll");
             content.mousedown(function () {
                 content.css("cursor", "move");
             });
             content.mouseup(function () {
                 content.css("cursor", "");
+            });
+            var zoom = 1;
+
+            function updateZoom() {
+                content_image.css("transform", getRotationCSS() + " scale(" + zoom + ")");
+            }
+
+            var tween;
+            content.mousewheel(function (event) {
+                zoom = Math.min(Math.max(zoom + SCROLL_STEP * event.deltaY, 1), SCROLL_LIMIT);
+                updateZoom();
+                //Make sure we don't somehow scroll offscreen (apparently possible)
+                //TODO Fix scrolling so we scroll into the centre of the screen
+                var width = content.width();
+                var height = content.height();
+                var xLimit = rawElement(content_image).width * zoom;
+                var yLimit = rawElement(content_image).height * zoom;
+                var nextScrollLeft = content.scrollLeft();
+                if (content.scrollLeft() + width > xLimit) {
+                    nextScrollLeft = xLimit - width;
+                }
+                var nextScrollTop = content.scrollTop();
+                if (content.scrollTop() + height > yLimit) {
+                    nextScrollTop = yLimit - height;
+                }
+                if (valid(tween)) {
+                    tween.stop();
+                }
+                tween = new TWEEN.Tween({sl: content.scrollLeft(), st: content.scrollTop()})
+                    .to({sl: nextScrollLeft, st: nextScrollTop}, 450)
+                    .onUpdate(function () {
+                        content.scrollLeft(this.sl);
+                        content.scrollTop(this.st);
+                    })
+                    .easing(TWEEN.Easing.Quadratic.InOut);
+                tween.start();
+                return false;
             });
             dragscroll.reset();
         });
