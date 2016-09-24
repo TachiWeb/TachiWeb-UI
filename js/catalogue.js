@@ -141,7 +141,7 @@ function selectSource(source) {
 }
 
 function isLoggedIn(source) {
-    if (!source["logged_in"]) {
+    if (!valid(source["logged_in"])) {
         return true;
     }
     return source["logged_in"];
