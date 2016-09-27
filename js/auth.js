@@ -14,6 +14,7 @@ function onLoad() {
     authSubmit = $("#auth_submit");
     setupDialogs();
     setupLogin();
+    //Show auth dialog
     rawElement(authDialog).showModal();
 }
 
@@ -42,6 +43,12 @@ function setupLogin() {
             rawElement(loadingDialog).close();
             rawElement(authDialog).showModal();
         }, {password: authDialogPassword.val()})
+    });
+    //Enter button triggers login
+    authDialogPassword.keyup(function (event) {
+        if (event.keyCode == 13) {
+            authSubmit.click();
+        }
     });
 }
 
