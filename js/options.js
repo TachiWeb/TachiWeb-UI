@@ -381,8 +381,13 @@ var Options = {};
         });
     })();
 
-    //Multiselect
+    //Multiselect, text
     (function () {
+
+        //Textfield types
+        const TYPE_TEXT = 1;
+        const TYPE_PASSWORD = 2;
+        const TYPE_MULTILINE = 3;
 
         /**
          * Show the dialog
@@ -483,6 +488,40 @@ var Options = {};
             return parent;
         };
 
+        var appendTextField = function (id, hint, initialValue, type, onchanged, rows) {
+            var parent = document.createElement("div");
+            parent.className = "mdl-textfield mdl-js-textfield";
+            var input;
+            if (type !== TYPE_MULTILINE) {
+                input = document.createElement("input");
+                if (type === TYPE_TEXT) {
+                    input.setAttribute("type", "text");
+                } else if (type === TYPE_PASSWORD) {
+                    input.setAttribute("type", "password");
+                }
+                input.value = initialValue;
+            } else {
+                input = document.createElement("textarea");
+                input.setAttribute("type", "text");
+                input.setAttribute("rows", rows);
+                input.textContent = initialValue;
+            }
+            input.className = "mdl-textfield__input";
+            input.id = id;
+            input.onchange = function () {
+                onchanged(input.value);
+            };
+            parent.appendChild(input);
+            var label = document.createElement("label");
+            label.className = "mdl-textfield__label";
+            label.setAttribute("for", id);
+            label.textContent = hint;
+            parent.appendChild(label);
+            getDialogContent()[0].appendChild(parent);
+            componentHandler.upgradeElement(parent);
+            return parent;
+        };
+
         Options.registerOptionsElement("select-single", {
             generate: function (schema) {
                 var that = this;
@@ -538,6 +577,57 @@ var Options = {};
             },
             type: "string"
         });
+
+        var registerText = function (name, type) {
+            Options.registerOptionsElement(name, {
+                generate: function (schema) {
+                    var that = this;
+                    var baseItem = Options.generateBaseItem(schema.label, schema.description);
+                    var element = $(baseItem.listItem);
+                    var button = generateBaseButton("mode_edit", function () {
+                        //Title
+                        setDialogTitle(schema.label);
+                        //Close button
+                        clearDialogButtons();
+                        var listener = {};
+                        appendDialogButton("Close", function () {
+                            element.data("listener", null);
+                            listener = null;
+                            closeDialog();
+                        });
+                        //Content
+                        clearDialogContent();
+                        //Append textfield
+                        listener = appendTextField(schema.key, schema.hint, element.data("curvalue"), type, function (newValue) {
+                            var oldValue = element.data("curvalue");
+                            that.setValue(element, newValue);
+                            Options.saveDataChange(element, schema, oldValue, newValue);
+                        }, schema.rows);
+                        //Allows setValue to operate when dialog is open
+                        element.data("listener", function (newValue) {
+                            listener.MaterialTextfield.change(newValue);
+                        });
+                        //Show dialog
+                        showDialog();
+                    });
+                    baseItem.secondaryContent.appendChild(button);
+                    return element;
+                },
+                setValue: function (element, value) {
+                    element.data("curvalue", value);
+                    //Call listener (to update UI if the dialog is still open)
+                    var listener = element.data("listener");
+                    if (listener !== undefined && listener !== null) {
+                        listener(value);
+                    }
+                },
+                type: "string"
+            });
+        };
+
+        registerText("text-single", TYPE_TEXT);
+        registerText("text-password", TYPE_PASSWORD);
+        registerText("text-multi", TYPE_MULTILINE);
     })();
 
     //Nested preferences support
@@ -546,6 +636,32 @@ var Options = {};
             var baseItem = Options.generateBaseItem(schema.label, schema.description);
             var button = generateBaseButton("chevron_right", function () {
                 Options.pushSchema(schema.prefs, schema.label);
+            });
+            baseItem.secondaryContent.appendChild(button);
+            return $(baseItem.listItem);
+        }
+    });
+
+    //API call support
+    Options.registerOptionsElement("api-call", {
+        generate: function (schema) {
+            var baseItem = Options.generateBaseItem(schema.label, schema.description);
+            var button = generateBaseButton(schema.button_icon, function () {
+                TWApi.Commands[schema.command].execute(function () {
+                    if (valid(schema.success_message)) {
+                        snackbar.showSnackbar({
+                            message: schema.success_message,
+                            timeout: 1000
+                        });
+                    }
+                }, function () {
+                    if (valid(schema.error_message)) {
+                        snackbar.showSnackbar({
+                            message: schema.error_message,
+                            timeout: 1000
+                        });
+                    }
+                }, schema.parameters);
             });
             baseItem.secondaryContent.appendChild(button);
             return $(baseItem.listItem);

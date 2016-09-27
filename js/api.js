@@ -58,8 +58,14 @@ var TWApi = {
                             if (res.success) {
                                 onSuccessWrapper(res, xhr);
                             } else {
-                                console.error("API error!", res.error);
-                                onErrorWrapper(res.error);
+                                if (res.error === "Not authenticated!") {
+                                    //Not authenticated
+                                    console.error("Not authenticated, redirecting to auth page!");
+                                    window.location = "/auth.html?fu=" + encodeURIComponent(window.location.pathname + window.location.search);
+                                } else {
+                                    console.error("API error!", res.error);
+                                    onErrorWrapper(res.error);
+                                }
                             }
                         }
                     }
@@ -168,6 +174,10 @@ var TWApi = {
             }
             return string;
         });
+        new ApiCommand("Auth", "/auth", function (parameters) {
+            return this.endpoint() + "?password=" + encodeURIComponent(parameters.password);
+        });
+        new ApiCommand("ClearSessions", "/clear_sessions");
         return built;
     }
 }.init();
