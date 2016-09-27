@@ -2,7 +2,19 @@
   {
     "label": "General",
     "type": "nested",
-    "prefs": []
+    "prefs": [
+      {
+        "label": "Manga label background",
+        "description": "The color of the manga label background in the catalogue and library.",
+        "default": "gradient",
+        "type": "select-single",
+        "key": "pref_manga_card_label_background",
+        "choices": {
+          "gradient": "Gradient",
+          "solid": "Solid"
+        }
+      }
+    ]
   },
   {
     "label": "Reader",

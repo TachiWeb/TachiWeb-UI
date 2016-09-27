@@ -1,3 +1,4 @@
+const MANGA_CARD_LABEL = "manga_card_label";
 /** Shared Manga Grid lib that allows displaying Manga in a grid format **/
 function appendManga(manga, element, openInNewTab, showUnreadBadge) {
     var card = document.createElement("div");
@@ -8,7 +9,18 @@ function appendManga(manga, element, openInNewTab, showUnreadBadge) {
     img.alt = manga.title;
     card.appendChild(img);
     var label = document.createElement("div");
-    label.className = "manga_card_label";
+    label.className = MANGA_CARD_LABEL + " manga_card_label_gradient";
+    if (valid(OptionsApi)) {
+        //Grab label type from options
+        OptionsApi.onReady(function () {
+            var background = OptionsApi.pref_manga_card_label_background;
+            if (background === "gradient") {
+                label.className = MANGA_CARD_LABEL + " manga_card_label_gradient";
+            } else if (background === "solid") {
+                label.className = MANGA_CARD_LABEL + " manga_card_label_solid";
+            }
+        });
+    }
     label.textContent = manga.title;
     card.appendChild(label);
     $(card).click(function () {

@@ -59,9 +59,16 @@ html, body {
 .manga_card_label {
     position: absolute;
     width: calc(100% - 16px); /* Label gets cut off otherwise for some reason **/
-    background: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.7) 40%, rgba(0, 0, 0, 0) 100%);
     padding: 8px;
     bottom: 0;
+}
+
+.manga_card_label_gradient {
+    background: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.7) 40%, rgba(0, 0, 0, 0) 100%);
+}
+
+.manga_card_label_solid {
+    background: rgba(0, 0, 0, 0.7);
 }
 
 .badge {

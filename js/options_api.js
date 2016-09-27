@@ -33,4 +33,5 @@ var OptionsApi = {};
     OptionsApi.pref_default_viewer_key = "left_to_right";
     OptionsApi.pref_reader_theme_key = "white";
     OptionsApi.pref_reader_enable_transitions = true;
+    OptionsApi.pref_manga_card_label_background = "gradient";
 })();
