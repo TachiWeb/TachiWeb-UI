@@ -22,10 +22,9 @@ Please don't destroy the live demo.
 - Add new manga from the catalogue (essentially fully implemented).
 - Backup/export and restore/import your library to and from Tachiyomi!
 - Run the server software on any server for remote access to your library (read manga anywhere with a internet connection!)
+- Authentication
 
 # Planned Features
-- Authentication
-- Settings UI (only UI not implemented!)
 - Persistent library filters
 - Category editing
 - Multi-select in all UIs
@@ -46,6 +45,7 @@ Performance is currently very good and the UI is quite fluid.
 Many buttons/elements of the UI still do nothing and are unimplemented, they will implemented eventually but usually higher priority features are implemented first.
 
 # License
+```
 Copyright 2016 Andy Bao
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -59,3 +59,4 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+```
