@@ -53,6 +53,14 @@ function mdlCheckboxCheck(checkbox, check) {
         rawElement(checkbox.parent()).MaterialCheckbox.uncheck();
     }
 }
+function mdlRadioCheck(radio, check) {
+    //For some stupid reason, we need the parent label to change the checkbox!
+    if (check) {
+        rawElement(radio.parent()).MaterialRadio.check();
+    } else {
+        rawElement(radio.parent()).MaterialRadio.uncheck();
+    }
+}
 
 function openInNewTab(url) {
     var win = window.open(url, '_blank');

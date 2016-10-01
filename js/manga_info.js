@@ -6,6 +6,7 @@ var refreshBtn;
 var refreshTooltip;
 var openBrowserBtn;
 var moreBtn;
+var changeDisplayModeBtn;
 var infoTab;
 var chaptersTab;
 var infoPanel;
@@ -25,6 +26,11 @@ var mangaTitleElement;
 
 var pageListDialog;
 var downloadDialog;
+var displayModeDialog;
+
+var dmOptionName;
+var dmOptionNumber;
+var dmBtnClose;
 
 var downloadBtn1;
 var downloadBtn5;
@@ -69,6 +75,11 @@ function mapFiltersToUI() {
 var sort = {
     reverse: false
 };
+var displayMode = "NAME";
+function mapDisplayModeToUI() {
+    mdlRadioCheck(dmOptionName, displayMode === "NAME");
+    mdlRadioCheck(dmOptionNumber, displayMode === "NUMBER");
+}
 
 const CHAPTER_UPDATE_FREQ = 1000;
 
@@ -82,6 +93,7 @@ function onLoad() {
     refreshTooltip = $("#refresh_tooltip");
     openBrowserBtn = $("#open_browser_btn");
     moreBtn = $("#more_btn");
+    changeDisplayModeBtn = $("#change_display_mode_btn");
     infoTab = $("#info_tab");
     chaptersTab = $("#chapter_tab");
     infoPanel = $("#info_panel");
@@ -93,6 +105,11 @@ function onLoad() {
 
     pageListDialog = $("#page_list_dialog");
     downloadDialog = $("#download_dialog");
+    displayModeDialog = $("#display_mode_dialog");
+
+    dmOptionName = $("#dm-show-name");
+    dmOptionNumber = $("#dm-show-number");
+    dmBtnClose = $("#display_mode_dialog_close");
 
     downloadBtn1 = $("#download_btn_1");
     downloadBtn5 = $("#download_btn_5");
@@ -125,6 +142,7 @@ function onLoad() {
     setupRefreshButton();
     setupFaveCommandListener();
     setupDownloadDialog();
+    setupDisplayModeDialog();
     startUpdatingChapters();
 }
 
@@ -142,6 +160,7 @@ function setupDialogs() {
     if (!rawElement(pageListDialog).showModal) {
         dialogPolyfill.registerDialog(rawElement(pageListDialog));
         dialogPolyfill.registerDialog(rawElement(downloadDialog));
+        dialogPolyfill.registerDialog(rawElement(displayModeDialog))
     }
 }
 function setupSort() {
@@ -171,6 +190,29 @@ function startUpdatingChapters() {
         }
     };
     realUpdateChapters();
+}
+function setupDisplayModeDialog() {
+    changeDisplayModeBtn.click(function () {
+        rawElement(displayModeDialog).showModal();
+    });
+
+    dmBtnClose.click(function () {
+        rawElement(displayModeDialog).close();
+    });
+
+    var updateDm = function (newDm) {
+        displayMode = newDm;
+        setServerFlag("DISPLAY_MODE", displayMode);
+        mapDisplayModeToUI();
+        applyAndUpdateChapters(currentChapters);
+    };
+
+    dmOptionName.click(function () {
+        updateDm("NAME");
+    });
+    dmOptionNumber.click(function () {
+        updateDm("NUMBER");
+    });
 }
 function setupDownloadDialog() {
     downloadBtn.click(function () {
@@ -361,6 +403,7 @@ function updateInfo() {
         currentInfo = res;
         mapFlagsToRules(res.flags);
         mapFiltersToUI();
+        mapDisplayModeToUI();
         updateInfoUI(currentInfo);
         applyAndUpdateChapters(currentChapters);
     }, infoUpdateError, {
@@ -485,6 +528,7 @@ function mapFlagsToRules(flags) {
     sort.reverse = flags.SORT_DIRECTION === "DESCENDING";
     filters.onlyUnread = flags.READ_FILTER === "UNREAD";
     filters.onlyDownloaded = flags.DOWNLOADED_FILTER === "DOWNLOADED";
+    displayMode = flags.DISPLAY_MODE;
 }
 function setServerFlag(flag, state) {
     TWApi.Commands.SetFlag.execute(null, function () {
@@ -562,7 +606,11 @@ function updateChaptersUI(chapters) {
         titleRow.className = "chapter_row";
         var titleElement = document.createElement("div");
         titleElement.className = "chapter_title";
-        titleElement.textContent = chapter.name;
+        if (displayMode === "NAME") {
+            titleElement.textContent = chapter.name;
+        } else if (displayMode === "NUMBER") {
+            titleElement.textContent = "Chapter " + chapter.chapter_number;
+        }
         titleRow.appendChild(titleElement);
 
         //The code below enables VERY HACKY right click context menus, these menus were hacked together so don't expect them to not be buggy
