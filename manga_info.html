@@ -71,7 +71,7 @@
     <!-- Menus -->
     <ul class="mdl-menu mdl-js-ripple-effect mdl-menu--bottom-right mdl-js-menu" for="more_btn">
         <li id="change_display_mode_btn" class="mdl-menu__item">Change display mode</li>
-        <li class="mdl-menu__item">Sorting mode</li>
+        <li id="sort_mode_btn" class="mdl-menu__item">Sorting mode</li>
     </ul>
     <ul class="mdl-menu mdl-js-ripple-effect mdl-menu--bottom-right mdl-js-menu" for="filter_btn">
         <label for="download-chkbx">
@@ -181,6 +181,25 @@
     </div>
     <div class="mdl-dialog__actions">
         <button id="display_mode_dialog_close" class="mdl-button mdl-js-button mdl-js-ripple-effect" type="button">
+            Close
+        </button>
+    </div>
+</dialog>
+<!-- Sort Mode dialog -->
+<dialog id="sort_mode_dialog" class="mdl-dialog">
+    <h3 class="mdl-dialog__title">Sorting mode</h3>
+    <div class="mdl-dialog__content">
+        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="sm-by-source">
+            <input type="radio" id="sm-by-source" class="mdl-radio__button" name="sort-mode" value="SOURCE" checked>
+            <span class="mdl-radio__label">By source</span>
+        </label>
+        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="sm-by-number">
+            <input type="radio" id="sm-by-number" class="mdl-radio__button" name="sort-mode" value="NUMBER">
+            <span class="mdl-radio__label">By chapter number</span>
+        </label>
+    </div>
+    <div class="mdl-dialog__actions">
+        <button id="sort_mode_dialog_close" class="mdl-button mdl-js-button mdl-js-ripple-effect" type="button">
             Close
         </button>
     </div>

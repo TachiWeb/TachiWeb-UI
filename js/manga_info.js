@@ -7,6 +7,7 @@ var refreshTooltip;
 var openBrowserBtn;
 var moreBtn;
 var changeDisplayModeBtn;
+var sortModeBtn;
 var infoTab;
 var chaptersTab;
 var infoPanel;
@@ -27,10 +28,15 @@ var mangaTitleElement;
 var pageListDialog;
 var downloadDialog;
 var displayModeDialog;
+var sortModeDialog;
 
 var dmOptionName;
 var dmOptionNumber;
 var dmBtnClose;
+
+var smOptionSource;
+var smOptionNumber;
+var smBtnClose;
 
 var downloadBtn1;
 var downloadBtn5;
@@ -73,8 +79,13 @@ function mapFiltersToUI() {
     mdlCheckboxCheck(downloadedCheckbox, filters.onlyDownloaded);
 }
 var sort = {
-    reverse: false
+    reverse: false,
+    mode: "SOURCE"
 };
+function mapSortModeToUI() {
+    mdlRadioCheck(smOptionSource, sort.mode === "SOURCE");
+    mdlRadioCheck(smOptionNumber, sort.mode === "NUMBER");
+}
 var displayMode = "NAME";
 function mapDisplayModeToUI() {
     mdlRadioCheck(dmOptionName, displayMode === "NAME");
@@ -94,6 +105,7 @@ function onLoad() {
     openBrowserBtn = $("#open_browser_btn");
     moreBtn = $("#more_btn");
     changeDisplayModeBtn = $("#change_display_mode_btn");
+    sortModeBtn = $("#sort_mode_btn");
     infoTab = $("#info_tab");
     chaptersTab = $("#chapter_tab");
     infoPanel = $("#info_panel");
@@ -106,10 +118,15 @@ function onLoad() {
     pageListDialog = $("#page_list_dialog");
     downloadDialog = $("#download_dialog");
     displayModeDialog = $("#display_mode_dialog");
+    sortModeDialog = $("#sort_mode_dialog");
 
     dmOptionName = $("#dm-show-name");
     dmOptionNumber = $("#dm-show-number");
     dmBtnClose = $("#display_mode_dialog_close");
+
+    smOptionSource = $("#sm-by-source");
+    smOptionNumber = $("#sm-by-number");
+    smBtnClose = $("#sort_mode_dialog_close");
 
     downloadBtn1 = $("#download_btn_1");
     downloadBtn5 = $("#download_btn_5");
@@ -143,6 +160,7 @@ function onLoad() {
     setupFaveCommandListener();
     setupDownloadDialog();
     setupDisplayModeDialog();
+    setupSortModeDialog();
     startUpdatingChapters();
 }
 
@@ -160,7 +178,8 @@ function setupDialogs() {
     if (!rawElement(pageListDialog).showModal) {
         dialogPolyfill.registerDialog(rawElement(pageListDialog));
         dialogPolyfill.registerDialog(rawElement(downloadDialog));
-        dialogPolyfill.registerDialog(rawElement(displayModeDialog))
+        dialogPolyfill.registerDialog(rawElement(displayModeDialog));
+        dialogPolyfill.registerDialog(rawElement(sortModeDialog));
     }
 }
 function setupSort() {
@@ -212,6 +231,29 @@ function setupDisplayModeDialog() {
     });
     dmOptionNumber.click(function () {
         updateDm("NUMBER");
+    });
+}
+function setupSortModeDialog() {
+    sortModeBtn.click(function () {
+        rawElement(sortModeDialog).showModal();
+    });
+
+    smBtnClose.click(function () {
+        rawElement(sortModeDialog).close();
+    });
+
+    var updateSm = function (newSm) {
+        sort.mode = newSm;
+        setServerFlag("SORT_TYPE", sort.mode);
+        mapSortModeToUI();
+        applyAndUpdateChapters(currentChapters);
+    };
+
+    smOptionSource.click(function () {
+        updateSm("SOURCE");
+    });
+    smOptionNumber.click(function () {
+        updateSm("NUMBER");
     });
 }
 function setupDownloadDialog() {
@@ -501,7 +543,11 @@ function applySort(chapters) {
 }
 function sortChapters(chapters) {
     chapters.sort(function (a, b) {
-        return a.chapter_number - b.chapter_number;
+        if (sort.mode === "SOURCE") {
+            return a.source_order - b.source_order;
+        } else if (sort.mode === "NUMBER") {
+            return b.chapter_number - a.chapter_number;
+        }
     });
     return chapters;
 }
@@ -526,6 +572,7 @@ function applyFilters(chapters) {
 }
 function mapFlagsToRules(flags) {
     sort.reverse = flags.SORT_DIRECTION === "DESCENDING";
+    sort.mode = flags.SORT_TYPE;
     filters.onlyUnread = flags.READ_FILTER === "UNREAD";
     filters.onlyDownloaded = flags.DOWNLOADED_FILTER === "DOWNLOADED";
     displayMode = flags.DISPLAY_MODE;
