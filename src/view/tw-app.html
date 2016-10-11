@@ -1,0 +1,145 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="/bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="/bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="/bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="/bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="/bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="/bower_components/app-route/app-location.html">
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="/bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/bower_components/paper-header-panel/paper-header-panel.html">
+<link rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="/bower_components/paper-drawer-panel/paper-drawer-panel.html">
+<link rel="import" href="/bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="/bower_components/paper-item/paper-item.html">
+<link rel="import" href="/bower_components/app-localize-behavior/app-localize-behavior.html">
+<link rel="import" href="/src/my-icons.html">
+
+<dom-module id="tw-app">
+    <template>
+        <style>
+            :host {
+                --app-primary-color: #54759e;
+                --app-secondary-color: black;
+
+                display: block;
+            }
+
+            paper-toolbar {
+                background-color: var(--app-primary-color);
+            }
+
+            paper-item {
+              cursor: pointer;
+            }
+            paper-drawer-panel {
+              min-height: 100vh;
+            }
+        </style>
+
+        <app-location route="{{route}}" use-hash-as-path></app-location>
+        <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
+
+        <paper-drawer-panel id="drawer">
+            <paper-header-panel drawer>
+                <paper-toolbar></paper-toolbar>
+                <paper-menu selected="{{page}}" attr-for-selected="value">
+                    <paper-item value="view-library">{{localize('drawer_item_library')}}</paper-item>
+                    <paper-item value="view-recently-read">{{localize('drawer_item_recently_read')}}</paper-item>
+                    <paper-item value="view-recent-updates">{{localize('drawer_item_recent_updates')}}</paper-item>
+                    <paper-item value="view-catalogues">{{localize('drawer_item_catalogues')}}</paper-item>
+                    <paper-item value="view-download-queue">{{localize('drawer_item_download_queue')}}</paper-item>
+                    <hr>
+                    <paper-item value="view-settings">{{localize('drawer_item_settings')}}</paper-item>
+                    <paper-item value="view-backup">{{localize('drawer_item_backup')}}</paper-item>
+                </paper-menu>
+            </paper-header-panel>
+            <paper-header-panel main>
+                <paper-toolbar>
+                    <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
+                    <div>[[title]]</div>
+                </paper-toolbar>
+                <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="view-404" role="main">
+                    <view-library name="view-library"></view-library>
+                    <my-view2 name="view2"></my-view2>
+                    <my-view3 name="view3"></my-view3>
+                    <view404 name="view-404"></view404>
+                </iron-pagkes>
+            </paper-header-panel>
+        </paper-drawer-panel>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'tw-app',
+
+            behaviors: [Polymer.AppLocalizeBehavior],
+            properties: {
+                page: {
+                    type: String,
+                    reflectToAttribute: true,
+                    observer: '_pageChanged'
+                },
+                title: {
+                  type: String,
+                  value: "TachiWeb"
+                },
+                language: {
+                    value: 'en'
+                },
+                resources: {
+                  //Required to update title once localizations are loaded
+                  observer: '_localizationsLoaded'
+                }
+            },
+
+            observers: ['_routePageChanged(routeData.page)'],
+
+            attached: function() {
+              this.loadResources(this.resolveUrl("/locale/locales.json"));
+            },
+
+            _routePageChanged: function (page) {
+                this.page = page || 'view-library';
+            },
+
+            _pageChanged: function (page) {
+                var resolvedPageUrl = this.resolveUrl(page + '.html');
+                this.importHref(resolvedPageUrl, null, this._showPage404, true);
+                //Update title
+                this._updateTitle(this.page);
+                //Close drawer
+                this.$.drawer.closeDrawer();
+            },
+
+            _updateTitle: function(page) {
+              //Localize must be initialized
+              if(this.localize) {
+                this.title = this.localize(this.page + "_title");
+              }
+            },
+
+            _localizationsLoaded: function() {
+              //Update title
+              this._updateTitle(this.page);
+            },
+
+            _showPage404: function () {
+                this.page = 'view-404';
+            }
+        });
+    </script>
+</dom-module>

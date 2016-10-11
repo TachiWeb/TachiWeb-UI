@@ -1,0 +1,48 @@
+<!-- Manga card (used in catalogue and my library screen) -->
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="tw-api-call">
+    <template>
+    </template>
+
+    <script>
+        Polymer({
+          is: 'tw-api-call',
+
+          properties: {
+            command: {
+              type: String,
+              notify: true
+            },
+            parameters: {
+              type: Object,
+              value: {},
+              notify: true
+            },
+            response: {
+              type: Object,
+              notify: true
+            }
+          },
+
+          observers: [
+            'sendAPICall(command, parameters)'
+          ],
+
+          sendAPICall: function(command, parameters) {
+            var that = this;
+            TWApi.Commands[command].execute(function(response) {
+              that.response = {
+                success: true,
+                response: response
+              };
+            }, function(errorMessage) {
+              that.response = {
+                success: false,
+                error: errorMessage
+              };
+            }, parameters);
+          }
+        });
+    </script>
+</dom-module>

@@ -1,0 +1,13 @@
+{
+  "en": {
+    "drawer_item_library": "Library",
+    "drawer_item_recently_read": "Recently read",
+    "drawer_item_recent_updates": "Recent updates",
+    "drawer_item_catalogues": "Catalogues",
+    "drawer_item_download_queue": "Download queue",
+    "drawer_item_settings": "Settings",
+    "drawer_item_backup": "Backup",
+
+    "view-library_title": "My Library"
+  }
+}

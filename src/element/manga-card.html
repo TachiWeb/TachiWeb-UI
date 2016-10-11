@@ -1,0 +1,57 @@
+<!-- Manga card (used in catalogue and my library screen) -->
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-card/paper-card.html">
+<link rel="import" href="/bower_components/iron-image/iron-image.html">
+
+<dom-module id="manga-card">
+    <template>
+        <style>
+            paper-card {
+                margin: 5px 0;
+                overflow: hidden; /* Label goes off card, but we don't care */
+                cursor: pointer;
+            }
+            .label {
+                position: absolute;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.7);
+                color: white;
+                padding: 5px;
+                width: calc(100% - 10px);
+            }
+        </style>
+
+        <paper-card image="[[coverUrl]]" alt$="[[mangaTitle]]">
+            <div class="label">[[mangaTitle]]</div>
+            <paper-ripple></paper-ripple>
+        </paper-card>
+    </template>
+
+    <script>
+        Polymer({
+          is: 'manga-card',
+
+          properties: {
+            mangaTitle: {
+              type: String,
+              notify: true
+            },
+            mangaId: {
+              type: Number,
+              notify: true
+            },
+            coverUrl: {
+              type: String,
+              computed: 'buildCoverURL(mangaId)',
+              notify: true
+            }
+          },
+
+          buildCoverURL: function(mangaId) {
+            return TWApi.Commands.Cover.buildUrl({
+              mangaId: mangaId
+            });
+          }
+        });
+    </script>
+</dom-module>
