@@ -110,6 +110,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             attached: function() {
               this.loadResources(this.resolveUrl("/locale/locales.json"));
+              document.dispatchEvent(
+              new CustomEvent('AppReady', {bubbles: true})
+            );
             },
 
             _routePageChanged: function (page) {
@@ -141,8 +144,5 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.page = 'view-404';
             }
         });
-        document.dispatchEvent(
-              new CustomEvent('AppReady', {bubbles: true})
-            );
     </script>
 </dom-module>
