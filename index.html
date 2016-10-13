@@ -94,6 +94,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           navigator.serviceWorker.register('/service-worker.js');
         });
       }
+      document.addEventListener('AppReady', function (e) {
+        //Remove error message
+        var errorElement = document.getElementsByClassName("_res_error")[0];
+        errorElement.parentNode.removeChild(errorElement);
+      }, false);
     </script>
 
     <link rel="import" href="/src/view/tw-app.html">
@@ -106,10 +111,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         min-height: 100vh;
         background-color: #eeeeee;
       }
+      ._res_error {
+        border-radius: 25px;
+        background: white;
+        padding: 20px;
+        margin: 20px;
+      }
+      ._res_error_title {
+        font-size: 30px;
+      }
+      ._res_error_code {
+        background-color: #f5f5f5;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-family: monospace;
+        padding: 3px;
+      }
     </style>
   </head>
   <body>
     <tw-app></tw-app>
+    <!-- Error page -->
+    <p class="_res_error">
+    <span class="_res_error_title"><b>TachiWeb:</b> <span style="color: red">Error</span>, could not load resources!</span>
+    <br><br>
+    Please ensure you have a stable network connection.
+    <br><br>
+    <b>Developers:</b>
+    Did you run <span class="_res_error_code">bower install</span>?
+    </p>
     <!-- Built with love using Polymer Starter Kit -->
   </body>
 </html>

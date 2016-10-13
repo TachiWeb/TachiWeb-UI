@@ -7,7 +7,7 @@ var TWApi = {
     },
     //API Endpoints
     Endpoints: {
-        Root: "http://tw1-tachiweb.rhcloud.com/api"
+        Root: "/api"
     },
     Commands: function () {
         var that = this;

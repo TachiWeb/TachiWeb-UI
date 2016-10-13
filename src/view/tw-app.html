@@ -141,5 +141,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.page = 'view-404';
             }
         });
+        document.dispatchEvent(
+              new CustomEvent('AppReady', {bubbles: true})
+            );
     </script>
 </dom-module>
