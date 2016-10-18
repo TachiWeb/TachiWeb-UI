@@ -27,6 +27,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="/bower_components/paper-item/paper-item.html">
 <link rel="import" href="/bower_components/app-localize-behavior/app-localize-behavior.html">
 <link rel="import" href="/src/my-icons.html">
+<link rel="import" href="/src/element/object-watch.html">
 
 <dom-module id="tw-app">
     <template>
@@ -110,9 +111,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             attached: function() {
               this.loadResources(this.resolveUrl("/locale/locales.json"));
-              document.dispatchEvent(
-              new CustomEvent('AppReady', {bubbles: true})
-            );
+              document.dispatchEvent(new CustomEvent('AppReady', {bubbles: true}));
             },
 
             _routePageChanged: function (page) {

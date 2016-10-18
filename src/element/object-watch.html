@@ -1,0 +1,210 @@
+<!-- Object watching API, allows seamless data sync across tabs and information sharing between components -->
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<!--
+Watches a single object.
+Updates to the object are propapagted across all tabs in the browser and all components in each tab.
+Updates are debounced.
+
+Requires each object to have an ID. Objects should be grouped by type.
+-->
+<dom-module id="watch-object">
+  <template>
+    </template>
+
+  <script>
+    Polymer({
+      is: 'watch-object',
+
+      properties: {
+        object: {
+          type: Object,
+          notify: true,
+          observer: '_objChanged'
+        },
+        type: {
+          type: String,
+          notify: true
+        },
+        id: {
+          type: Object,
+          notify: true
+        },
+        eventHubName: {
+          type: String,
+          value: 'ObjectEvent'
+        },
+        lastUpdateTime: {
+          type: Number,
+          value: 0
+        }
+      },
+
+      observers: [
+        '_watchObj(type, id)'
+      ],
+
+      _watchObj: function(type, id) {
+        let that = this;
+        //Disconnect current event hub
+        if (this.connection !== null && this.connection !== undefined) {
+          this.connection.disconnect();
+          this.connection = null;
+        }
+        //Create new connection
+        this.connection = EventHub.connect();
+        //Listen for object changes
+        this.connection.on(this.eventHubName, function(data) {
+          //Check both ID and type are the same
+          if (data.type === type && data.id === id) {
+            if (data.timestamp > that.lastUpdateTime) {
+              //Prevent broadcasting our own changes!
+              //Assign signature if we don't have one yet
+              if(data.object._nextChangeSignature === null || data.object._nextChangeSignature === undefined) {
+                data.object._nextChangeSignature = guid();
+              }
+              //Update our signature
+              that.nextChangeSignature = data.object._nextChangeSignature;
+              that.object = data.object;
+            }
+          }
+        });
+      },
+
+      _objChanged: function() {
+        //Do not broadcast our own changes!
+        if(this.object._nextChangeSignature !== null && this.object._nextChangeSignature !== undefined) {
+          //Signature matches local one, do not broadcast
+          if(this.object._nextChangeSignature === this.nextChangeSignature) {
+            //Assign new signature so next change will be broadcast
+            this._nextChangeSignature = guid();
+            return;
+          }
+        } else {
+          //No signature means the object came from an outside source (so we should broadcast it)
+          //We still assign it a signature.
+          //When assigning the signature, since it matches the local signature, the signature change event will not be broadcast
+          this._nextChangeSignature = guid();
+          this.object._nextChangeSignature = this.nextChangeSignature;
+        }
+        this.lastUpdateTime = Date.now();
+        if (this.debounceFunc === null || this.debounceFunc === undefined) {
+          let that = this;
+          this.debounceFunc = debounce(function() {
+            EventHub.emit(that.eventHubName, {
+              type: that.type,
+              id: that.id,
+              object: that.object,
+              timestamp: that.lastUpdateTime
+            });
+          }, 500);
+        }
+        this.debounceFunc();
+      }
+    });
+  </script>
+</dom-module>
+
+<!--
+Watch for objects that match a certain filter.
+Changes to object that match the filter in any component in any window will automatically add/remove the object from the array based on whether or not the object matches the filter.
+Requires objects store their ID in a parameter.
+Do not add/remove objects from the array.
+Only matches objects that match it's type.
+-->
+<dom-module id="watch-object-filter">
+  <template>
+    <template is="dom-repeat" items="{{array}}">
+        <watch-object object="{{item}}" type="[[type]]" id="[[_arraySelector(item, idParam)]]"></watch-object>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'watch-object-filter',
+
+      properties: {
+        array: {
+          type: Array,
+          value: [],
+          notify: true
+        },
+        type: {
+          type: String,
+          notify: true
+        },
+        filter: {
+          type: Object,
+          notify: true
+        },
+        idParam: {
+          type: String,
+          notify: true
+        },
+        eventHubName: {
+          type: String,
+          value: 'ObjectEvent'
+        }
+      },
+
+      observers: [
+        '_watchFilter(type, filter, idParam)'
+      ],
+
+      _watchFilter: function(type, filter, idParam) {
+        let that = this;
+        //Disconnect current event hub
+        if (this.connection !== null && this.connection !== undefined) {
+          this.connection.disconnect();
+          this.connection = null;
+        }
+        //Create new connection
+        this.connection = EventHub.connect();
+
+        let filterFunction = Function.from(filter);
+
+        //Listen for object changes
+        this.connection.on(this.eventHubName, function(data) {
+          //Check that we care about this type
+          if (data.type === type && data.object !== undefined && data.object != null) {
+            //Check with filter
+            let valid = filterFunction(data.object);
+            //Get object id
+            let id = data.object[idParam];
+
+            if (valid) {
+              //Add to array if valid and not already in array
+              for (let i = 0; i < that.array.length; i++) {
+                if (that.get(["array", i, idParam]) === id) {
+                  //TODO DELETE IF ABOVE WORKS: if(that.array[i][idParam] === id) {
+                  //Found the same object, just apply the changes
+                  that.set(["array", i], data.object);
+                  //TODO DELETE IF ABOVE WORKS: that.array[i] = data.object;
+                  return;
+                }
+              }
+              that.push('array', data.object);
+            }
+            else {
+              //Remove from array
+              //Iterate through array and find existing object
+              let index = -1;
+              for (let i = 0; i < that.array.length; i++) {
+                if (that.get(["array", i, idParam]) === id) {
+                  //TODO DELETE IF ABOVE WORKS: if(that.array[i][idParam] === id) {
+                  that.splice("array", index, 1);
+                  return;
+                }
+              }
+            }
+          }
+        });
+      },
+      
+      //Used for selecting idParam
+      _arraySelector: function(array, index) {
+        return array[index];
+      }
+    });
+  </script>
+</dom-module>

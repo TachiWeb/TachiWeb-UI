@@ -36,6 +36,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </template>
 
         <tw-api-call command="Library" response="{{library_response}}"></tw-api-call>
+        <watch-object-filter array="{{library_response.response.content}}" type="manga" filter="{{libraryFilter}}" id-param="id"></watch-object>
     </template>
 
     <script>
@@ -46,6 +47,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 library_response: {
                     type: Object,
                     notify: true
+                },
+                libraryFilter: {
+                    type: String,
+                    value: function(manga) {
+                        return manga.favorite;
+                    }.to()
                 }
             },
 
