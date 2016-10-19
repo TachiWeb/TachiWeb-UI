@@ -34,8 +34,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </template>
               </iron-grid>
         </template>
-
+        
+        <!-- Fetch manga from server -->
         <tw-api-call command="Library" response="{{library_response}}"></tw-api-call>
+        <!-- Sync manga across entire browser -->
         <watch-object-filter array="{{library_response.response.content}}" type="manga" filter="{{libraryFilter}}" id-param="id"></watch-object>
     </template>
 

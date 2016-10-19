@@ -58,6 +58,9 @@ var RevisionManager;
         },
         close: function() {
           parentHub.disconnect(this);
+        },
+        emit: function(name, parameters) {
+          parentHub.emit(name, parameters);
         }
       };
       this.connections.push(connection);
@@ -71,15 +74,18 @@ var RevisionManager;
       }
     },
     //Receieve event and delegate to children
-    emit: function(name, parameters) {
+    emit: function(name, parameters, onlyInternal) {
       logger.debug("Received internal event!", name, parameters);
       //Delegate event to children
       this._internalEmit(name, parameters);
-      //Delegate event to other tabs
-      intercom.safeEmit(this._intercomEventName, {
-        name: name,
-        parameters: parameters
-      });
+      //Do not emit internal events to other tabs/windows
+      if(!onlyInternal) {
+        //Delegate event to other tabs
+        intercom.safeEmit(this._intercomEventName, {
+          name: name,
+          parameters: parameters
+        });
+      }
     },
     //Internal function that delegates events to children
     _internalEmit: function(name, parameters) {

@@ -2,6 +2,7 @@ var TWApi = {
     //Setup the API
     init: function () {
         this.Commands = this.Commands();
+        this.logger = Logger.get('TWApi');
         delete this.init;
         return this;
     },
@@ -61,6 +62,7 @@ var TWApi = {
                                 if (res.error === "Not authenticated!") {
                                     //Not authenticated
                                     console.error("Not authenticated, redirecting to auth page!");
+                                    //TODO Change to new UI
                                     window.location = "/auth.html?fu=" + encodeURIComponent(window.location.pathname + window.location.search);
                                 } else {
                                     console.error("API error!", res.error);
