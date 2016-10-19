@@ -61,7 +61,7 @@ Requires each object to have an ID. Objects should be grouped by type.
               //Prevent broadcasting our own changes!
               //Assign signature if we don't have one yet
               if(data.object._nextChangeSignature === null || data.object._nextChangeSignature === undefined) {
-                data.object._nextChangeSignature = guid();
+                data.object._nextChangeSignature = Util.guid();
               }
               //Update our signature
               that.nextChangeSignature = data.object._nextChangeSignature;
@@ -77,20 +77,20 @@ Requires each object to have an ID. Objects should be grouped by type.
           //Signature matches local one, do not broadcast
           if(this.object._nextChangeSignature === this.nextChangeSignature) {
             //Assign new signature so next change will be broadcast
-            this._nextChangeSignature = guid();
+            this._nextChangeSignature = Util.guid();
             return;
           }
         } else {
           //No signature means the object came from an outside source (so we should broadcast it)
           //We still assign it a signature.
           //When assigning the signature, since it matches the local signature, the signature change event will not be broadcast
-          this._nextChangeSignature = guid();
+          this._nextChangeSignature = Util.guid();
           this.object._nextChangeSignature = this.nextChangeSignature;
         }
         this.lastUpdateTime = Date.now();
         if (this.debounceFunc === null || this.debounceFunc === undefined) {
           let that = this;
-          this.debounceFunc = debounce(function() {
+          this.debounceFunc = Util.debounce(function() {
             EventHub.emit(that.eventHubName, {
               type: that.type,
               id: that.id,

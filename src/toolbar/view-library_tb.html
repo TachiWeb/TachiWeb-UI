@@ -1,0 +1,41 @@
+<!-- Toolbar for My Library view -->
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="/bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="/bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/src/element/paper-static-menu.html">
+<link rel="import" href="/src/element/material-search.html">
+
+<dom-module id="view-library_tb">
+    <template>
+      <paper-menu-button dynamic-align>
+  <paper-icon-button icon="icons:filter-list" class="dropdown-trigger"></paper-icon-button>
+  <paper-static-menu id="filter_menu" class="dropdown-content">
+      <!-- TODO LOCALE -->
+      <paper-item>Downloaded</paper-item>
+      <paper-item>Unread</paper-item>
+      <paper-item>Remove filter</paper-item>
+  </paper-static-menu>
+</paper-menu-button>
+<paper-icon-button icon="icons:refresh"></paper-icon-button>
+<paper-icon-button id="search_button" icon="icons:search"></paper-icon-button>
+<material-search id="search_bar"></material-search>
+  </template>
+
+    <script>
+        Polymer({
+            is: 'view-library_tb',
+            listeners: {
+                'filter_menu.item-click': '_filterChange',
+                'search_button.tap': '_openSearch'
+            },
+            _filterChange: function(event, detail) {
+                console.log(detail); //TODO Replace with actual filter code
+            },
+            _openSearch: function() {
+                this.$.search_bar.open();
+            }
+        });
+    </script>
+</dom-module>

@@ -1,0 +1,18 @@
+<!-- Wrapper around AppLocalizeBehavior for easy localization globally. -->
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/app-localize-behavior/app-localize-behavior.html">
+
+<script>
+LocalizedAppBehaviorImpl = {
+    properties: {
+        language: {
+          value: 'en'
+        }
+    },
+    attached: function () {
+        this.loadResources(this.resolveUrl("/locale/locales.json"));
+    }
+}
+
+LocalizedAppBehavior = [Polymer.AppLocalizeBehavior, LocalizedAppBehaviorImpl]
+</script>

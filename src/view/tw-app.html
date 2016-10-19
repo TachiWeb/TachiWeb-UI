@@ -25,7 +25,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="/bower_components/paper-drawer-panel/paper-drawer-panel.html">
 <link rel="import" href="/bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="/bower_components/paper-item/paper-item.html">
-<link rel="import" href="/bower_components/app-localize-behavior/app-localize-behavior.html">
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="/bower_components/iron-icons/image-icons.html">
+
+<link rel="import" href="/src/behavior/localized-app-behavior.html">
 <link rel="import" href="/src/my-icons.html">
 <link rel="import" href="/src/element/object-watch.html">
 
@@ -71,14 +74,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <paper-header-panel main>
                 <paper-toolbar>
                     <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-                    <div>[[title]]</div>
+                    <span class="title">[[title]]</span>
+                    <iron-pages selected="[[toolbar_page]]" attr-for-selected="name" fallback-selection="view-empty"></iron-pages>
+                        <view-library_tb name="view-library_tb"></view-library_tb>
+                        <view-empty name="view-empty"></view-empty>
+                    </iron-pages>
                 </paper-toolbar>
                 <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="view-404" role="main">
                     <view-library name="view-library"></view-library>
                     <my-view2 name="view2"></my-view2>
                     <my-view3 name="view3"></my-view3>
                     <view404 name="view-404"></view404>
-                </iron-pagkes>
+                </iron-pages>
             </paper-header-panel>
         </paper-drawer-panel>
     </template>
@@ -87,7 +94,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         Polymer({
             is: 'tw-app',
 
-            behaviors: [Polymer.AppLocalizeBehavior],
+            behaviors: [LocalizedAppBehavior],
             properties: {
                 page: {
                     type: String,
@@ -110,7 +117,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             observers: ['_routePageChanged(routeData.page)'],
 
             attached: function() {
-              this.loadResources(this.resolveUrl("/locale/locales.json"));
               document.dispatchEvent(new CustomEvent('AppReady', {bubbles: true}));
             },
 
@@ -121,6 +127,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             _pageChanged: function (page) {
                 var resolvedPageUrl = this.resolveUrl(page + '.html');
                 this.importHref(resolvedPageUrl, null, this._showPage404, true);
+                
+                //Setup toolbar URL
+                var toolbarUrl = "";
+                if(this.page === 'view-404') {
+                    this.toolbar_page = 'view-empty'
+                } else {
+                    this.toolbar_page = page + '_tb';
+                    toolbarUrl = "../toolbar/";
+                }
+                toolbarUrl += this.toolbar_page + '.html';
+                var resolvedToolbarUrl = this.resolveUrl(toolbarUrl);
+                this.importHref(resolvedToolbarUrl, null, this._showEmptyPage, true);
+
                 //Update title
                 this._updateTitle(this.page);
                 //Close drawer
@@ -141,6 +160,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _showPage404: function () {
                 this.page = 'view-404';
+            },
+            
+            _showEmptyPage: function() {
+                this.toolbar_page = '../view/view-empty';
             }
         });
     </script>

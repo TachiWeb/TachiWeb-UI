@@ -8,6 +8,8 @@
     "drawer_item_settings": "Settings",
     "drawer_item_backup": "Backup",
 
-    "view-library_title": "My Library"
+    "view-library_title": "My Library",
+    
+    "material_search_label": "Search"
   }
 }
