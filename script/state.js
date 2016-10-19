@@ -1,6 +1,5 @@
 //EventHub propagates events across components in a page.
 var EventHub;
-var RevisionManager;
 
 (function() {
   //Allows broadcasting events across tabs
