@@ -38,7 +38,7 @@
             listeners: {
                 'filter_menu.item-click': '_filterChange',
                 'search_button.tap': '_openSearch',
-                'search_bar.iron-overlay-closed': '_stopSearch'
+                'search_bar.search-closed': '_stopSearch'
             },
             _filterChange: function(event, detail) {
                 console.log(detail); //TODO Replace with actual filter code
@@ -49,7 +49,6 @@
             _stopSearch: function() {
                 //Broadcast search stop
                 this.librarySearchValue = "";
-                EventHub.emit("LibrarySearchEvent", "SearchStopped", true);
             }
         });
     </script>

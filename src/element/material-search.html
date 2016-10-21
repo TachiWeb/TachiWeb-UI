@@ -97,6 +97,7 @@
         if(!this._queueExit) {
           this.playAnimation('exit');
           this._queueExit = true;
+          this.fire('search-closed', {});
         }
       },
       _closeSearch: function(event) {

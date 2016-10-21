@@ -65,8 +65,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     observer: '_updateLibraryFilter'
                 }
             },
-            
-            behaviors: [EventHubBehavior],
 
             listeners: {
               'grid_hider.dom-change': 'resizeGrid'
@@ -84,13 +82,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               }
             },
             attached: function() {
-                /*this.ehConn.on("LibrarySearchEvent", function(command) {
-                    if(command === "SearchStopped") {
-                        _updateLibraryFilter();
-                    }
-                });*/
+                //Computed library filter
                 let that = this;
-                //TODO Use Function.bind(this); on this
                 this.libraryFilter = function(manga) {
                         let valid = manga.favorite;
                         if(valid
