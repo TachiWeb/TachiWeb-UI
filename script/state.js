@@ -7,7 +7,7 @@ var SWIntercom;
     listeners: [],
     supported: true,
     init: function() {
-      if(SharedWorker) {
+      if(typeof SharedWorker !== "undefined" && SharedWorker !== null) {
         this.worker = new SharedWorker('/script/swintercom.js');
         this.worker.port.addEventListener('message', function(e) {
           this._internalEmit(e.data.name, e.data.data);

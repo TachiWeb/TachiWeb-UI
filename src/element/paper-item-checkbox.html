@@ -39,6 +39,14 @@
                 'wrapped_checkbox.tap': '_checkboxTapped',
                 'item_wrapper.tap': '_itemTapped'
             },
+            properties: {
+                checked: {
+                    notify: true
+                },
+                value: {
+                    notify: true
+                }
+            },
             _itemTapped: function() {
                 this.$.wrapped_checkbox.checked = !this.$.wrapped_checkbox.checked;
             },

@@ -15,8 +15,8 @@
   <paper-icon-button icon="icons:filter-list" class="dropdown-trigger"></paper-icon-button>
   <paper-static-menu id="filter_menu" class="dropdown-content">
       <!-- TODO LOCALE -->
-      <paper-item-checkbox id="filter_downloaded" menu="[[_getMenu()]]">Downloaded</paper-item-checkbox>
-      <paper-item-checkbox id="filter_unread" menu="[[_getMenu()]]">Unread</paper-item-checkbox>
+      <paper-item-checkbox id="filter_downloaded" menu="[[_getMenu()]]" checked="{{filterDownloaded}}">Downloaded</paper-item-checkbox>
+      <paper-item-checkbox id="filter_unread" menu="[[_getMenu()]]" checked="{{filterUnread}}">Unread</paper-item-checkbox>
       <paper-item id="filter_remove">Remove filter</paper-item>
   </paper-static-menu>
 </paper-menu-button>
@@ -25,6 +25,9 @@
 <material-search id="search_bar" value="{{librarySearchValue}}"></material-search>
 <!-- Broadcast search event -->
 <watch-object object="{{librarySearchValue}}" type="LibrarySearchEvent" internal-only></watch-object>
+<!-- Sync filters to library -->
+<watch-object object="{{filterDownloaded}}" type="LibraryFilterEvent" id="Downloaded"></watch-object>
+<watch-object object="{{filterUnread}}" type="LibraryFilterEvent" id="Unread"></watch-object>
   </template>
 
     <script>
