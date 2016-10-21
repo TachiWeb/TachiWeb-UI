@@ -4,18 +4,20 @@
 <link rel="import" href="/bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="/bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="/src/element/paper-static-menu.html">
 <link rel="import" href="/src/element/material-search.html">
+<link rel="import" href="/src/element/paper-item-checkbox.html">
 
 <dom-module id="view-library_tb">
     <template>
-      <paper-menu-button dynamic-align>
+      <paper-menu-button id="filter_menu_button" dynamic-align>
   <paper-icon-button icon="icons:filter-list" class="dropdown-trigger"></paper-icon-button>
   <paper-static-menu id="filter_menu" class="dropdown-content">
       <!-- TODO LOCALE -->
-      <paper-item>Downloaded</paper-item>
-      <paper-item>Unread</paper-item>
-      <paper-item>Remove filter</paper-item>
+      <paper-item-checkbox id="filter_downloaded" menu="[[_getMenu()]]">Downloaded</paper-item-checkbox>
+      <paper-item-checkbox id="filter_unread" menu="[[_getMenu()]]">Unread</paper-item-checkbox>
+      <paper-item id="filter_remove">Remove filter</paper-item>
   </paper-static-menu>
 </paper-menu-button>
 <paper-icon-button icon="icons:refresh"></paper-icon-button>
@@ -36,12 +38,9 @@
                 }
             },
             listeners: {
-                'filter_menu.item-click': '_filterChange',
                 'search_button.tap': '_openSearch',
-                'search_bar.search-closed': '_stopSearch'
-            },
-            _filterChange: function(event, detail) {
-                console.log(detail); //TODO Replace with actual filter code
+                'search_bar.search-closed': '_stopSearch',
+                'filter_remove.tap': '_clearFilter'
             },
             _openSearch: function() {
                 this.$.search_bar.open();
@@ -49,6 +48,13 @@
             _stopSearch: function() {
                 //Broadcast search stop
                 this.librarySearchValue = "";
+            },
+            _getMenu: function() {
+                return this.$.filter_menu_button;
+            },
+            _clearFilter: function() {
+                this.$.filter_downloaded.checked = false;
+                this.$.filter_unread.checked = false;
             }
         });
     </script>

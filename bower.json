@@ -30,7 +30,8 @@
     "paper-menu-button": "PolymerElements/paper-menu-button#^1.5.2",
     "iron-overlay-behavior": "PolymerElements/iron-overlay-behavior#^1.9.0",
     "paper-input": "PolymerElements/paper-input#^1.1.20",
-    "neon-animation": "PolymerElements/neon-animation#^1.2.4"
+    "neon-animation": "PolymerElements/neon-animation#^1.2.4",
+    "paper-checkbox": "PolymerElements/paper-checkbox#^1.4.1"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"

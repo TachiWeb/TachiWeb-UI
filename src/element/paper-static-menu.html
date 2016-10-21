@@ -11,8 +11,13 @@
     <script>
         Polymer({
             is: 'paper-static-menu',
+            properties: {
+                close: {
+                    type: Object
+                }
+            },
             listeners: {
-                'internal_menu.iron-select': '_itemClick'
+                'internal_menu.iron-select': '_itemClick',
             },
             _itemClick: function(event, detail) {
                 var index = Util.indexInParent(detail.item);

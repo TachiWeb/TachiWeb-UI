@@ -1,0 +1,53 @@
+<!-- Paper checkbox wrapped in paper-item! -->
+<link rel="import" href="/bower_components/paper-item/paper-item.html">
+<link rel="import" href="/bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="paper-item-checkbox">
+    <template>
+      <paper-item id="item_wrapper">
+            <paper-checkbox id="wrapped_checkbox"
+                active="{{active}}"
+                aria-active-attribute="{{aria-active-attribute}}"
+                checked="{{checked}}"
+                disabled="{{disabled}}"
+                focused="{{focused}}"
+                invalid="{{invalid}}"
+                key-bindings="{{keyBindings}}"
+                key-event-target="{{keyEventTarget}}"
+                name="{{name}}"
+                noink="{{noink}}"
+                pointer-down="{{pointerDown}}"
+                pressed="{{pressed}}"
+                received-focus-from-keyboard="{{receivedFocusFromKeyboard}}"
+                required="{{required}}"
+                stop-keyboard-event-propagation="{{stopKeyboardEventPropagation}}"
+                toggles="{{toggles}}"
+                validator="{{validator}}"
+                validator-type="{{validatorType}}"
+                value="{{value}}">
+              <content>
+              </content>
+            </paper-checkbox>
+        </paper-item>
+      </template>
+
+    <script>
+        Polymer({
+            is: 'paper-item-checkbox',
+            listeners: {
+                'wrapped_checkbox.tap': '_checkboxTapped',
+                'item_wrapper.tap': '_itemTapped'
+            },
+            _itemTapped: function() {
+                this.$.wrapped_checkbox.checked = !this.$.wrapped_checkbox.checked;
+            },
+            _checkboxTapped: function(e) {
+                e.stopPropagation();
+                if(this.menu !== undefined && this.menu !== null) {
+                    this.menu.close();
+                }
+            }
+        });
+    </script>
+</dom-module>
