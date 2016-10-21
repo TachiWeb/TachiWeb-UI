@@ -27,8 +27,15 @@
                 padding: 0;
               }
           }
+          #search_close {
+              margin: 5px;
+              color: black;
+              opacity: var(--dark-disabled-opacity, 0.38);
+              float: left;
+          }
       </style>
       <paper-material id="search_box" elevation="1">
+        <paper-icon-button id="search_close" icon="icons:arrow-back"></paper-icon-button>
         <paper-input id="search_input" label="{{localize('material_search_label')}}" value="{{value}}" always-float-label>
         </paper-input>
       </paper-material>
@@ -45,7 +52,8 @@
       listeners: {
           'iron-overlay-opened': '_initSearch',
           'iron-overlay-canceled': '_destroySearch',
-          'neon-animation-finish': '_closeSearch'
+          'neon-animation-finish': '_closeSearch',
+          'search_close.tap': 'closeSearch'
       },
       properties: {
         value: {
@@ -72,14 +80,19 @@
               }]
             }
           }
+        },
+        noCancelOnOutsideClick: {
+          value: true
         }
       },
       _initSearch: function() {
         this.playAnimation('entry');
-        this.$.search_input.$.input.focus();
+        this.$.search_input.$.input.focus(); //Autofocus attribute does not work on paper-input for some reason
       },
       _destroySearch: function(event) {
-        event.preventDefault(); //Do not close overlay for now
+        if(event !== undefined && event !== null) {
+          event.preventDefault(); //Do not close overlay for now
+        }
         //Do not play animation if we are already animating
         if(!this._queueExit) {
           this.playAnimation('exit');
@@ -92,6 +105,9 @@
           this._queueExit = false;
           this.close();
         }
+      },
+      closeSearch: function() {
+        this._destroySearch();
       }
     });
   </script>

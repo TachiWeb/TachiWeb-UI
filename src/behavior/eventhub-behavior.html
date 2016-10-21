@@ -1,0 +1,18 @@
+<!-- Behavior that automagically manages connections to the event hub -->
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<script>
+EventHubBehavior = {
+    properties: {
+        ehConn: {
+            type: Object
+        }
+    },
+    attached: function() {
+        this.ehConn = EventHub.connect();
+    },
+    detatched: function() {
+        this.ehConn.disconnect();
+    }
+}
+</script>

@@ -13,6 +13,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="/src/element/manga-card.html">
 <link rel="import" href="/src/element/tw-api-call.html">
 <link rel="import" href="/src/element/iron-grid.html">
+<link rel="import" href="/src/behavior/eventhub-behavior.html">
 
 <dom-module id="view-library">
     <template>
@@ -38,7 +39,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <!-- Fetch manga from server -->
         <tw-api-call command="Library" response="{{library_response}}"></tw-api-call>
         <!-- Sync manga across entire browser -->
-        <watch-object-filter array="{{library_response.response.content}}" type="manga" filter="{{libraryFilter}}" id-param="id"></watch-object>
+        <watch-object-filter filtered="{{library_response.response.content}}" type="manga" filter="{{libraryFilter}}" id-param="id"></watch-object>
+        <!-- Store any recieved manga information -->
+        <watch-object-frozen id="local_manga_db" type="manga" id-param="id"></watch-object-frozen>
+        <!-- Recieve search event -->
+        <watch-object object="{{librarySearchValue}}" type="LibrarySearchEvent" internal-only></watch-object>
     </template>
 
     <script>
@@ -51,12 +56,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     notify: true
                 },
                 libraryFilter: {
+                    type: String
+                },
+                librarySearchValue: {
                     type: String,
-                    value: function(manga) {
-                        return manga.favorite;
-                    }.to()
+                    value: '',
+                    notify: true,
+                    observer: '_updateLibraryFilter'
                 }
             },
+            
+            behaviors: [EventHubBehavior],
 
             listeners: {
               'grid_hider.dom-change': 'resizeGrid'
@@ -72,6 +82,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 });
                 grid.onResize(null, true);
               }
+            },
+            attached: function() {
+                /*this.ehConn.on("LibrarySearchEvent", function(command) {
+                    if(command === "SearchStopped") {
+                        _updateLibraryFilter();
+                    }
+                });*/
+                let that = this;
+                //TODO Use Function.bind(this); on this
+                this.libraryFilter = function(manga) {
+                        let valid = manga.favorite;
+                        if(valid
+                            && that.librarySearchValue !== ''
+                            && !manga.title.toLowerCase().includes(that.librarySearchValue.toLowerCase())) {
+                            valid = false;
+                        }
+                        return valid;
+                    }.to();
+            },
+            _updateLibraryFilter: function() {
+                this.$.local_manga_db.requestData();
             }
         });
     </script>

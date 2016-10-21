@@ -14,6 +14,27 @@ var Util = {
 			if (callNow) func.apply(context, args);
 		};
 	},
+	
+	group: function(func, wait) {
+		var calls = []; //Queued calls
+		let timeout;
+		return function() {
+			var context = this,
+				args = arguments;
+			var later = function() {
+				timeout = null;
+				//Apply queued calls
+				for(let call of calls) {
+					func.apply(context, call);
+				}
+				calls = [];
+			};
+			//Queue the call
+			calls.push(args);
+			clearTimeout(timeout);
+			timeout = setTimeout(later, wait);
+		};
+	},
 
 	guid: function() {
 		let S4 = function() {

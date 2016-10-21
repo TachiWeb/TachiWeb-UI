@@ -28,7 +28,8 @@ Requires each object to have an ID. Objects should be grouped by type.
         },
         id: {
           type: Object,
-          notify: true
+          notify: true,
+          value: 0
         },
         eventHubName: {
           type: String,
@@ -37,6 +38,14 @@ Requires each object to have an ID. Objects should be grouped by type.
         lastUpdateTime: {
           type: Number,
           value: 0
+        },
+        internalOnly: {
+          type: Boolean,
+          value: false
+        },
+        disableSetter: {
+          type: Boolean,
+          value: false
         }
       },
 
@@ -54,9 +63,12 @@ Requires each object to have an ID. Objects should be grouped by type.
         //Create new connection
         this.connection = EventHub.connect();
         //Listen for object changes
-        this.connection.on(this.eventHubName, function(data) {
+        this.connection.on(this.eventHubName, function(data, internal) {
+          if(that.disableSetter
+            || (that.internalOnly && !internal)) return; //Reject external data if we are internal only
           //Check both ID and type are the same
-          if (data.type === type && data.id === id) {
+          if (data.object !== undefined && data.object !== null
+                             && data.type === type && data.id === id) {
             if (data.timestamp > that.lastUpdateTime) {
               //Prevent broadcasting our own changes!
               //Assign signature if we don't have one yet
@@ -65,26 +77,38 @@ Requires each object to have an ID. Objects should be grouped by type.
               }
               //Update our signature
               that.nextChangeSignature = data.object._nextChangeSignature;
-              that.object = data.object;
+             that.object = data.object;
             }
+          }
+        });
+        this.connection.on("ObjectRequest", function(requestedType, internal) {
+          if(that.internalOnly && !internal) return; //Reject external data if we are internal only
+          if(requestedType === that.type) {
+            //Generate a new object signature
+            that.nextChangeSignature = Util.guid();
+            //Broadcast fake change
+            that._objChanged();
           }
         });
       },
 
       _objChanged: function() {
+        if(this.object === undefined || this.object === null) {
+          return;
+        }
         //Do not broadcast our own changes!
         if(this.object._nextChangeSignature !== null && this.object._nextChangeSignature !== undefined) {
           //Signature matches local one, do not broadcast
           if(this.object._nextChangeSignature === this.nextChangeSignature) {
             //Assign new signature so next change will be broadcast
-            this._nextChangeSignature = Util.guid();
+            this.nextChangeSignature = Util.guid();
             return;
           }
         } else {
           //No signature means the object came from an outside source (so we should broadcast it)
           //We still assign it a signature.
           //When assigning the signature, since it matches the local signature, the signature change event will not be broadcast
-          this._nextChangeSignature = Util.guid();
+          this.nextChangeSignature = Util.guid();
           this.object._nextChangeSignature = this.nextChangeSignature;
         }
         this.lastUpdateTime = Date.now();
@@ -96,10 +120,15 @@ Requires each object to have an ID. Objects should be grouped by type.
               id: that.id,
               object: that.object,
               timestamp: that.lastUpdateTime
-            });
-          }, 500);
+            }, that.internalOnly);
+          }, 50);
         }
         this.debounceFunc();
+      },
+      
+      //Request all nodes with data on this object type to transmit it
+      requestData: function() {
+        EventHub.emit("ObjectRequest", this.type);
       }
     });
   </script>
@@ -114,8 +143,8 @@ Only matches objects that match it's type.
 -->
 <dom-module id="watch-object-filter">
   <template>
-    <template is="dom-repeat" items="{{array}}">
-        <watch-object object="{{item}}" type="[[type]]" id="[[_arraySelector(item, idParam)]]"></watch-object>
+    <template is="dom-repeat" items="[[filtered]]">
+        <watch-object object="{{item}}" type="[[type]]" id="[[_arraySelector(item, idParam)]]" internal-only="[[internalOnly]]" disable-setter></watch-object>
     </template>
   </template>
 
@@ -124,7 +153,7 @@ Only matches objects that match it's type.
       is: 'watch-object-filter',
 
       properties: {
-        array: {
+        filtered: {
           type: Array,
           value: [],
           notify: true
@@ -144,6 +173,10 @@ Only matches objects that match it's type.
         eventHubName: {
           type: String,
           value: 'ObjectEvent'
+        },
+        internalOnly: {
+          type: Boolean,
+          value: false
         }
       },
 
@@ -174,26 +207,23 @@ Only matches objects that match it's type.
 
             if (valid) {
               //Add to array if valid and not already in array
-              for (let i = 0; i < that.array.length; i++) {
-                if (that.get(["array", i, idParam]) === id) {
-                  //TODO DELETE IF ABOVE WORKS: if(that.array[i][idParam] === id) {
+              for (let i = 0; i < that.get("filtered").length; i++) {
+                if (that.get(["filtered", i, idParam]) === id) {
                   //Found the same object, just apply the changes
-                  that.set(["array", i], data.object);
-                  //TODO DELETE IF ABOVE WORKS: that.array[i] = data.object;
+                  if(that.get(["filtered", i, "_nextChangeSignature"]) !== data.object._nextChangeSignature) {
+                    that.set(["filtered", i], data.object);
+                  }
                   return;
                 }
               }
-              that.push('array', data.object);
+              that.push('filtered', data.object);
             }
             else {
               //Remove from array
               //Iterate through array and find existing object
-              let index = -1;
-              for (let i = 0; i < that.array.length; i++) {
-                if (that.get(["array", i, idParam]) === id) {
-                  //TODO DELETE IF ABOVE WORKS: if(that.array[i][idParam] === id) {
-                  that.splice("array", index, 1);
-                  return;
+              for (let i = 0; i < that.get("filtered").length; i++) {
+                if (that.get(["filtered", i, idParam]) === id) {
+                  that.splice("filtered", i, 1);
                 }
               }
             }
@@ -204,6 +234,108 @@ Only matches objects that match it's type.
       //Used for selecting idParam
       _arraySelector: function(array, index) {
         return array[index];
+      },
+      
+      //Request all nodes with data on this object type to transmit it
+      requestData: function() {
+        EventHub.emit("ObjectRequest", this.type);
+      }
+    });
+  </script>
+</dom-module>
+
+<!--
+Similar to watch-object-filter except there is no filter.
+Every object event noticed by the watch-object-frozen element is kept in it's memory forever.
+It will respond to requests for objects.
+It's externally visible array serves simply as input, it will not make any changes to it.
+-->
+<dom-module id="watch-object-frozen">
+  <template>
+    <template is="dom-repeat" items="[[_internalArray]]">
+        <watch-object object="{{item}}" type="[[type]]" id="[[_arraySelector(item, idParam)]]" internal-only="[[internalOnly]]" disable-setter></watch-object>
+    </template>
+    <template is="dom-repeat" items="[[array]]">
+        <watch-object object="{{item}}" type="[[type]]" id="[[_arraySelector(item, idParam)]]" internal-only="[[internalOnly]]" disable-setter></watch-object>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'watch-object-frozen',
+
+      properties: {
+        array: {
+          type: Array,
+          value: [],
+          notify: true
+        },
+        _internalArray: {
+          type: Array,
+          value: [],
+          notify: true
+        },
+        type: {
+          type: String,
+          notify: true
+        },
+        idParam: {
+          type: String,
+          notify: true
+        },
+        eventHubName: {
+          type: String,
+          value: 'ObjectEvent'
+        },
+        internalOnly: {
+          type: Boolean,
+          value: false
+        }
+      },
+
+      observers: [
+        '_watchAll(type, idParam)'
+      ],
+
+      _watchAll: function(type, idParam) {
+        let that = this;
+        //Disconnect current event hub
+        if (this.connection !== null && this.connection !== undefined) {
+          this.connection.disconnect();
+          this.connection = null;
+        }
+        //Create new connection
+        this.connection = EventHub.connect();
+
+        //Listen for object changes
+        this.connection.on(this.eventHubName, function(data) {
+          //Check that we care about this type
+          if (data.type === type && data.object !== undefined && data.object != null) {
+            //Get object id
+            let id = data.object[idParam];
+              //Add to internal array if not already in array
+              for (let i = 0; i < that.get("_internalArray").length; i++) {
+                if (that.get(["_internalArray", i, idParam]) === id) {
+                  //Found the same object, just apply the changes
+                  if(that.get(["_internalArray", i, "_nextChangeSignature"]) !== data.object._nextChangeSignature) {
+                    that.set(["_internalArray", i], data.object);
+                  }
+                  return;
+                }
+              }
+              that.push('_internalArray', data.object);
+          }
+        });
+      },
+      
+      //Used for selecting idParam
+      _arraySelector: function(array, index) {
+        return array[index];
+      },
+      
+      //Request all nodes with data on this object type to transmit it
+      requestData: function() {
+        EventHub.emit("ObjectRequest", this.type);
       }
     });
   </script>

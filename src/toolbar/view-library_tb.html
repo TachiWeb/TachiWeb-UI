@@ -20,21 +20,36 @@
 </paper-menu-button>
 <paper-icon-button icon="icons:refresh"></paper-icon-button>
 <paper-icon-button id="search_button" icon="icons:search"></paper-icon-button>
-<material-search id="search_bar"></material-search>
+<material-search id="search_bar" value="{{librarySearchValue}}"></material-search>
+<!-- Broadcast search event -->
+<watch-object object="{{librarySearchValue}}" type="LibrarySearchEvent" internal-only></watch-object>
   </template>
 
     <script>
         Polymer({
             is: 'view-library_tb',
+            properties: {
+                librarySearch: {
+                    type: String,
+                    value: '',
+                    notify: true
+                }
+            },
             listeners: {
                 'filter_menu.item-click': '_filterChange',
-                'search_button.tap': '_openSearch'
+                'search_button.tap': '_openSearch',
+                'search_bar.iron-overlay-closed': '_stopSearch'
             },
             _filterChange: function(event, detail) {
                 console.log(detail); //TODO Replace with actual filter code
             },
             _openSearch: function() {
                 this.$.search_bar.open();
+            },
+            _stopSearch: function() {
+                //Broadcast search stop
+                this.librarySearchValue = "";
+                EventHub.emit("LibrarySearchEvent", "SearchStopped", true);
             }
         });
     </script>
