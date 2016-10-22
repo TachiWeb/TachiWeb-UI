@@ -1,0 +1,114 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="/src/element/settings/settings-screen.html">
+
+<link rel="import" href="/src/behavior/localized-app-behavior.html">
+<link rel="import" href="/src/behavior/eventhub-behavior.html">
+<link rel="import" href="/src/behavior/activity-behavior.html">
+<link rel="import" href="/src/element/tw-api-call.html">
+<link rel="import" href="/src/element/iron-alias.html">
+
+<dom-module id="settings-container">
+  <template>
+    <style>
+      #back_btn {
+        margin-right: 24px;
+      }
+      #settings_content {
+        height: 100%;
+        background: white;
+      }
+    </style>
+        <paper-header-panel>
+        <paper-toolbar>
+            <paper-icon-button id="back_btn" icon="icons:arrow-back"></paper-icon-button>
+            <span id="title" class="title">[[_getCurrent(title)]]</span>
+      </paper-toolbar>
+        <div id="settings_content">
+          <settings-screen schema="[[_getCurrent(schema)]]"></settings-screen>
+        </div>
+        </paper-header-panel>
+        <iron-ajax id="schema_request" url="[[source]]" handle-as="json" last-response="{{schemaResponse}}" auto></iron-ajax>
+        <tw-api-call command="GetPrefs" response="{{optionsResponse}}"></tw-api-call>
+        <iron-alias a="{{optionsResponse.response.prefs}}" b="{{optionsState}}"></iron-alias>
+    </template>
+
+  <script>
+    Polymer({
+      is: 'settings-container',
+      properties: {
+        source: {
+          type: String
+        },
+        schema: {
+          type: Array,
+          value: []
+        },
+        optionsState: {
+          type: Object
+        },
+        schemaResponse: {
+          type: Object
+        },
+        title: {
+          type: Array,
+          value: []
+        },
+        resources: {
+          //Required to update title once localizations are loaded
+          observer: '_localizationsLoaded'
+        }
+      },
+      observers: ['_setupScreens(schemaResponse, optionsState)'],
+      behaviors: [LocalizedAppBehavior, EventHubBehavior],
+
+      listeners: {
+        'back_btn.tap': '_goBack'
+      },
+      
+      attached: function() {
+        this.ehConn.on("SettingsPagePushRequest", function(request) {
+          this.push('title', request.title);
+          this.push('schema', request.schema);
+          this.notifyArray('title');
+          this.notifyArray('schema');
+        }.bind(this));
+      },
+
+      _setupScreens: function(schemaResponse, optionsState) {
+        this.schema = [schemaResponse];
+      },
+
+      _getCurrent: function(stack) {
+        return stack.peek();
+      },
+
+      _localizationsLoaded: function() {
+        //Update title
+        //Not sure why we need to override dirty checking here. But it doesn't work without it (just pushing to the array does nothing).
+        this.title = [this.localize('settings_title_initial')];
+      },
+
+      _goBack: function() {
+        if (this.schema.length <= 1) {
+          this.fire('exit');
+        } else {
+          this.schema.pop();
+          this.title.pop();
+          this.notifyArray('title');
+          this.notifyArray('schema');
+        }
+      },
+      
+      notifyArray: function(name) {
+        let backup = this[name];
+        this[name] = [];
+        this[name] = backup;
+      }
+    });
+  </script>
+</dom-module>

@@ -8,6 +8,7 @@
 <link rel="import" href="/src/element/paper-static-menu.html">
 <link rel="import" href="/src/element/material-search.html">
 <link rel="import" href="/src/element/paper-item-checkbox.html">
+<link rel="import" href="/src/behavior/localized-app-behavior.html">
 
 <dom-module id="view-library_tb">
     <template>
@@ -15,9 +16,9 @@
   <paper-icon-button icon="icons:filter-list" class="dropdown-trigger"></paper-icon-button>
   <paper-static-menu id="filter_menu" class="dropdown-content">
       <!-- TODO LOCALE -->
-      <paper-item-checkbox id="filter_downloaded" menu="[[_getMenu()]]" checked="{{filterDownloaded}}">Downloaded</paper-item-checkbox>
-      <paper-item-checkbox id="filter_unread" menu="[[_getMenu()]]" checked="{{filterUnread}}">Unread</paper-item-checkbox>
-      <paper-item id="filter_remove">Remove filter</paper-item>
+      <paper-item-checkbox id="filter_downloaded" menu="[[_getMenu()]]" checked="{{filterDownloaded}}">[[localize('filter_downloaded')]]</paper-item-checkbox>
+      <paper-item-checkbox id="filter_unread" menu="[[_getMenu()]]" checked="{{filterUnread}}">[[localize('filter_unread')]]</paper-item-checkbox>
+      <paper-item id="filter_remove">[[localize('remove_filter')]]</paper-item>
   </paper-static-menu>
 </paper-menu-button>
 <paper-icon-button icon="icons:refresh"></paper-icon-button>
@@ -40,6 +41,7 @@
                     notify: true
                 }
             },
+            behaviors: [LocalizedAppBehavior],
             listeners: {
                 'search_button.tap': '_openSearch',
                 'search_bar.search-closed': '_stopSearch',

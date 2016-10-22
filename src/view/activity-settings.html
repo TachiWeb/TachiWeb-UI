@@ -1,0 +1,22 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/src/behavior/activity-behavior.html">
+<link rel="import" href="/src/element/settings/settings-container.html">
+
+<dom-module id="activity-settings">
+  <template>
+      <settings-container id="container" source="/prefs/schema.json"></settings-container>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'activity-settings',
+      behaviors: [ActivityBehavior],
+      listeners: {
+        'container.exit': '_exitSettings'
+      },
+      _exitSettings: function() {
+        EventHub.emit("ActivitySwitchRequest", "Main", true);
+      }
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,26 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="page-change-setting">
+  <template></template>
+
+  <script>
+    Polymer({
+      is: 'page-change-setting',
+      properties: {
+          title: {
+              type: String
+          },
+          newSchema: {
+              type: Object
+          }
+      },
+      handleTap: function() {
+          var that = this;
+          EventHub.emit("SettingsPagePushRequest", {
+              title: that.title,
+              schema: that.newSchema
+          }, true);
+      }
+    });
+  </script>
+</dom-module>

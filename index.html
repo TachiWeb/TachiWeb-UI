@@ -108,12 +108,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
       document.addEventListener('AppReady', function (e) {
         //Remove error message
-        var errorElement = document.getElementsByClassName("_res_error")[0];
+        var errorElement = document.getElementsByClassName("_app_loading")[0];
         errorElement.parentNode.removeChild(errorElement);
       }, false);
     </script>
 
-    <link rel="import" href="/src/view/tw-app.html">
+    <link rel="import" href="/src/view/tw-app.html" async>
 
     <style>
       body {
@@ -123,35 +123,57 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         min-height: 100vh;
         background-color: #eeeeee;
       }
-      ._res_error {
-        border-radius: 25px;
-        background: white;
-        padding: 20px;
-        margin: 20px;
+      ._app_loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        animation: _loading_fade_in 1s;
+        animation-delay: 0.25s;
+        animation-fill-mode: forwards;
       }
-      ._res_error_title {
-        font-size: 30px;
+      ._app_loading_bar {
+        margin: 16px;
+        background-color: rgba(0, 0, 0, 0.25);
+        height: 3px;
+        width: calc(128px - 32px);
+        border-radius: 3px;
+        overflow: hidden;
       }
-      ._res_error_code {
-        background-color: #f5f5f5;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-family: monospace;
-        padding: 3px;
+      ._app_loading_bar_inner {
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.25);
+        width: 30px;
+        animation: _loading_bar_anim 1s infinite linear;
+        border-radius: 3px;
+      }
+      @keyframes _loading_bar_anim {
+        0% {
+          margin-left: -40px;
+        }
+        100% {
+          margin-left: calc(128px - 32px + 10px);
+        }
+      }
+      @keyframes _loading_fade_in {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
       }
     </style>
   </head>
   <body>
     <tw-app></tw-app>
-    <!-- Error page -->
-    <p class="_res_error">
-    <span class="_res_error_title"><b>TachiWeb:</b> <span style="color: red">Error</span>, could not load resources!</span>
-    <br><br>
-    Please ensure you have a stable network connection.
-    <br><br>
-    <b>Developers:</b>
-    Did you run <span class="_res_error_code">bower install</span>?
-    </p>
-    <!-- Built with love using Polymer Starter Kit -->
+    <!-- Loading screen -->
+    <div class="_app_loading">
+      <img class="_app_loading_icon" src="data:image/png;base64,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"/>
+      <div class="_app_loading_bar">
+        <div class="_app_loading_bar_inner"></div>
+      </div>
+    </div>
   </body>
 </html>

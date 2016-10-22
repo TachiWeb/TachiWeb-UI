@@ -10,6 +10,12 @@
 
     "view-library_title": "My Library",
     
-    "material_search_label": "Search"
+    "material_search_label": "Search",
+    
+    "settings_title_initial": "Settings",
+    
+    "filter_downloaded": "Downloaded",
+    "filter_unread": "Unread",
+    "remove_filter": "Remove filter"
   }
 }

@@ -1,0 +1,42 @@
+<!-- Simple data binding linking -->
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="iron-alias">
+  <template></template>
+
+  <script>
+    Polymer({
+      is: 'iron-alias',
+      properties: {
+          a: {
+              notify: true,
+              observer: '_aO'
+          },
+          b: {
+              notify: true,
+              observer: '_bO'
+          },
+          ignoreNext: {
+              type: Boolean,
+              value: false
+          }
+      },
+      _aO: function() {
+          if(!this.ignoreNext) {
+            this.ignoreNext = true;
+            this.b = this.a;
+          } else {
+            this.ignoreNext = false;
+          }
+      },
+      _bO: function() {
+          if(!this.ignoreNext) {
+            this.ignoreNext = true;
+            this.a = this.b;
+          } else {
+            this.ignoreNext = false;
+          }
+      }
+    });
+  </script>
+</dom-module>

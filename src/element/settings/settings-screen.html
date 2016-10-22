@@ -1,0 +1,22 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/src/element/settings/settings-item.html">
+
+<dom-module id="settings-screen">
+  <template>
+    <template is="dom-repeat" items="{{schema}}">
+      <settings-item reference="{{item}}"></settings-item>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'settings-screen',
+      properties: {
+        schema: {
+          type: Array,
+          value: []
+        }
+      }
+    });
+  </script>
+</dom-module>

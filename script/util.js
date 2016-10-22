@@ -53,3 +53,7 @@ var Util = {
 		return i;
 	}
 }
+//Utility array peek function
+Array.prototype.peek = function() {
+	return this[this.length - 1];
+}

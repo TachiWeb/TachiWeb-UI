@@ -1,0 +1,47 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-item/paper-item.html">
+<link rel="import" href="/bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="/bower_components/paper-ripple/paper-ripple.html">
+
+<link rel="import" href="/src/element/settings/types/page-change-setting.html">
+
+<dom-module id="settings-item">
+  <template>
+      <style>
+          #pref_item {
+              border-bottom: 1px grey;
+          }
+      </style>
+      <paper-item id="pref_item">
+          <paper-item-body two-line>
+              <div>[[reference.label]]</div>
+              <div secondary>[[reference.description]]</div>
+          </paper-item-body>
+          <paper-ripple></paper-ripple>
+    </paper-item>
+    <!-- TODO Replace this with something magical -->
+    <template is="dom-if" if="[[equals(reference.type, 'nested')]]" restamp>
+      <page-change-setting id="setting" title="[[reference.label]]" new-schema="[[reference.prefs]]"></page-change-setting>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'settings-item',
+      properties: {
+          reference: {
+              type: Object
+          }
+      },
+      listeners: {
+        'pref_item.tap': '_handleTap'
+      },
+      equals: function(left, right) {
+        return left === right;
+      },
+      _handleTap: function() {
+        this.$$("#setting").handleTap();
+      }
+    });
+  </script>
+</dom-module>
