@@ -35,8 +35,8 @@
         <!-- Recieve search event -->
         <watch-object object="{{librarySearchValue}}" type="LibrarySearchEvent" internal-only></watch-object>
         <!-- Recieve filter status -->
-        <watch-object object="{{filterDownloaded}}" type="LibraryFilterEvent" id="Downloaded"></watch-object>
-        <watch-object object="{{filterUnread}}" type="LibraryFilterEvent" id="Unread"></watch-object>
+        <watch-object object="{{filterDownloaded}}" type="LibraryFilterEvent" object-id="Downloaded"></watch-object>
+        <watch-object object="{{filterUnread}}" type="LibraryFilterEvent" object-id="Unread"></watch-object>
     </template>
 
     <script>

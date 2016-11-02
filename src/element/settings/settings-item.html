@@ -4,6 +4,7 @@
 <link rel="import" href="/bower_components/paper-ripple/paper-ripple.html">
 
 <link rel="import" href="/src/element/settings/types/page-change-setting.html">
+<link rel="import" href="/src/element/settings/types/single-select-setting.html">
 
 <dom-module id="settings-item">
   <template>
@@ -23,6 +24,12 @@
     <template is="dom-if" if="[[equals(reference.type, 'nested')]]" restamp>
       <page-change-setting id="setting" title="[[reference.label]]" new-schema="[[reference.prefs]]"></page-change-setting>
     </template>
+    <template is="dom-if" if="[[equals(reference.type, 'select-single')]]" restamp>
+      <single-select-setting id="setting"
+      title="[[reference.label]]"
+      choices="[[reference.choices]]"
+      value="{{value}}"></single-select-setting>
+    </template>
   </template>
 
   <script>
@@ -31,16 +38,52 @@
       properties: {
           reference: {
               type: Object
+          },
+          value: {
+            type: Object,
+            observer: '_valueChanged'
+          },
+          optionsState: {
+            type: Object
           }
       },
       listeners: {
         'pref_item.tap': '_handleTap'
       },
+      observers: [
+        '_optionsChanged(reference, optionsState.*)'
+      ],
       equals: function(left, right) {
         return left === right;
       },
       _handleTap: function() {
         this.$$("#setting").handleTap();
+      },
+      _loadValue: function() {
+        let newValue = this.get(['optionsState', this.reference.key, 'v']);
+        if(newValue === undefined || newValue === null) {
+          this.value = this.reference.default;
+        } else if(newValue !== this.value) {
+          this.value = newValue;
+        }
+      },
+      _optionsChanged: function() {
+        if(this.reference.key !== null && this.reference.key !== undefined) {
+          this._loadValue();
+        }
+      },
+      _valueChanged: function() {
+        let that = this;
+          EventHub.emit("OptionsSaveRequest", {
+            key: that.reference.key,
+            value: that.value,
+            type: that.mapType(that.reference.type)
+          });
+      },
+      mapType: function(type) {
+        return {
+          'select-single': 'String'
+        }[type];
       }
     });
   </script>

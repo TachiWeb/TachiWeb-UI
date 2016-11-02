@@ -29,12 +29,13 @@
             <span id="title" class="title">[[_getCurrent(title)]]</span>
       </paper-toolbar>
         <div id="settings_content">
-          <settings-screen schema="[[_getCurrent(schema)]]"></settings-screen>
+          <settings-screen schema="[[_getCurrent(schema)]]" options-state="[[optionsState]]"></settings-screen>
         </div>
         </paper-header-panel>
         <iron-ajax id="schema_request" url="[[source]]" handle-as="json" last-response="{{schemaResponse}}" auto></iron-ajax>
         <tw-api-call command="GetPrefs" response="{{optionsResponse}}"></tw-api-call>
         <iron-alias a="{{optionsResponse.response.prefs}}" b="{{optionsState}}"></iron-alias>
+        <watch-object type="SettingsState" object="{{optionsState}}"></watch-object>
     </template>
 
   <script>
@@ -76,6 +77,22 @@
           this.push('schema', request.schema);
           this.notifyArray('title');
           this.notifyArray('schema');
+        }.bind(this));
+        this.ehConn.on("OptionsSaveRequest", function(request) {
+          let that = this;
+          if(request.value !== this.get(['optionsState', request.key, 'v'])) {
+          this.set(['optionsState', request.key, 'v'], request.value);
+          //TODO NOTE! The settings are set TWICE by the code below, this could cause problems later on, we need a fix
+          //I say twice beacuse when the settings are synced across multiple tabs, both tabs send the new settings to the server :/
+          TWApi.Commands.SetPref.execute(null,
+          function() {
+            //TODO Handle error
+          }, {
+            key: request.key,
+            type: request.type,
+            value: request.value
+          });
+          }
         }.bind(this));
       },
 

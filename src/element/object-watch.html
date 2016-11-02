@@ -19,14 +19,13 @@ Requires each object to have an ID. Objects should be grouped by type.
       properties: {
         object: {
           type: Object,
-          notify: true,
-          observer: '_objChanged'
+          notify: true
         },
         type: {
           type: String,
           notify: true
         },
-        id: {
+        objectId: {
           type: Object,
           notify: true,
           value: 0
@@ -46,14 +45,25 @@ Requires each object to have an ID. Objects should be grouped by type.
         disableSetter: {
           type: Boolean,
           value: false
+        },
+        initialValue: {
+          type: Boolean,
+          value: true
         }
       },
 
       observers: [
-        '_watchObj(type, id)'
+        '_watchObj(type, objectId)',
+        '_objChanged(objectId, object)'
       ],
+      
+      attached: function() {
+        if(!this.disableSetter) {
+          this.requestData();
+        }
+      },
 
-      _watchObj: function(type, id) {
+      _watchObj: function(type, objectId) {
         let that = this;
         //Disconnect current event hub
         if (this.connection !== null && this.connection !== undefined) {
@@ -68,7 +78,7 @@ Requires each object to have an ID. Objects should be grouped by type.
             || (that.internalOnly && !internal)) return; //Reject external data if we are internal only
           //Check both ID and type are the same
           if (data.object !== undefined && data.object !== null
-                             && data.type === type && data.id === id) {
+                             && data.type === type && data.id === objectId) {
             if (data.timestamp > that.lastUpdateTime) {
               //Prevent broadcasting our own changes!
               //Assign signature if we don't have one yet
@@ -87,19 +97,19 @@ Requires each object to have an ID. Objects should be grouped by type.
             //Generate a new object signature
             that.nextChangeSignature = Util.guid();
             //Broadcast fake change
-            that._objChanged();
+            that._objChanged(that.objectId, that.object, true);
           }
         });
       },
 
-      _objChanged: function() {
-        if(this.object === undefined || this.object === null) {
+      _objChanged: function(objectId, object, force) {
+        if(object === undefined || object === null) {
           return;
         }
         //Do not broadcast our own changes!
-        if(this.object._nextChangeSignature !== null && this.object._nextChangeSignature !== undefined) {
+        if(object._nextChangeSignature !== null && object._nextChangeSignature !== undefined) {
           //Signature matches local one, do not broadcast
-          if(this.object._nextChangeSignature === this.nextChangeSignature) {
+          if(object._nextChangeSignature === this.nextChangeSignature) {
             //Assign new signature so next change will be broadcast
             this.nextChangeSignature = Util.guid();
             return;
@@ -109,7 +119,7 @@ Requires each object to have an ID. Objects should be grouped by type.
           //We still assign it a signature.
           //When assigning the signature, since it matches the local signature, the signature change event will not be broadcast
           this.nextChangeSignature = Util.guid();
-          this.object._nextChangeSignature = this.nextChangeSignature;
+          object._nextChangeSignature = this.nextChangeSignature;
         }
         this.lastUpdateTime = Date.now();
         if (this.debounceFunc === null || this.debounceFunc === undefined) {
@@ -117,13 +127,18 @@ Requires each object to have an ID. Objects should be grouped by type.
           this.debounceFunc = Util.debounce(function() {
             EventHub.emit(that.eventHubName, {
               type: that.type,
-              id: that.id,
+              id: that.objectId,
               object: that.object,
               timestamp: that.lastUpdateTime
             }, that.internalOnly);
           }, 50);
         }
-        this.debounceFunc();
+        if(force || !this.initialValue) {
+          this.debounceFunc();
+        }
+        if(!force) {
+          this.initialValue = false;
+        }
       },
       
       //Request all nodes with data on this object type to transmit it
@@ -144,7 +159,7 @@ Only matches objects that match it's type.
 <dom-module id="watch-object-filter">
   <template>
     <template is="dom-repeat" items="[[filtered]]">
-        <watch-object object="{{item}}" type="[[type]]" id="[[_arraySelector(item, idParam)]]" internal-only="[[internalOnly]]" disable-setter></watch-object>
+        <watch-object object="{{item}}" type="[[type]]" object-id="[[_arraySelector(item, idParam)]]" internal-only="[[internalOnly]]" disable-setter></watch-object>
     </template>
   </template>
 
@@ -253,10 +268,10 @@ It's externally visible array serves simply as input, it will not make any chang
 <dom-module id="watch-object-frozen">
   <template>
     <template is="dom-repeat" items="[[_internalArray]]">
-        <watch-object object="{{item}}" type="[[type]]" id="[[_arraySelector(item, idParam)]]" internal-only="[[internalOnly]]" disable-setter></watch-object>
+        <watch-object object="{{item}}" type="[[type]]" object-id="[[_arraySelector(item, idParam)]]" internal-only="[[internalOnly]]" disable-setter></watch-object>
     </template>
     <template is="dom-repeat" items="[[array]]">
-        <watch-object object="{{item}}" type="[[type]]" id="[[_arraySelector(item, idParam)]]" internal-only="[[internalOnly]]" disable-setter></watch-object>
+        <watch-object object="{{item}}" type="[[type]]" object-id="[[_arraySelector(item, idParam)]]" internal-only="[[internalOnly]]" disable-setter></watch-object>
     </template>
   </template>
 

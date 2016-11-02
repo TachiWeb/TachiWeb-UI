@@ -1,0 +1,64 @@
+<link rel="import" href="/bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="/bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="/bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="/bower_components/neon-animation/animations/fade-out-animation.html">
+
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="single-select-setting">
+  <template>
+      <style>
+          .entry {
+              display: block;
+          }
+      </style>
+      <paper-dialog id="_internal_dialog" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+  <h2>[[title]]</h2>
+  <paper-radio-group selected="{{value}}">
+  <template is="dom-repeat" items="[[propertiesToArray(choices)]]" restamp>
+      <paper-radio-button class="entry" name="[[item.key]]">[[item.value]]</paper-radio-button>
+    </template>
+</paper-radio-group>
+  <!-- TODO Localize -->
+  <div class="buttons">
+    <paper-button id="btn_close" dialog-confirm autofocus>Close</paper-button>
+  </div>
+</paper-dialog>
+</template>
+
+  <script>
+    Polymer({
+      is: 'single-select-setting',
+      properties: {
+          title: {
+              type: String
+          },
+          choices: {
+              type: Array,
+              value: []
+          },
+          value: {
+              type: String,
+              notify: true
+          }
+      },
+      handleTap: function() {
+          this.$._internal_dialog.open();
+      },
+      propertiesToArray: function(object) {
+          let builtArray = [];
+          if(object !== undefined && object !== null) {
+            Object.keys(object).forEach(function(key,index) {
+                builtArray.push({
+                    key: key,
+                    value: object[key]
+                });
+            });
+          }
+          return builtArray;
+      }
+    });
+  </script>
+</dom-module>

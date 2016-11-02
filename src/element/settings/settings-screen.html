@@ -4,7 +4,7 @@
 <dom-module id="settings-screen">
   <template>
     <template is="dom-repeat" items="{{schema}}">
-      <settings-item reference="{{item}}"></settings-item>
+      <settings-item reference="{{item}}" options-state="[[optionsState]]"></settings-item>
     </template>
   </template>
 
@@ -15,6 +15,9 @@
         schema: {
           type: Array,
           value: []
+        },
+        optionsState: {
+          type: Object
         }
       }
     });
