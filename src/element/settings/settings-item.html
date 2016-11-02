@@ -5,6 +5,7 @@
 
 <link rel="import" href="/src/element/settings/types/page-change-setting.html">
 <link rel="import" href="/src/element/settings/types/single-select-setting.html">
+<link rel="import" href="/src/element/settings/types/switch-setting.html">
 
 <dom-module id="settings-item">
   <template>
@@ -18,6 +19,9 @@
               <div>[[reference.label]]</div>
               <div secondary>[[reference.description]]</div>
           </paper-item-body>
+          <template is="dom-if" if="[[equals(reference.type, 'switch')]]" restamp>
+            <switch-setting id="setting"value="{{value}}"></switch-setting>
+          </template>
           <paper-ripple></paper-ripple>
     </paper-item>
     <!-- TODO Replace this with something magical -->
@@ -82,7 +86,8 @@
       },
       mapType: function(type) {
         return {
-          'select-single': 'String'
+          'select-single': 'String',
+          'switch': 'Boolean'
         }[type];
       }
     });

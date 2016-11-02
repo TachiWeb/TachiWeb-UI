@@ -1,0 +1,32 @@
+<link rel="import" href="/bower_components/paper-toggle-button/paper-toggle-button.html">
+
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="switch-setting">
+  <template>
+      <style>
+          .entry {
+              display: block;
+          }
+      </style>
+<paper-toggle-button id="_internal_switch" checked="{{value}}"></paper-toggle-button>
+</template>
+
+  <script>
+    Polymer({
+      is: 'switch-setting',
+      properties: {
+          value: {
+              type: Boolean,
+              notify: true
+          }
+      },
+      listeners: {
+        '_internal_switch.tap': 'handleTap'
+      },
+      handleTap: function() {
+          this.value = !this.value;
+      }
+    });
+  </script>
+</dom-module>
