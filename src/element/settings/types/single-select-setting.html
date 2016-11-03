@@ -8,7 +8,7 @@
 <link rel="import" href="/bower_components/polymer/polymer.html">
 
 <dom-module id="single-select-setting">
-  <template>
+    <template>
       <style>
           .entry {
               display: block;
@@ -20,45 +20,47 @@
   <template is="dom-repeat" items="[[propertiesToArray(choices)]]" restamp>
       <paper-radio-button class="entry" name="[[item.key]]">[[item.value]]</paper-radio-button>
     </template>
-</paper-radio-group>
-  <!-- TODO Localize -->
-  <div class="buttons">
-    <paper-button id="btn_close" dialog-confirm autofocus>Close</paper-button>
-  </div>
-</paper-dialog>
-</template>
+    </paper-radio-group>
+    <!-- TODO Localize -->
+    <div class="buttons">
+        <paper-button id="btn_close" dialog-confirm autofocus>Close</paper-button>
+    </div>
+    </paper-dialog>
+    </template>
 
-  <script>
-    Polymer({
-      is: 'single-select-setting',
-      properties: {
-          title: {
-              type: String
-          },
-          choices: {
-              type: Array,
-              value: []
-          },
-          value: {
-              type: String,
-              notify: true
-          }
-      },
-      handleTap: function() {
-          this.$._internal_dialog.open();
-      },
-      propertiesToArray: function(object) {
-          let builtArray = [];
-          if(object !== undefined && object !== null) {
-            Object.keys(object).forEach(function(key,index) {
-                builtArray.push({
-                    key: key,
-                    value: object[key]
-                });
-            });
-          }
-          return builtArray;
-      }
-    });
-  </script>
+    <script>
+        Polymer({
+            is: 'single-select-setting',
+            properties: {
+                title: {
+                    type: String
+                },
+                choices: {
+                    type: Array,
+                    value: []
+                },
+                value: {
+                    type: String,
+                    notify: true
+                }
+            },
+            handleTap: function () {
+                this.$._internal_dialog.open();
+            },
+            propertiesToArray: function (object) {
+                let builtArray = [];
+                if (object !== undefined && object !== null) {
+                    Object.keys(object)
+                        .forEach(function (key, index) {
+                            builtArray.push({
+                                key: key,
+                                value: object[key]
+                            });
+                        });
+                }
+                return builtArray;
+            }
+        });
+
+    </script>
 </dom-module>
