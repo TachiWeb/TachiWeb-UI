@@ -4,6 +4,10 @@
 <link rel="import" href="/bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
 
+<link rel="import" href="/bower_components/mat-breadcrumb/mat-breadcrumb.html">
+<link rel="import" href="/bower_components/mat-paper/mat-paper.html">
+<link rel="import" href="/bower_components/mat-snackbar/mat-snackbar.html">
+
 <link rel="import" href="/src/element/settings/settings-screen.html">
 
 <link rel="import" href="/src/behavior/localized-app-behavior.html">
@@ -22,11 +26,30 @@
         height: 100%;
         background: white;
       }
+      #title > mat-paper {
+        background: rgba(0,0,0,0);
+      }
+      #title {
+        overflow: visible;
+      }
     </style>
         <paper-header-panel>
         <paper-toolbar>
             <paper-icon-button id="back_btn" icon="icons:arrow-back"></paper-icon-button>
-            <span id="title" class="title">[[_getCurrent(title)]]</span>
+            <!--<span id="title" class="title">[[_getCurrent(title)]]</span>-->
+            <span id="title" class="title">
+              <template is="dom-if" if="[[!enableMobileTitle]]">
+                <mat-paper theme="dark">
+            <mat-breadcrumb>
+              <template is="dom-repeat" items="[[title]]">
+                <mat-breadcrumb-step label="[[item]]"></mat-breadcrumb-step>
+              </template>
+              </mat-breadcrumb>
+              </mat-paper>
+              </template>
+              <template is="dom-if" if="[[enableMobileTitle]]">[[_getCurrent(title)]]</span>
+              </template>
+              </span>
       </paper-toolbar>
         <div id="settings_content">
           <settings-screen schema="[[_getCurrent(schema)]]" options-state="[[optionsState]]"></settings-screen>
@@ -36,6 +59,9 @@
         <tw-api-call command="GetPrefs" response="{{optionsResponse}}"></tw-api-call>
         <iron-alias a="{{optionsResponse.response.prefs}}" b="{{optionsState}}"></iron-alias>
         <watch-object type="SettingsState" object="{{optionsState}}"></watch-object>
+        
+        <!-- TODO Localize -->
+        <mat-snackbar id="pref_save_error_sb" label="An error occured while saving your preferences!"></mat-snackbar>
     </template>
 
   <script>
@@ -58,6 +84,10 @@
         title: {
           type: Array,
           value: []
+        },
+        enableMobileTitle: {
+          type: Boolean,
+          value: false
         },
         resources: {
           //Required to update title once localizations are loaded
@@ -87,6 +117,7 @@
           TWApi.Commands.SetPref.execute(null,
           function() {
             //TODO Handle error
+            that.$.pref_save_error_sb.show();
           }, {
             key: request.key,
             type: request.type,
@@ -94,6 +125,12 @@
           });
           }
         }.bind(this));
+        window.addEventListener('resize', this.updateTitleMode.bind(this));
+        this.updateTitleMode();
+      },
+      
+      updateTitleMode: function() {
+        this.enableMobileTitle = window.innerWidth < 512;
       },
 
       _setupScreens: function(schemaResponse, optionsState) {

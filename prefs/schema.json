@@ -97,7 +97,6 @@
             "type": "api-call",
             "success_message": "Successfully cleared sessions!",
             "error_message": "Failed to clear sessions!",
-            "button_icon": "delete",
             "command": "ClearSessions"
           }
         ]

@@ -17,7 +17,7 @@
       <paper-dialog id="_internal_dialog" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
   <h2>[[title]]</h2>
   <paper-radio-group selected="{{value}}">
-  <template is="dom-repeat" items="[[propertiesToArray(choices)]]" restamp>
+  <template is="dom-repeat" items="[[propertiesToArray(choices)]]">
       <paper-radio-button class="entry" name="[[item.key]]">[[item.value]]</paper-radio-button>
     </template>
     </paper-radio-group>

@@ -6,6 +6,8 @@
 <link rel="import" href="/src/element/settings/types/page-change-setting.html">
 <link rel="import" href="/src/element/settings/types/single-select-setting.html">
 <link rel="import" href="/src/element/settings/types/switch-setting.html">
+<link rel="import" href="/src/element/settings/types/text-setting.html">
+<link rel="import" href="/src/element/settings/types/api-call-setting.html">
 
 <dom-module id="settings-item">
   <template>
@@ -24,7 +26,7 @@
           </template>
           <paper-ripple></paper-ripple>
     </paper-item>
-    <!-- TODO Replace this with something magical -->
+    <!-- TODO Replace all these DOM-IFs with something magical -->
     <template is="dom-if" if="[[equals(reference.type, 'nested')]]" restamp>
       <page-change-setting id="setting" title="[[reference.label]]" new-schema="[[reference.prefs]]"></page-change-setting>
     </template>
@@ -33,6 +35,32 @@
       title="[[reference.label]]"
       choices="[[reference.choices]]"
       value="{{value}}"></single-select-setting>
+    </template>
+    <template is="dom-if" if="[[equals(reference.type, 'text')]]" restamp>
+      <text-setting id="setting"
+      title="[[reference.label]]"
+      hint="[[reference.hint]]"
+      value="{{value}}"></text-setting>
+    </template>
+    <template is="dom-if" if="[[equals(reference.type, 'text-password')]]" restamp>
+      <text-setting id="setting"
+      title="[[reference.label]]"
+      hint="[[reference.hint]]"
+      value="{{value}}"
+      password></text-setting>
+    </template>
+    <template is="dom-if" if="[[equals(reference.type, 'text-multiline')]]" restamp>
+      <text-setting id="setting"
+      title="[[reference.label]]"
+      hint="[[reference.hint]]"
+      value="{{value}}"
+      autoresize></text-setting>
+    </template>
+    <template is="dom-if" if="[[equals(reference.type, 'api-call')]]" restamp>
+      <api-call-setting id="setting"
+      command="[[reference.command]]"
+      success-message="[[reference.success_message]]"
+      error-message="[[reference.error_message]]"></api-call-setting>
     </template>
   </template>
 
@@ -87,7 +115,10 @@
       mapType: function(type) {
         return {
           'select-single': 'String',
-          'switch': 'Boolean'
+          'switch': 'Boolean',
+          'text-password': 'String',
+          'text': 'String',
+          'text-multiline': 'String'
         }[type];
       }
     });

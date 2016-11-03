@@ -1,0 +1,76 @@
+<link rel="import" href="/bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/bower_components/paper-input/paper-input.html">
+<link rel="import" href="/bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="/bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="/bower_components/neon-animation/animations/fade-out-animation.html">
+
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="text-setting">
+    <template>
+        <style>
+          #_internal_dialog .input-field {
+              margin-top: 0px;
+          }
+      </style>
+      <paper-dialog id="_internal_dialog" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+          <h2>[[title]]</h2>
+          <template is="dom-if" if="[[!autoresize]]">
+              <paper-input class="input-field" value="{{value}}" label="[[_getHint(hint, title)]]" type="[[_inputType(password)]]"></paper-input>
+          </template>
+          <template is="dom-if" if="[[autoresize]]">
+              <paper-textarea class="input-field" value="{{value}}" label="[[_getHint(hint, title)]]" type="[[_inputType(password)]]"></paper-textarea>
+          </template>
+    <!-- TODO Localize -->
+    <div class="buttons">
+        <paper-button id="btn_close" dialog-confirm autofocus>Close</paper-button>
+    </div>
+    </paper-dialog>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'text-setting',
+            properties: {
+                title: {
+                    type: String
+                },
+                password: {
+                    type: Boolean,
+                    value: false
+                },
+                autoresize: {
+                    type: Boolean,
+                    value: false
+                },
+                hint: {
+                    type: String,
+                    value: null
+                },
+                value: {
+                    type: String,
+                    notify: true
+                }
+            },
+            handleTap: function () {
+                this.$._internal_dialog.open();
+            },
+            _inputType: function(isPassword) {
+                if(isPassword) {
+                    return "password";
+                } else {
+                    return "text";
+                }
+            },
+            _getHint: function(originalHint, title) {
+                if(originalHint !== null && originalHint !== undefined) {
+                    return originalHint;
+                } else {
+                    return title;
+                }
+            }
+        });
+
+    </script>
+</dom-module>

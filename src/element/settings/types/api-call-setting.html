@@ -1,0 +1,36 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="api-call-setting">
+  <template>
+    <mat-snackbar id="api_call_success_sb" label="[[successMessage]]"></mat-snackbar>
+    <mat-snackbar id="api_call_error_sb" label="[[errorMessage]]"></mat-snackbar>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'api-call-setting',
+      properties: {
+          command: {
+            type: String
+          },
+          successMessage: {
+              type: String,
+              value: "The operation completed successfully!" //TODO Localize
+          },
+          errorMessage: {
+            type: String,
+            value: "An error occured while performing the operation!" //TODO Localize
+          }
+      },
+      handleTap: function() {
+          var that = this;
+          //TODO Perform call
+          TWApi.Commands[that.command].execute(function() {
+            that.$.api_call_success_sb.show();
+          }, function() {
+            that.$.api_call_error_sb.show();
+          });
+      }
+    });
+  </script>
+</dom-module>

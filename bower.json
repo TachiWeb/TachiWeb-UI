@@ -36,7 +36,10 @@
     "paper-button": "PolymerElements/paper-button#^1.0.14",
     "paper-radio-group": "PolymerElements/paper-radio-group#^1.2.1",
     "paper-radio-button": "PolymerElements/paper-radio-button#^1.2.1",
-    "paper-toggle-button": "PolymerElements/paper-toggle-button#^1.2.1"
+    "paper-toggle-button": "PolymerElements/paper-toggle-button#^1.2.1",
+    "expandjs": "ExpandJS/expandjs#^0.10.0",
+    "mat-elements": "ExpandJS/mat-elements#^0.10.0",
+    "xp-elements": "ExpandJS/xp-elements#^0.10.0"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
